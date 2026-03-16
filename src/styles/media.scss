@@ -1,0 +1,9 @@
+@media (max-width: 998px){
+}
+@media (max-width: 767px) {
+  html body .el-dialog,
+  html body .el-drawer,
+  html body .el-message-box {
+    width: calc(100% - 32px) !important;
+  }
+}

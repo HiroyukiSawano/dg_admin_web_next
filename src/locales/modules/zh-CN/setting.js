@@ -1,0 +1,51 @@
+export default {
+
+  'ec.setting.drawer.title': '主题配置',
+  'ec.setting.drawer.title.theme': '主题配置',
+  'ec.setting.drawer.title.function': '功能配置',
+  'ec.setting.drawer.title.css': '样式配置',
+
+  'ec.setting.form.label.dark': '黑夜模式',
+  'ec.setting.form.label.language': '语言',
+  'ec.setting.form.label.layout': '框架布局',
+
+  'ec.setting.form.label.layout.type.column': '栏目',
+  'ec.setting.form.label.layout.type.classic': '经典',
+  'ec.setting.form.label.layout.type.complex': '综合',
+  'ec.setting.form.label.layout.type.dock': '功能坞',
+  'ec.setting.form.label.layout.type.mixture': '混合',
+
+  'ec.setting.form.label.strategy': '页面布局策略',
+  'ec.setting.form.label.strategy.type.flexbox': '弹性策略',
+  'ec.setting.form.label.strategy.type.fixed': '固定策略',
+  'ec.setting.form.label.strategy.remark.flexbox': '弹性布局策略，页面不滚动，主内容区域滚动',
+  'ec.setting.form.label.strategy.remark.fixed': '固定布局策略，页面滚动，主内容区域不滚动',
+
+  'ec.setting.form.label.theme': '主题',
+  'ec.setting.form.label.theme.type.primary': '主色',
+  'ec.setting.form.label.theme.type.simple': '简洁',
+  'ec.setting.form.label.theme.type.technological': '科技',
+  'ec.setting.form.label.theme.type.immersive': '沉浸',
+  'ec.setting.form.label.autoexit': '自动登出',
+  'ec.setting.form.label.autoexit.alert': '自动登出设置将在下次登录时生效',
+  'ec.setting.form.label.color': '配色',
+  'ec.setting.form.label.weakness': '色弱',
+  'ec.setting.form.label.watermark': '全局水印',
+  'ec.setting.form.label.collapse': '开启菜单折叠',
+  'ec.setting.form.label.breadcrumb': '开启面包屑',
+  'ec.setting.form.label.tabs': '开启页签栏',
+  'ec.setting.form.label.tabsPersistence': '持久化页签栏',
+  'ec.setting.form.label.radius': '圆角',
+  'ec.setting.form.label.fontFamily': '字体家族',
+  'ec.setting.form.label.fontFamily.type.default': '默认字体',
+  'ec.setting.form.label.fontFamily.type.AlimamaFangYuanTiVF': '阿里妈妈方圆体',
+  'ec.setting.form.label.fontFamily.type.DingTalkJinBuTi': '钉钉进步体',
+  'ec.setting.form.label.fontSize': '字体大小',
+  'ec.setting.form.label.fontWeightPrimary': '加粗字体字重',
+  'ec.setting.form.label.unique': '开启菜单手风琴效果',
+
+  'ec.setting.form.label.effect': '视觉特效',
+  'ec.setting.form.label.effect.alert': '启用液态玻璃视觉特效后，可能会影响系统的渲染流畅度与响应性能',
+  'ec.setting.form.label.css.alert': '借助全局样式变量，可实时地调整与计算全局样式，实现主题的深度定制',
+
+}

@@ -1,0 +1,95 @@
+<template>
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" :width="width" :height="height">
+    <title>{{ title }}</title>
+    <g :fill="fill">
+      <g class="nc-loop-heart-32-icon-f">
+        <path
+          d="M26.083,8.921A6.543,6.543,0,0,0,16,9.934a6.544,6.544,0,1,0-10.08,8.243L16,28.257l10.081-10.08a6.544,6.544,0,0,0,0-9.255Z"
+          :fill="fill"></path>
+        <circle cx="16" cy="16" r="16" :fill="_secondaryfill"></circle>
+      </g>
+    </g>
+  </svg>
+</template>
+
+<style lang="scss" scoped>
+.nc-loop-heart-32-icon-f {
+  --animation-duration: 1.8s
+}
+
+.nc-loop-heart-32-icon-f * {
+  transform-origin: 50% 50%
+}
+
+.nc-loop-heart-32-icon-f :nth-child(1) {
+  animation: nc-loop-heart-anim var(--animation-duration) infinite
+}
+
+.nc-loop-heart-32-icon-f :nth-child(2) {
+  transform: scale(0);
+  animation: nc-loop-heart-anim-2 var(--animation-duration) infinite
+}
+
+@keyframes nc-loop-heart-anim {
+
+  0%,
+  100%,
+  20%,
+  40% {
+    transform: scaleY(1)
+  }
+
+  10%,
+  30% {
+    transform: scale(.8)
+  }
+}
+
+@keyframes nc-loop-heart-anim-2 {
+  0% {
+    transform: scale(0);
+    opacity: 1
+  }
+
+  100%,
+  40% {
+    opacity: 0;
+    transform: scale(1)
+  }
+}
+</style>
+
+<script>
+export default {
+  props: {
+    width: {
+      type: [Number, String],
+      default: "1em"
+    },
+    height: {
+      type: [Number, String],
+      default: "1em"
+    },
+    strokewidth: {
+      type: [Number, String],
+      default: 1
+    },
+    title: {
+      type: String,
+      default: "heart anim"
+    },
+    fill: {
+      type: String,
+      default: "currentColor"
+    },
+    secondaryfill: {
+      type: String
+    }
+  },
+  computed: {
+    _secondaryfill: function () {
+      return this.secondaryfill || this.fill
+    }
+  }
+}
+</script>

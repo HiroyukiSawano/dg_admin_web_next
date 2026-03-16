@@ -1,0 +1,42 @@
+.ec-chat-thinking {
+  width: 100%;
+  :deep(.el-collapse) {
+    --el-collapse-border-color: transparent;
+    --el-collapse-header-height: 32px;
+    // --el-collapse-header-text-color: var(--el-text-color-secondary);
+    --el-collapse-content-text-color: var(--el-text-color-secondary);
+    border: 0;
+    .el-collapse-item {
+      .el-collapse-item__icon {
+        transform: scale(1.15);
+      }
+      .el-collapse-item__icon {
+        margin-right: 6px;
+      }
+      .el-collapse-item__title {
+        display: inline-flex;
+        align-items: center;
+      }
+      .el-collapse-item__header {
+        padding-right: 0;
+      }
+      .el-collapse-item__header,
+      .el-collapse-item__wrap {
+        border: 0;
+      }
+      .el-collapse-item__content {
+        padding: 0;
+        line-height: 1.5;
+      }
+      .el-collapse-item__arrow {
+        margin-left: 6px;
+        opacity: 0.5;
+        svg {
+          transform: scale(1.25);
+        }
+      }
+      .el-collapse-item__content {
+      }
+    }
+  }
+}

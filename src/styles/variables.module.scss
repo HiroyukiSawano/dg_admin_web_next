@@ -1,0 +1,7 @@
+$elColorPrimary: var(--el-color-primary);
+$elFontFamily: var(--el-font-family);
+
+:export {
+  elColorPrimary: $elColorPrimary;
+  elFontFamily: $elFontFamily;
+}

@@ -1,0 +1,192 @@
+/* CSS 动画样式调整 */
+.card-motion-enter-active,
+.card-motion-move,
+.card-motion-leave-active {
+  transition: all 0.3s ease;
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.card-motion-enter-from,
+.card-motion-leave-to {
+  opacity: 0;
+  /* 从左侧外进入（进场）/ 移动到右侧外（退场） */
+  transform: translateX(-100%);
+  /* 进场初始位置在左侧外 */
+  /* 如果你希望从左侧稍微偏移进入，可以用 translateX(-10px) */
+}
+
+.card-motion-leave-active {
+  /* 退场时从当前位置移动到右侧外 */
+  transform: translateX(100%);
+  opacity: 0;
+}
+.ec-chat-attachments__wrapper {
+  position: relative;
+  height: 100%;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.ec-chat-attachments {
+  margin: -6px 0;
+}
+.ec-chat-attachments.ec-chat-attachments--overflow-wrap,
+.ec-chat-attachments.ec-chat-attachments--overflow-scrollY {
+  .ec-chat-attachments__list {
+    flex-wrap: wrap;
+  }
+}
+.ec-chat-attachments__list {
+  display: flex;
+  align-items: center;
+  // margin: -6px;
+  // height: 100%;
+  // width: 100%;
+  gap: 12px;
+  padding: 6px 0;
+}
+
+.ec-chat-attachments__upload,
+.ec-chat-attachments__list-item {
+  display: inline-flex;
+}
+
+.ec-chat-attachments__button-prev,
+.ec-chat-attachments__button-next {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 10;
+  background-color: color-mix(in srgb, var(--el-color-black) 30%, transparent);
+  color: var(--el-color-white);
+  border: none;
+  padding-left: 0;
+  padding-right: 0;
+  border-radius: var(--el-border-radius-base);
+  transition: var(--el-transition-all);
+  &:hover {
+    background-color: color-mix(in srgb, var(--el-color-black) 50%, transparent);
+  }
+
+  &:active {
+    background-color: color-mix(in srgb, var(--el-color-black) 70%, transparent);
+  }
+}
+
+.ec-chat-attachments__button-prev {
+  left: 0;
+  border-top-left-radius: 0px;
+  border-bottom-left-radius: 0px;
+}
+
+.ec-chat-attachments__button-next {
+  right: 0;
+  border-top-right-radius: 0px;
+  border-bottom-right-radius: 0px;
+}
+
+.ec-chat-attachments__background {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.ec-chat-attachments__background-prev,
+.ec-chat-attachments__background-next {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 56px;
+  z-index: 8;
+  transition: var(--el-transition-all);
+}
+.ec-chat-attachments__background-prev {
+  left: 0;
+  background: linear-gradient(to right, var(--el-fill-color-blank), transparent);
+}
+
+.ec-chat-attachments__background-next {
+  right: 0;
+  background: linear-gradient(to left, var(--el-fill-color-blank), transparent);
+}
+
+.ec-chat-attachments--overflow-scrollX {
+  height: 100%;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  scrollbar-width: none;
+}
+
+.ec-chat-attachments--overflow-scrollY {
+  width: 100%;
+  height: 100%;
+}
+
+.ec-chat-attachments__upload-button {
+  // display: flex;
+  //  display: inline-flex;
+  //     align-items: center;
+  //     justify-content: center;
+  //     padding: 0;
+  //     height: 56px;
+  //     width: 56px;
+  //     border-radius: var(--el-border-radius-base);
+  //     // font-size: 24px;
+  //     color: var(--el-text-color-placeholder);
+  //     &:hover {
+  //       color: var(--el-color-primary);
+  //     }
+  :deep(.el-upload) {
+    height: 56px;
+    width: 56px;
+    font-size: 24px;
+    background-color: var(--el-fill-color-blank);
+    border: 1px dashed var(--el-border-color);
+    color: var(--el-text-color-placeholder);
+    border-radius: var(--el-border-radius-base);
+    &:hover {
+      color: var(--el-color-primary);
+      border-color: var(--el-color-primary);
+    }
+
+    .el-upload-dragger {
+      height: 100%;
+      width: 100%;
+      padding: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: 0;
+      border-radius: 0;
+    }
+  }
+}
+
+/* 设置穿梭节点的样式 */
+.ec-chat-attachments__drop-area {
+  position: absolute;
+  inset: -1px;
+  border-radius: var(--el-border-radius-base);
+  border: 1px dashed var(--el-color-primary);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  background: var(--el-mask-color-extra-light);
+  backdrop-filter: blur(2px);
+
+  .ec-chat-attachments__drop-area-icon {
+    font-size: 32px;
+    color: var(--el-color-primary);
+    line-height: 1;
+  }
+
+  .ec-chat-attachments__drop-area-text {
+    color: var(--el-color-primary);
+  }
+}

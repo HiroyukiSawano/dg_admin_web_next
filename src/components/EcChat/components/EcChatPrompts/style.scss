@@ -1,0 +1,101 @@
+.ec-chat-prompts {
+  display: flex;
+  flex-direction: column;
+  .ec-chat-prompts__title {
+    font-weight: var(--el-font-weight-primary);
+    margin-bottom: 8px;
+    font-size: var(--el-font-size-medium);
+    box-sizing: border-box;
+    word-break: break-word;
+  }
+
+  .ec-chat-prompts__list {
+    display: flex;
+    gap: 12px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    list-style: none;
+    padding-inline-start: 0;
+    margin-block: 0;
+    align-items: stretch;
+    box-sizing: border-box;
+  }
+
+  .ec-chat-prompts__list--wrap {
+    flex-wrap: wrap;
+  }
+
+  .ec-chat-prompts__list--vertical {
+    flex-direction: column;
+    align-items: flex-start;
+    .ec-chat-prompts__item {
+      width: 100%;
+    }
+  }
+
+  .ec-chat-prompts__item {
+    flex: none;
+    display: flex;
+    gap: 8px;
+    height: 100%;
+    padding: 12px;
+    align-items: center;
+    justify-content: flex-start;
+    background: var(--el-fill-color-blank);
+    border-radius: var(--el-border-radius-base);
+    border: 1px solid var(--el-border-color);
+    transition: var(--el-transition-all);
+  }
+
+  .is-disabled {
+    pointer-events: none;
+  }
+
+  .is-hover {
+    cursor: pointer;
+    background-color: var(--el-fill-color-light);
+  }
+
+  .is-active {
+    background: rgba(0, 0, 0, 0.15);
+  }
+
+  .item-content-container {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+  }
+
+  .ec-chat-prompts__item__content {
+    flex: auto;
+    min-width: 0;
+    display: flex;
+    gap: 4px;
+    flex-direction: column;
+    align-items: flex-start;
+    .ec-chat-prompts__item__icon {
+      margin: 0;
+      padding: 0;
+      font-size: 14px;
+      line-height: 1.5;
+      text-align: start;
+      white-space: normal;
+    }
+
+    .ec-chat-prompts__item__label {
+      font-size: var(--el-font-size-base);
+      font-weight: var(--el-font-weight-primary);
+    }
+    .ec-chat-prompts__item__description {
+      font-size: var(--el-font-size-extra-small);
+      color: var(--el-text-color-secondary);
+    }
+  }
+
+  // 限制子项的宽度
+  .ec-chat-prompts__item__children {
+    .ec-chat-prompts__list--vertical {
+      align-items: initial;
+    }
+  }
+}

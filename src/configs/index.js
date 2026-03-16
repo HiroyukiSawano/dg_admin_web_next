@@ -1,0 +1,132 @@
+const defaultConfig = {
+  APP_NAME: '数字政府管理框架',
+  APP_NAME_EN: 'ECGAP Web',
+  APP_LOGO: '@/assets/images/logo.svg',
+  APP_COPYRIGHT: 'COPYRIGHT © ECGAP WEB',
+  APP_VERSION: '4.5.05',
+  APP_API_URL: import.meta.env.VITE_APP_API,
+  APP_CODE: import.meta.env.VITE_APP_CODE,
+
+  // Toggle auth globally. When false, the app bypasses the login flow.
+  AUTH_ENABLED: false,
+
+  TOKEN_NAME: 'Authorization',
+  TOKEN_EXPIRES: 0.3,
+  USER_EXPIRES: 0.3,
+
+  REQUEST_HEADERS: {},
+  REQUEST_TIMEOUT: 20000,
+  REQUEST_CONTENT_TYPE: 'application/json;charset=UTF-8',
+  REQUEST_CACHE: false,
+  REQUEST_TEMPLATE_TOKEN:
+    'eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhbm9ueW1vdXMiLCJhdWQiOiIiLCJzZXJ2ZXIiOiJodHRwOi8vbG9jYWxob3N0OjMwMzQiLCJyb2xlIjoiIiwic3RhdHVzIjoiMyIsImlzcyI6Imluc3B1ciIsImp0aSI6ImQzMmViMjE0LWViNjYtNDM2Ni05ZTVlLWI1NWQwMWM5MDJlMiIsImlhdCI6MTYyMDk3MTQ3NCwiZXhwIjoxNjIxMDAwMjc0fQ.M8XAoxEpHX--OnAJaRhmTb8YkhFzO2mKoUUji74VcFpZstUCRnpURAh0WhkFjei98jddk1yvD-DHLxmu0OuvJg',
+
+  ROUTES_HOMEPAGE: null,
+  ROUTES_WHITELIST: ['/password', '/register'],
+  ROUTES_PROVENANCE: 'fontend',
+  ROUTES_CONTROL: true,
+
+  SYSTEM_LANGUAGE: 'zh-CN',
+  SYSTEM_DARK: false,
+  SYSTEM_WEAKNESS: false,
+  SYSTEM_WATERMARK: false,
+  SYSTEM_AUTOEXIT: 0,
+  SYSTEM_MENU_LOCALE: true,
+  SYSTEM_LOCALE_ENABLED: true,
+
+  STYLE_LAYOUT: 'classic',
+  STYLE_STRATEGY: 'flexbox',
+  STYLE_THEME: 'immersive',
+  STYLE_COLOR: '#207f4c',
+  STYLE_EFFECT: 'none',
+  STYLE_COLLAPSE: false,
+  STYLE_BREADCRUMB: true,
+  STYLE_UNIQUE: false,
+  STYLE_TABS: false,
+  STYLE_TABS_PERSISTENCE: true,
+  STYLE_VARIABLES: {
+    borderRadius: 0,
+    fontSize: 14,
+    fontWeightPrimary: 500,
+    fontFamily:
+      "GoogleSansFlexVF-Regular, 'Microsoft YaHei', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Helvetica Neue', Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol'",
+  },
+
+  STORAGE_PREFIX: import.meta.env.VITE_APP_CODE,
+  STORAGE_ENCRYPTION: '',
+  STORAGE_ENCRYPTION_KEY: '2XNN4K8L',
+
+  COOKIE_PREFIX: import.meta.env.VITE_APP_CODE,
+  COOKIE_ENCRYPTION: 'AES',
+  COOKIE_ENCRYPTION_KEY: '2C7EHY8M',
+
+  BSP_ENCRYPTION_ENABLED: true,
+  BSP_ENCRYPTION_PUBLIC_KEY:
+    '042c7247d2ddbda242e0b885e68ea88b6ca1ee976e58c53cdb722806ed356b1bef73e588df01b8068bbe5d081984701654445b14a7515633237935bace693671e9',
+  BSP_ENCRYPTION_PRIVATE_KEY:
+    '7a487652031727cb0024c605e3cf35d591c07fe6c5392eeabe3032305f43adeb',
+  BSP_ENCRYPTION_API_LIST: ['/bspplus/utils/uuid', '/bspplus/user/login', '/bspplus/user/menus'],
+}
+
+if (process.env.NODE_ENV === 'production') {
+  Object.assign(defaultConfig, window.publicConfig)
+}
+
+export default defaultConfig
+
+export const {
+  APP_NAME,
+  APP_NAME_EN,
+  APP_LOGO,
+  APP_COPYRIGHT,
+  APP_VERSION,
+  APP_API_URL,
+  APP_CODE,
+  AUTH_ENABLED,
+
+  TOKEN_NAME,
+  TOKEN_EXPIRES,
+  USER_EXPIRES,
+
+  REQUEST_HEADERS,
+  REQUEST_TIMEOUT,
+  REQUEST_CONTENT_TYPE,
+  REQUEST_CACHE,
+  REQUEST_TEMPLATE_TOKEN,
+
+  ROUTES_HOMEPAGE,
+  ROUTES_WHITELIST,
+  ROUTES_PROVENANCE,
+  ROUTES_CONTROL,
+
+  SYSTEM_LANGUAGE,
+  SYSTEM_DARK,
+  SYSTEM_WEAKNESS,
+  SYSTEM_WATERMARK,
+  SYSTEM_AUTOEXIT,
+
+  STYLE_LAYOUT,
+  STYLE_STRATEGY,
+  STYLE_THEME,
+  STYLE_COLOR,
+  STYLE_EFFECT,
+  STYLE_COLLAPSE,
+  STYLE_BREADCRUMB,
+  STYLE_UNIQUE,
+  STYLE_TABS,
+  STYLE_TABS_PERSISTENCE,
+  STYLE_VARIABLES,
+
+  STORAGE_PREFIX,
+  STORAGE_ENCRYPTION,
+  STORAGE_ENCRYPTION_KEY,
+
+  COOKIE_PREFIX,
+  COOKIE_ENCRYPTION,
+  COOKIE_ENCRYPTION_KEY,
+
+  BSP_ENCRYPTION_ENABLED,
+  BSP_ENCRYPTION_PUBLIC_KEY,
+  BSP_ENCRYPTION_PRIVATE_KEY,
+  BSP_ENCRYPTION_API_LIST,
+} = defaultConfig

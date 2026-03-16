@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="zh">
+  <head>
+    <meta charset="UTF-8" />
+    <meta content="IE=edge" http-equiv="X-UA-Compatible" />
+    <meta content="webkit" name="renderer" />
+    <meta
+      content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
+      name="viewport"
+    />
+    <meta content="no-cache, no-store, must-revalidate" http-equiv="Cache-Control" />
+    <!-- 绕过 Referer 限制 -->
+    <meta name="referrer" content="no-referrer"> 
+    <link rel="icon" href="/favicon.svg" />
+    <title>ECGAP Web 4.5</title>
+    <script src="/config.js?id=<%=Date.now()%>"></script>
+    <!-- <script type="text/javascript">
+      document.write("<script src='config.js?id=" + Date.now() + "'><\/script>")
+    </script> -->
+  </head>
+  <body>
+    <div id="app" class="app">
+      <div class="app-loading">
+        <div class="app-loading__logo">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+            <g class="nc-loop-squares-anim-2-icon-f" fill="currentColor">
+              <rect height="7" rx="0" width="7" x="9" opacity="0.33"></rect>
+              <rect height="7" rx="0" width="7" x="9" y="9"></rect>
+              <rect height="7" rx="0" width="7" y="9" opacity="0.33"></rect>
+              <rect height="7" rx="0" width="7"></rect>
+            </g>
+          </svg>
+        </div>
+      </div>
+      <style>
+        .app-loading {
+          position: fixed;
+          top: 0px;
+          left: 0px;
+          right: 0px;
+          bottom: 0px;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          flex-direction: column;
+          background: #fff;
+          z-index: 88888;
+        }
+        .app-loading .app-loading__logo svg {
+          color: #427af4;
+          width: 32px;
+          height: 32px;
+        }
+        .nc-loop-squares-anim-2-icon-f > * {
+          --animation-duration: 1s;
+          animation: nc-loop-squares-anim-2 var(--animation-duration) infinite;
+        }
+        .nc-loop-squares-anim-2-icon-f > :nth-child(1) {
+          opacity: 0;
+          animation-delay: calc(-1 * var(--animation-duration) / 2);
+        }
+        .nc-loop-squares-anim-2-icon-f > :nth-child(2) {
+          opacity: 0.5;
+          animation-delay: calc(-1 * var(--animation-duration) / 4);
+        }
+        .nc-loop-squares-anim-2-icon-f > :nth-child(4) {
+          animation-delay: calc(var(--animation-duration) / 4);
+        }
+        @keyframes nc-loop-squares-anim-2 {
+          0%,
+          100% {
+            opacity: 1;
+          }
+          50% {
+            opacity: 0;
+          }
+        }
+      </style>
+    </div>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>

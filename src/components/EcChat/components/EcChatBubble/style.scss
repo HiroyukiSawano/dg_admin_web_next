@@ -1,0 +1,117 @@
+.ec-chat-bubble {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  .ec-chat-bubble__avatar {
+    display: flex;
+    flex-shrink: 0;
+    &.ec-chat-bubble__avatar--placeholder {
+      .el-avatar {
+        visibility: hidden;
+      }
+    }
+  }
+  .ec-chat-bubble__content {
+    flex: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    min-width: 0;
+    max-width: 100%;
+  }
+  .ec-chat-bubble__header,
+  .ec-chat-bubble__detail,
+  .ec-chat-bubble__footer {
+    font-size: var(--el-font-size-base);
+    color: var(--el-text-color-primary);
+  }
+
+  .ec-chat-bubble__detail {
+    position: relative;
+    box-sizing: border-box;
+    padding: 12px 16px;
+    min-width: 0;
+    max-width: 100%;
+    min-height: 44px;
+    color: var(--el-text-color-primary);
+    font-size: var(--el-font-size-base);
+    background-color: var(--el-fill-color);
+    word-break: break-word;
+    border-radius: var(--el-border-radius-base);
+  }
+  .ec-chat-bubble__typewriter {
+    &.no-content {
+      height: 0;
+    }
+  }
+  .ec-chat-bubble__footer {
+    // margin-top: 8px;
+  }
+  .ec-chat-bubble__header {
+    // margin-bottom: 6px;
+  }
+
+  &.is-left {
+    .ec-chat-bubble__content {
+    }
+    &.ec-chat-bubble--corner {
+      .ec-chat-bubble__detail {
+        border-start-start-radius: 0;
+      }
+    }
+  }
+  &.is-right {
+    justify-content: end;
+    flex-direction: row-reverse;
+
+    .ec-chat-bubble__content {
+      align-items: flex-end;
+    }
+    &.ec-chat-bubble--corner {
+      .ec-chat-bubble__detail {
+        border-start-end-radius: 0;
+      }
+    }
+  }
+
+  &.ec-chat-bubble--round {
+    .ec-chat-bubble__detail {
+      border-radius: var(--el-border-radius-round);
+    }
+  }
+
+  &.ec-chat-bubble--filled {
+    .ec-chat-bubble__detail {
+      background-color: var(--el-fill-color);
+    }
+  }
+
+  &.ec-chat-bubble--borderless {
+    .ec-chat-bubble__detail {
+      background-color: var(--el-fill-color);
+      border: var(--el-border-width) solid var(--el-border-color);
+    }
+  }
+
+  &.ec-chat-bubble--outlined {
+    .ec-chat-bubble__detail {
+      background: none;
+      border: var(--el-border-width) solid var(--el-border-color);
+    }
+  }
+
+  &.ec-chat-bubble--shadow {
+    .ec-chat-bubble__detail {
+      background: none;
+      box-shadow: var(--el-box-shadow-light);
+    }
+  }
+
+  &.ec-chat-bubble--text {
+    .ec-chat-bubble__detail {
+      background-color: transparent;
+      padding-left: 0;
+      padding-right: 0;
+    }
+  }
+}

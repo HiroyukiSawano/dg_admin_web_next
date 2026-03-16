@@ -1,0 +1,44 @@
+.ec-chat-bubble-list__wrapper {
+  position: relative;
+  height: 100%;
+  width: 100%;
+}
+
+.ec-chat-bubble-list {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.ec-chat-bubble-list__back-button {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 16px;
+  z-index: 100;
+  cursor: pointer;
+
+  .el-button {
+    --el-button-border-color: transparent;
+    --el-button-hover-border-color: transparent;
+    box-shadow: var(--el-box-shadow-light);
+
+    &.is-loading {
+      &::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        border: 2px solid transparent;
+        border-top-color: var(--el-color-primary);
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+
+      @keyframes loading-spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+    }
+  }
+}

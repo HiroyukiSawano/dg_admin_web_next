@@ -1,0 +1,73 @@
+<template>
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" :width="width" :height="height">
+    <title>{{ title }}</title>
+    <g :fill="fill">
+      <g class="nc-loop-ripple-32-icon-f">
+        <circle cx="16" cy="16" r="16" :fill="fill"></circle>
+        <circle cx="16" cy="16" r="16" :fill="_secondaryfill"></circle>
+      </g>
+    </g>
+  </svg>
+</template>
+
+<style lang="scss" scoped>
+.nc-loop-ripple-32-icon-f {
+  --animation-duration: 1.2s
+}
+
+.nc-loop-ripple-32-icon-f * {
+  transform-origin: 50% 50%;
+  animation: nc-loop-ripple-anim var(--animation-duration) infinite cubic-bezier(.215, .61, .355, 1)
+}
+
+.nc-loop-ripple-32-icon-f :nth-child(2) {
+  animation-delay: calc(var(--animation-duration)/-2)
+}
+
+@keyframes nc-loop-ripple-anim {
+  0% {
+    opacity: 1;
+    transform: scale(.2)
+  }
+
+  100% {
+    opacity: 0;
+    transform: scale(1)
+  }
+}
+</style>
+
+<script>
+export default {
+  props: {
+    width: {
+      type: [Number, String],
+      default: "1em"
+    },
+    height: {
+      type: [Number, String],
+      default: "1em"
+    },
+    strokewidth: {
+      type: [Number, String],
+      default: 1
+    },
+    title: {
+      type: String,
+      default: "ripple anim"
+    },
+    fill: {
+      type: String,
+      default: "currentColor"
+    },
+    secondaryfill: {
+      type: String
+    }
+  },
+  computed: {
+    _secondaryfill: function () {
+      return this.secondaryfill || this.fill
+    }
+  }
+}
+</script>
