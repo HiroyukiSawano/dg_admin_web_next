@@ -180,6 +180,9 @@ export default {
 
   'ec.menu.name.packages': '框架依赖',
   'ec.menu.name.log': '日志',
+  'ec.menu.name.monitor': '监控中心',
+  'ec.menu.name.monitorDashboard': '监控大盘',
+  'ec.menu.name.monitorLogs': '日志审计',
 
   'ec.menu.name.setting': '配置',
   'ec.menu.name.settingAccount': '用户中心',

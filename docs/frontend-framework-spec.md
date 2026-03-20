@@ -11,6 +11,13 @@
 - 新增代码必须融入现有 `Vue 3 + Vite + Element Plus + Pinia + Vue Router + Vue I18n + Sass` 体系。
 - 本文档优先服务“可执行开发”，不是宣传型说明。
 
+配套文档：
+
+- `docs/frontend-visual-baseline.md`：补充视觉基线、页面骨架、样式允许项与禁止项。
+- `docs/ai-refactor-workflow.md`：定义 AI 重构的两阶段工作流、输入包和输出要求。
+- `docs/refactor-acceptance-checklist.md`：提供试点页和常规页面的验收清单。
+- `docs/ai-refactor-prompt-template.md`：提供可直接复制给 AI 的重构提示词模板。
+
 ## 2. 项目定位与总体判断
 
 这是一个中后台前端 Demo / 脚手架项目，不是纯视觉稿，也不是最小化模板。它已经具备以下基础能力：

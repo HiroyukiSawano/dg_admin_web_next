@@ -178,6 +178,9 @@ export default {
 
   'ec.menu.name.packages': 'Packages',
   'ec.menu.name.log': 'Log',
+  'ec.menu.name.monitor': 'Monitoring',
+  'ec.menu.name.monitorDashboard': 'Dashboard',
+  'ec.menu.name.monitorLogs': 'Log Audit',
 
   'ec.menu.name.setting': 'Setting',
   'ec.menu.name.settingAccount': 'Account Center',
