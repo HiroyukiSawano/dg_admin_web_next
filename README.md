@@ -1,5 +1,23 @@
 # dg_admin_web_next
 
+## AI Coding Usage
+
+For AI-assisted work in this repository, choose the prompt template by task type:
+
+- Continue refactoring or migrating an existing page: `@docs/ai/refactor/prompt-template.md`
+- Create a new business page or module: `@docs/ai/new-page/prompt-template.md`
+
+Supporting docs:
+
+- Refactor workflow: `@docs/ai/refactor/workflow.md`
+- Global frontend rules: `docs/frontend-framework-spec.md`
+- Visual baseline: `docs/frontend-visual-baseline.md`
+
+Recommended usage:
+
+- Refactor example: `请按 @docs/ai/refactor/prompt-template.md 执行，继续迁移 monitor 模块的某个旧页面。`
+- New page example: `请按 @docs/ai/new-page/prompt-template.md 执行，新增 asset 模块下的标准台账列表页。`
+
 
 
 ## Getting started

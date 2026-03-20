@@ -2,7 +2,12 @@
 
 ## 1. 适用场景
 
-用于旧前端迁移、新业务页接入、已有 AI 重构结果二次修正。目标是让 AI 按照当前项目真实规范工作，而不是只按抽象“重构”指令自由发挥。
+用于旧前端迁移、已有 AI 重构结果二次修正。目标是让 AI 按照当前项目真实规范工作，而不是只按抽象“重构”指令自由发挥。
+
+说明：
+
+- 如果是“把旧系统页面迁到当前框架”，继续使用本文件。
+- 如果是“在当前框架里新增资产管理等新业务页”，优先改用 `docs/ai/new-page/prompt-template.md`，并配合 `docs/new-business-module-guide.md`、`docs/frontend-service-contract.md`、`docs/page-archetypes.md` 使用。
 
 ## 2. AI 输入包
 

@@ -14,9 +14,15 @@
 配套文档：
 
 - `docs/frontend-visual-baseline.md`：补充视觉基线、页面骨架、样式允许项与禁止项。
-- `docs/ai-refactor-workflow.md`：定义 AI 重构的两阶段工作流、输入包和输出要求。
+- `docs/ai/refactor/workflow.md`：定义 AI 重构的两阶段工作流、输入包和输出要求。
 - `docs/refactor-acceptance-checklist.md`：提供试点页和常规页面的验收清单。
-- `docs/ai-refactor-prompt-template.md`：提供可直接复制给 AI 的重构提示词模板。
+- `docs/ai/refactor/prompt-template.md`：提供可直接复制给 AI 的重构提示词模板。
+- `docs/new-business-module-guide.md`：定义新增业务模块时的目录落位、状态边界和最小完成标准。
+- `docs/frontend-service-contract.md`：定义 service 层、接口协议和错误处理约定。
+- `docs/page-archetypes.md`：定义新增页面时优先采用的页型范式。
+- `docs/component-reuse-catalog.md`：列出新增页面时优先复用的现有组件和页面样例。
+- `docs/ai/new-page/prompt-template.md`：提供“新增业务页”专用 AI 提示词模板。
+- `docs/golden-module-example.md`：用 monitor 模块说明一套合格新模块的真实结构。
 
 ## 2. 项目定位与总体判断
 
@@ -652,6 +658,14 @@ export const apiSomething = (params) => {
 7. 补充国际化文案
 8. 校验菜单显示、页面高亮、移动端布局和权限显隐
 
+新增业务页时，建议同时参考：
+
+- `docs/new-business-module-guide.md`
+- `docs/frontend-service-contract.md`
+- `docs/page-archetypes.md`
+- `docs/component-reuse-catalog.md`
+- `docs/golden-module-example.md`
+
 ### 18.2 新增一个列表 + 详情编辑业务
 
 推荐顺序：
@@ -661,6 +675,12 @@ export const apiSomething = (params) => {
 3. 接 service 层
 4. 再决定详情使用弹窗还是隐藏子路由
 5. 最后补权限按钮、国际化和样式细节
+
+若通过 AI 生成新增页面，优先使用：
+
+- `docs/ai/new-page/prompt-template.md`
+
+不要误用旧页迁移提示词去新增全新的业务模块。
 
 ### 18.3 新增全局能力
 
