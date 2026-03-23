@@ -1026,7 +1026,13 @@ const handlePageSizeChange = (pageSize) => {
   loadData()
 }
 
-const openCreate = () => {
+const openCreate = async () => {
+  try {
+    await loadSupportOptions()
+  } catch (error) {
+    ElMessage.error(error.message || t('ec.hardware.support.failed'))
+    return
+  }
   formDialog.mode = 'create'
   formDialog.assetId = null
   formDialog.loading = false
@@ -1040,6 +1046,7 @@ const openEdit = async (row) => {
   formDialog.visible = true
   formDialog.loading = true
   try {
+    await loadSupportOptions()
     const detail = await fetchDetail(row.id)
     fillFormData(detail)
   } catch (error) {
@@ -1055,6 +1062,7 @@ const openDetail = async (row) => {
   detailLoading.value = true
   detailRecord.value = null
   try {
+    await loadSupportOptions()
     detailRecord.value = await fetchDetail(row.id)
   } catch (error) {
     ElMessage.error(error.message || t('ec.hardware.detail.failed'))
@@ -1116,6 +1124,7 @@ const openRelationDialog = async (type, row) => {
   relationDialog.ownerId = null
 
   try {
+    await loadSupportOptions()
     const detail = await fetchDetail(row.id)
     if (type === 'systems') {
       relationDialog.values = Array.isArray(detail.informationSystemIds) ? detail.informationSystemIds : []

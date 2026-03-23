@@ -8,11 +8,15 @@
         <path d="M16,17.4l5.3,5.3L16,28l-5.3-5.3L16,17.4z" />
       </g>
     </svg>
-    <span>{{ $t('ec.app.name') }}</span>
+    <span>{{ name }}</span>
   </div>
 </template>
 
 <script setup>
+import { storeToRefs } from 'pinia'
+import { useSystemStore } from '@/stores/modules/systemStore'
+
+const { name } = storeToRefs(useSystemStore())
 </script>
 
 <style lang="scss" scoped>

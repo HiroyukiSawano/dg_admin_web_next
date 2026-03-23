@@ -131,15 +131,11 @@ export const getHardwareDepartmentOptions = () => {
 
 export const getHardwareLocationOptions = async () => {
   const payload = await resolveEamResponse({
-    url: '/api/v1/locations',
+    url: '/api/v1/locations/options',
     method: 'GET',
-    params: {
-      pageNo: 1,
-      pageSize: 1000,
-    },
   })
 
-  return Array.isArray(payload?.records) ? payload.records : []
+  return Array.isArray(payload) ? payload : []
 }
 
 export const getHardwarePersonOptions = async () => {

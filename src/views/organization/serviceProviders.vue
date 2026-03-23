@@ -178,22 +178,22 @@
         <div class="organization-detail__relation-block">
           <span>{{ t('ec.organization.serviceProvider.relations.hardwareAssets') }}</span>
           <div class="organization-detail__tags">
-            <el-tag v-for="item in normalizeRelationIds(detailRecord.hardwareAssetIds)" :key="`hardware-${item}`">{{ item }}</el-tag>
-            <el-empty v-if="normalizeRelationIds(detailRecord.hardwareAssetIds).length === 0" :image-size="56" :description="t('ec.organization.common.noRelation')" />
+            <el-tag v-for="item in hardwareRelationLabels" :key="`hardware-${item}`">{{ item }}</el-tag>
+            <el-empty v-if="hardwareRelationLabels.length === 0" :image-size="56" :description="t('ec.organization.common.noRelation')" />
           </div>
         </div>
         <div class="organization-detail__relation-block">
           <span>{{ t('ec.organization.serviceProvider.relations.informationSystems') }}</span>
           <div class="organization-detail__tags">
-            <el-tag v-for="item in normalizeRelationIds(detailRecord.informationSystemIds)" :key="`system-${item}`">{{ item }}</el-tag>
-            <el-empty v-if="normalizeRelationIds(detailRecord.informationSystemIds).length === 0" :image-size="56" :description="t('ec.organization.common.noRelation')" />
+            <el-tag v-for="item in informationSystemRelationLabels" :key="`system-${item}`">{{ item }}</el-tag>
+            <el-empty v-if="informationSystemRelationLabels.length === 0" :image-size="56" :description="t('ec.organization.common.noRelation')" />
           </div>
         </div>
         <div class="organization-detail__relation-block">
           <span>{{ t('ec.organization.serviceProvider.relations.projects') }}</span>
           <div class="organization-detail__tags">
-            <el-tag v-for="item in normalizeRelationIds(detailRecord.projectIds)" :key="`project-${item}`">{{ item }}</el-tag>
-            <el-empty v-if="normalizeRelationIds(detailRecord.projectIds).length === 0" :image-size="56" :description="t('ec.organization.common.noRelation')" />
+            <el-tag v-for="item in projectRelationLabels" :key="`project-${item}`">{{ item }}</el-tag>
+            <el-empty v-if="projectRelationLabels.length === 0" :image-size="56" :description="t('ec.organization.common.noRelation')" />
           </div>
         </div>
       </div>
@@ -210,11 +210,14 @@ import { useSystemStore } from '@/stores/modules/systemStore'
 import {
   createServiceProvider,
   deleteServiceProvider,
+  getOrganizationHardwareOptions,
+  getOrganizationInformationSystemOptions,
+  getOrganizationProjectOptions,
   getServiceProviderDetail,
   getServiceProviderList,
   updateServiceProvider,
 } from '@/services/modules/organizationService'
-import { formatDateTime, getStatusTagType, normalizeRelationIds } from './helpers'
+import { buildListLabelMap, formatDateTime, getStatusTagType, mapIdsToLabels } from './helpers'
 
 defineOptions({ name: 'OrganizationServiceProviders' })
 
@@ -239,6 +242,9 @@ const dialogMode = ref('create')
 const formRef = ref(null)
 const tableData = ref([])
 const detailRecord = ref(null)
+const hardwareOptions = ref([])
+const informationSystemOptions = ref([])
+const projectOptions = ref([])
 
 const queryForm = reactive({
   keyword: '',
@@ -275,8 +281,19 @@ const paginationLayout = computed(() => {
   return device.value === 'mobile' ? 'total, prev, next' : 'total, prev, pager, next, sizes'
 })
 
+const hardwareNameMap = computed(() => buildListLabelMap(hardwareOptions.value, 'displayLabel'))
+const informationSystemNameMap = computed(() => buildListLabelMap(informationSystemOptions.value, 'displayLabel'))
+const projectNameMap = computed(() => buildListLabelMap(projectOptions.value, 'displayLabel'))
+const hardwareRelationLabels = computed(() => mapIdsToLabels(detailRecord.value?.hardwareAssetIds, hardwareNameMap.value))
+const informationSystemRelationLabels = computed(() => mapIdsToLabels(detailRecord.value?.informationSystemIds, informationSystemNameMap.value))
+const projectRelationLabels = computed(() => mapIdsToLabels(detailRecord.value?.projectIds, projectNameMap.value))
+
 const getServiceProviderTypeLabel = (value) => {
   return serviceProviderTypeOptions.value.find((item) => item.value === value)?.label || value || '-'
+}
+
+const buildDisplayLabel = (primary, secondary) => {
+  return [primary, secondary].filter(Boolean).join(' / ') || '-'
 }
 
 const resetFormData = () => {
@@ -307,6 +324,27 @@ const loadData = async () => {
   } finally {
     tableLoading.value = false
   }
+}
+
+const loadSupportOptions = async () => {
+  const [hardwareAssets, informationSystems, projects] = await Promise.all([
+    getOrganizationHardwareOptions(),
+    getOrganizationInformationSystemOptions(),
+    getOrganizationProjectOptions(),
+  ])
+
+  hardwareOptions.value = hardwareAssets.map((item) => ({
+    ...item,
+    displayLabel: buildDisplayLabel(item.assetCode, item.assetName),
+  }))
+  informationSystemOptions.value = informationSystems.map((item) => ({
+    ...item,
+    displayLabel: buildDisplayLabel(item.code, item.name),
+  }))
+  projectOptions.value = projects.map((item) => ({
+    ...item,
+    displayLabel: buildDisplayLabel(item.code, item.name),
+  }))
 }
 
 const handleSearch = () => {
@@ -358,6 +396,7 @@ const openDetail = async (row) => {
   detailLoading.value = true
   detailRecord.value = null
   try {
+    await loadSupportOptions()
     detailRecord.value = await getServiceProviderDetail(row.id)
   } catch (error) {
     ElMessage.error(error.message || t('ec.organization.serviceProvider.message.detailFailed'))
@@ -428,6 +467,7 @@ const handleDialogClosed = () => {
 }
 
 onMounted(() => {
+  loadSupportOptions().catch(() => {})
   loadData()
 })
 </script>

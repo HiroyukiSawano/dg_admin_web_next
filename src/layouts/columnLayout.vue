@@ -6,7 +6,7 @@
     <el-container>
       <div class="el-splite hidden-sm-and-down">
         <div class="el-splite__header">
-          <el-tooltip effect="dark" :content="$t('ec.app.name')" placement="right">
+          <el-tooltip effect="dark" :content="systemName" placement="right">
             <layout-logo />
           </el-tooltip>
         </div>
@@ -93,7 +93,7 @@ const nexts = ref([])
 
 // 获取样式状态
 const { unique, tabs, collapse, breadcrumb, strategy } = storeToRefs(useStyleStore())
-const { device } = storeToRefs(useSystemStore())
+const { device, name: systemName } = storeToRefs(useSystemStore())
 const { UpdateStyle } = useStyleStore()
 
 // 获取保活状态

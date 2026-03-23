@@ -8,7 +8,9 @@ const defaultConfig = {
   APP_CODE: import.meta.env.VITE_APP_CODE,
 
   // Toggle auth globally. When false, the app bypasses the login flow.
-  AUTH_ENABLED: false,
+  AUTH_ENABLED: true,
+  // Login mode: 'local' uses built-in demo accounts, 'backend' calls BSP login APIs.
+  AUTH_LOGIN_MODE: import.meta.env.VITE_APP_AUTH_LOGIN_MODE || 'local',
 
   TOKEN_NAME: 'Authorization',
   TOKEN_EXPIRES: 0.3,
@@ -83,6 +85,7 @@ export const {
   APP_API_URL,
   APP_CODE,
   AUTH_ENABLED,
+  AUTH_LOGIN_MODE,
 
   TOKEN_NAME,
   TOKEN_EXPIRES,

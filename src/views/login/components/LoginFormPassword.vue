@@ -83,10 +83,10 @@ const handleLogin = async () => {
   try {
     logined.value = true
     const params = {
-      username: 'platformadmin',
-      password: '5fa4fe49a0f447458fce93195af6c81c',
+      username: forms.value.username,
+      password: md5(forms.value.password),
       appCode: import.meta.env.VITE_APP_CODE,
-      remember: true,
+      remember: forms.value.remember,
     }
     const res = await apiUserLogin(params)
     logined.value = false

@@ -208,3 +208,30 @@ export const deletePerson = (id) => {
 export const getPersonDepartmentOptions = () => {
   return getDepartmentOptions()
 }
+
+export const getOrganizationHardwareOptions = async () => {
+  const payload = await resolveEamResponse({
+    url: '/api/v1/hardware-assets/options',
+    method: 'GET',
+  })
+
+  return Array.isArray(payload) ? payload : []
+}
+
+export const getOrganizationInformationSystemOptions = async () => {
+  const payload = await resolveEamResponse({
+    url: '/api/v1/information-systems/options',
+    method: 'GET',
+  })
+
+  return Array.isArray(payload) ? payload : []
+}
+
+export const getOrganizationProjectOptions = async () => {
+  const payload = await resolveEamResponse({
+    url: '/api/v1/projects/options',
+    method: 'GET',
+  })
+
+  return Array.isArray(payload) ? payload : []
+}

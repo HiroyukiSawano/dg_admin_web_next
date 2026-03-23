@@ -26,6 +26,13 @@ export const buildIdNameMap = (tree = []) => {
   }, {})
 }
 
+export const buildListLabelMap = (list = [], labelKey = 'name') => {
+  return (Array.isArray(list) ? list : []).reduce((acc, item) => {
+    acc[item.id] = item[labelKey]
+    return acc
+  }, {})
+}
+
 export const filterTreeByKeyword = (tree = [], keyword = '', fields = ['code', 'name']) => {
   const normalizedKeyword = keyword.trim().toLowerCase()
   if (!normalizedKeyword) {
@@ -104,4 +111,8 @@ export const getStatusTagType = (status) => {
 
 export const normalizeRelationIds = (value) => {
   return Array.isArray(value) ? value : []
+}
+
+export const mapIdsToLabels = (ids = [], mapping = {}) => {
+  return normalizeRelationIds(ids).map((item) => mapping[item] || String(item))
 }

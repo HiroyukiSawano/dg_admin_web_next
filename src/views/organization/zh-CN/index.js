@@ -92,9 +92,9 @@ export default {
   'ec.organization.serviceProvider.type.serviceProvider': '服务提供商',
   'ec.organization.serviceProvider.type.integrator': '集成商',
   'ec.organization.serviceProvider.type.maintenance': '维保商',
-  'ec.organization.serviceProvider.relations.hardwareAssets': '关联硬件 ID',
-  'ec.organization.serviceProvider.relations.informationSystems': '关联信息系统 ID',
-  'ec.organization.serviceProvider.relations.projects': '关联项目 ID',
+  'ec.organization.serviceProvider.relations.hardwareAssets': '关联硬件',
+  'ec.organization.serviceProvider.relations.informationSystems': '关联信息系统',
+  'ec.organization.serviceProvider.relations.projects': '关联项目',
 
   'ec.organization.person.form.keyword': '关键字',
   'ec.organization.person.form.keywordPlaceholder': '请输入姓名、工号或手机号',
@@ -124,7 +124,7 @@ export default {
   'ec.organization.person.message.loadFailed': '人员数据加载失败',
   'ec.organization.person.message.detailFailed': '人员详情加载失败',
   'ec.organization.person.message.departmentLoadFailed': '部门选项加载失败',
-  'ec.organization.person.relations.hardwareAssets': '关联硬件 ID',
-  'ec.organization.person.relations.informationSystems': '关联信息系统 ID',
-  'ec.organization.person.relations.projects': '关联项目 ID',
+  'ec.organization.person.relations.hardwareAssets': '关联硬件',
+  'ec.organization.person.relations.informationSystems': '关联信息系统',
+  'ec.organization.person.relations.projects': '关联项目',
 }

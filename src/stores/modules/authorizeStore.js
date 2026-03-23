@@ -1,7 +1,9 @@
 import { defineStore } from 'pinia'
 import { apiUtilsUuid } from '@/services/modules/bspService'
+import { resolveSystemProfile } from '@/configs/systemProfile'
 import {
   AUTH_ENABLED,
+  AUTH_LOGIN_MODE,
   STORAGE_PREFIX,
   COOKIE_PREFIX,
   TOKEN_EXPIRES,
@@ -9,6 +11,7 @@ import {
 } from '@/configs'
 import { Storage, Cookie } from '@/utils/storage'
 import { usePermissionStore } from './permissionStore'
+import { useSystemStore } from './systemStore'
 import { useTabsStore } from './tabsStore'
 
 const defaultUser = () => ({
@@ -19,12 +22,32 @@ const defaultUser = () => ({
   username: 'platformadmin',
 })
 
+const defaultRoles = () => (AUTH_ENABLED ? [] : ['AUTH_SYSTEM_ADMIN', 'ROLE_SYSTE'])
+const defaultPermissions = () => (AUTH_ENABLED ? [] : ['LIST.ADD', 'LIST.EDIT', 'LIST.DELETE', 'USER.ADD', 'USER.EDIT', 'USER.DELETE'])
+
+const normalizeList = (value) => {
+  if (Array.isArray(value)) return value.filter(Boolean)
+  if (typeof value === 'string') {
+    return value
+      .split(',')
+      .map((item) => item.trim())
+      .filter(Boolean)
+  }
+  return []
+}
+
+const syncSystemName = (user, roles) => {
+  const { UpdateSystem } = useSystemStore()
+  const { name } = resolveSystemProfile({ user, roles })
+  UpdateSystem({ key: 'name', value: name })
+}
+
 const useAuthorizeStore = defineStore('authentes', {
   state: () => ({
     token: '',
     user: defaultUser(),
-    roles: ['AUTH_SYSTEM_ADMIN', 'ROLE_SYSTE'],
-    permissions: ['LIST.ADD', 'LIST.EDIT', 'LIST.DELETE', 'USER.ADD', 'USER.EDIT', 'USER.DELETE'],
+    roles: defaultRoles(),
+    permissions: defaultPermissions(),
   }),
   getters: {},
   actions: {
@@ -32,11 +55,15 @@ const useAuthorizeStore = defineStore('authentes', {
       this.$reset()
       Cookie.removeItem(`${STORAGE_PREFIX}/AUTHORIZE_TOKEN_KEY`)
       Cookie.removeItem(`${STORAGE_PREFIX}/AUTHORIZE_USER_KEY`)
+      syncSystemName(defaultUser(), defaultRoles())
     },
     SetAuthorize(payload = {}) {
-      const { token = '', user = defaultUser() } = payload
+      const { token = '', user = defaultUser(), roles, permissions } = payload
       this.token = token
       this.user = { ...defaultUser(), ...user }
+      this.roles = normalizeList(roles ?? user?.role ?? user?.roles)
+      this.permissions = normalizeList(permissions ?? user?.permission ?? user?.permissions)
+      syncSystemName(this.user, this.roles)
     },
     Login(payload) {
       this.SetAuthorize(payload)
@@ -51,6 +78,7 @@ const useAuthorizeStore = defineStore('authentes', {
     EnsureAuthorize() {
       if (!AUTH_ENABLED && !this.user?.id) {
         this.user = defaultUser()
+        syncSystemName(this.user, this.roles)
       }
     },
     async CheckToken() {
@@ -58,11 +86,20 @@ const useAuthorizeStore = defineStore('authentes', {
         this.EnsureAuthorize()
         return
       }
+      if (!this.user?.id) return
       if (this.token) return
-      const {
-        data: { data: token },
-      } = await apiUtilsUuid()
-      this.token = token
+      if (AUTH_LOGIN_MODE === 'local') {
+        this.ResetAuthorize()
+        return
+      }
+      try {
+        const {
+          data: { data: token },
+        } = await apiUtilsUuid()
+        this.token = token
+      } catch (error) {
+        this.ResetAuthorize()
+      }
     },
     async ClearCache() {
       this.Logout()

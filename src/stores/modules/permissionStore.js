@@ -1,6 +1,7 @@
 import { mergeWith } from 'lodash-es'
 import { defineStore } from 'pinia'
 import configs from '@/configs'
+import { resolveSystemProfile } from '@/configs/systemProfile'
 import { removeRoutes, resetRoutes, frontendRoutes } from '@/router'
 import { apiUserMenus } from '@/services/modules/bspService'
 import { useAuthorizeStore } from './authorizeStore'
@@ -189,7 +190,10 @@ const flattenRoutes = (data, breadcrumb = []) => {
  * @param {Array} roles - 当前用户的角色数组，用于判断用户是否有访问特定路由的权限
  */
 const filterRoutes = (data, roles = []) => {
+  const { allowedPrefixes = [] } = resolveSystemProfile({ roles })
+
   return data.reduce((acc, item) => {
+    if (allowedPrefixes.length > 0 && !hasRoutePrefixAccess(item, allowedPrefixes)) return acc
     // 如果用户不具备访问此路由的角色权限，则跳过此路由，不加入到结果中
     if (item.meta?.roles && !item.meta?.roles.some((r) => roles.includes(r))) return acc
     // 复制当前路由项，以避免修改原始数据结构
@@ -199,6 +203,11 @@ const filterRoutes = (data, roles = []) => {
     // 将处理后的当前路由项添加到结果数组中
     return [...acc, _item]
   }, [])
+}
+
+const hasRoutePrefixAccess = (route, allowedPrefixes = []) => {
+  const path = route?.path || ''
+  return allowedPrefixes.some((prefix) => path === prefix || path.startsWith(`${prefix}/`))
 }
 
 /**

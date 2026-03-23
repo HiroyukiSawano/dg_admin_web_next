@@ -15,7 +15,7 @@
                 <path d="M16,17.4l5.3,5.3L16,28l-5.3-5.3L16,17.4z" />
               </g>
             </svg>
-            <span>{{ $t('ec.app.name') }}</span>
+            <span>{{ systemName }}</span>
           </div>
 
           <el-tabs v-model="active" class="login-tabs">
@@ -32,9 +32,13 @@
 
 <script setup>
 import { ref } from 'vue'
+import { storeToRefs } from 'pinia'
+import { useSystemStore } from '@/stores/modules/systemStore'
 import LoginFormPassword from './components/LoginFormPassword'
 import LoginFormPhone from './components/LoginFormPhone'
+
 const active = ref('account')
+const { name: systemName } = storeToRefs(useSystemStore())
 </script>
 <style lang="scss" scoped>
 

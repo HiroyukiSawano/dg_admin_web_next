@@ -92,9 +92,9 @@ export default {
   'ec.organization.serviceProvider.type.serviceProvider': 'Service Provider',
   'ec.organization.serviceProvider.type.integrator': 'Integrator',
   'ec.organization.serviceProvider.type.maintenance': 'Maintenance',
-  'ec.organization.serviceProvider.relations.hardwareAssets': 'Related Hardware IDs',
-  'ec.organization.serviceProvider.relations.informationSystems': 'Related System IDs',
-  'ec.organization.serviceProvider.relations.projects': 'Related Project IDs',
+  'ec.organization.serviceProvider.relations.hardwareAssets': 'Hardware Assets',
+  'ec.organization.serviceProvider.relations.informationSystems': 'Systems',
+  'ec.organization.serviceProvider.relations.projects': 'Projects',
 
   'ec.organization.person.form.keyword': 'Keyword',
   'ec.organization.person.form.keywordPlaceholder': 'Search by name, employee no. or mobile',
@@ -124,7 +124,7 @@ export default {
   'ec.organization.person.message.loadFailed': 'Failed to load persons',
   'ec.organization.person.message.detailFailed': 'Failed to load person detail',
   'ec.organization.person.message.departmentLoadFailed': 'Failed to load department options',
-  'ec.organization.person.relations.hardwareAssets': 'Related Hardware IDs',
-  'ec.organization.person.relations.informationSystems': 'Related System IDs',
-  'ec.organization.person.relations.projects': 'Related Project IDs',
+  'ec.organization.person.relations.hardwareAssets': 'Hardware Assets',
+  'ec.organization.person.relations.informationSystems': 'Systems',
+  'ec.organization.person.relations.projects': 'Projects',
 }

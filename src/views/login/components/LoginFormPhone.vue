@@ -101,8 +101,8 @@ const handleLogin = async () => {
   try {
     logined.value = true
     const params = {
-      username: 'platformadmin',
-      password: '5fa4fe49a0f447458fce93195af6c81c',
+      username: 'eam_demo',
+      password: 'e10adc3949ba59abbe56e057f20f883e',
       appCode: import.meta.env.VITE_APP_CODE,
       remember: true,
     }

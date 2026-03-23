@@ -1,6 +1,61 @@
 import Http from '@/utils/http'
+import { AUTH_LOGIN_MODE } from '@/configs'
+
+const LOCAL_LOGIN_USERS = {
+  platformadmin: {
+    password: '21232f297a57a5a743894a0e4a801fc3',
+    token: 'local-admin-token',
+    user: {
+      id: 'local-admin-user',
+      name: '平台管理员',
+      organName: '信息化资产管理中心',
+      username: 'platformadmin',
+      avatar: '',
+      role: 'AUTH_SYSTEM_ADMIN,ROLE_SYSTEM',
+      permission: 'LIST.ADD,LIST.EDIT,LIST.DELETE,USER.ADD,USER.EDIT,USER.DELETE',
+    },
+  },
+  eam_demo: {
+    password: 'e10adc3949ba59abbe56e057f20f883e',
+    token: 'local-asset-demo-token',
+    user: {
+      id: 'local-asset-demo-user',
+      name: '资产管理演示账号',
+      organName: '资产管理系统',
+      username: 'eam_demo',
+      avatar: '',
+      role: 'ROLE_EAM_ASSET',
+      permission: '',
+    },
+  },
+  ops_demo: {
+    password: 'e10adc3949ba59abbe56e057f20f883e',
+    token: 'local-operations-demo-token',
+    user: {
+      id: 'local-operations-demo-user',
+      name: '运营管理演示账号',
+      organName: '运营管理系统',
+      username: 'ops_demo',
+      avatar: '',
+      role: 'ROLE_EAM_OPERATIONS',
+      permission: '',
+    },
+  },
+}
 
 export const apiUserLogin = (params) => {
+  if (AUTH_LOGIN_MODE === 'local') {
+    const localUser = LOCAL_LOGIN_USERS[params?.username]
+    if (localUser && localUser.password === params?.password) {
+      return Promise.resolve({
+        flag: true,
+        msg: '登录成功',
+        token: localUser.token,
+        user: localUser.user,
+      })
+    }
+  }
+
   return Http.request({
     url: '/bspplus/user/login',
     data: params,
@@ -45,6 +100,10 @@ export const apiUtilsUuid = () => {
   )
 }
 export const apiUtilsSendSlideCode = () => {
+  if (AUTH_LOGIN_MODE === 'local') {
+    return Promise.resolve({ flag: true })
+  }
+
   return Http.request({
     url: '/bspplus/utils/send/slideCode',
     method: 'GET',
@@ -963,4 +1022,3 @@ export const apiUserMenus = () => {
     },
   ]
 }
-

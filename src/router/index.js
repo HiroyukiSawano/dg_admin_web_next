@@ -5,6 +5,7 @@ import configs, { AUTH_ENABLED } from '@/configs'
 import { t } from '@/locales'
 import { useAuthorizeStore } from '@/stores/modules/authorizeStore'
 import { usePermissionStore } from '@/stores/modules/permissionStore'
+import { useSystemStore } from '@/stores/modules/systemStore'
 
 const modules = import.meta.glob('./modules/*.js', { eager: true })
 const staticRoutes = Object.keys(modules).reduce((acc, path) => {
@@ -117,7 +118,7 @@ router.beforeEach(async (to, from) => {
   NProgress.start()
   const authorizeStore = useAuthorizeStore()
   const permissionStore = usePermissionStore()
-  const { user, CheckToken } = authorizeStore
+  const { CheckToken } = authorizeStore
   const { routed, homepage, GenerateRoutes } = permissionStore
 
   if (configs.ROUTES_WHITELIST.includes(to.path)) return true
@@ -135,7 +136,7 @@ router.beforeEach(async (to, from) => {
 
   await CheckToken()
 
-  const identifier = user?.id
+  const identifier = authorizeStore.user?.id
   if (!identifier) {
     if (to.path !== '/login') return { path: '/login', replace: true }
     return true
@@ -152,7 +153,9 @@ router.beforeEach(async (to, from) => {
 })
 
 router.afterEach((to) => {
-  document.title = to.meta.title ? `${t(to.meta.title)} - ${t('ec.app.name')}` : `${t('ec.app.name')}`
+  const systemStore = useSystemStore()
+  const appName = systemStore.name
+  document.title = to.meta.title ? `${t(to.meta.title)} - ${appName}` : `${appName}`
   NProgress.done()
 })
 
