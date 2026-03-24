@@ -1,0 +1,637 @@
+<template>
+  <div class="figma-shell">
+    <header class="figma-shell__header">
+      <div class="figma-shell__brand">
+        <div class="figma-shell__brand-icon">
+          <span></span>
+        </div>
+        <div class="figma-shell__brand-title">{{ t('ec.organization.figma.appTitle') }}</div>
+      </div>
+
+      <nav class="figma-shell__top-nav hidden-sm-and-down">
+        <button
+          v-for="item in topMenus"
+          :key="item.key"
+          class="figma-shell__top-link"
+          type="button"
+        >
+          {{ t(item.label) }}
+        </button>
+      </nav>
+
+      <div class="figma-shell__tools">
+        <button class="figma-shell__tool-button" type="button">
+          <i class="ri-search-line"></i>
+        </button>
+        <button class="figma-shell__tool-button" type="button">
+          <i class="ri-notification-3-line"></i>
+          <span class="figma-shell__tool-dot"></span>
+        </button>
+        <div class="figma-shell__account">
+          <div class="figma-shell__avatar">{{ accountInitial }}</div>
+          <span>{{ displayUserName }}</span>
+        </div>
+      </div>
+    </header>
+
+    <div class="figma-shell__body">
+      <aside class="figma-shell__aside">
+        <button
+          v-for="item in sideMenus"
+          :key="item.key"
+          class="figma-shell__side-link"
+          :class="{ 'is-active': item.active, 'is-disabled': item.disabled }"
+          type="button"
+          :disabled="item.disabled"
+          @click="navigate(item)"
+        >
+          <i :class="item.icon"></i>
+          <span>{{ t(item.label) }}</span>
+        </button>
+      </aside>
+
+      <main class="figma-shell__main">
+        <section class="figma-shell__panel">
+          <div class="figma-shell__tabs">
+            <button
+              v-for="item in subTabs"
+              :key="item.key"
+              class="figma-shell__tab"
+              :class="{ 'is-active': item.key === activeTab }"
+              type="button"
+              @click="router.push(item.path)"
+            >
+              {{ t(item.label) }}
+            </button>
+          </div>
+
+          <div class="figma-shell__stats">
+            <template v-if="statsLoading">
+              <el-skeleton
+                v-for="index in stats.length || 4"
+                :key="index"
+                animated
+                class="figma-shell__stat-skeleton"
+              >
+                <template #template>
+                  <div class="figma-shell__stat-card">
+                    <el-skeleton-item variant="text" style="width: 56%;" />
+                    <el-skeleton-item variant="text" style="width: 28%; height: 32px; margin-top: 16px;" />
+                  </div>
+                </template>
+              </el-skeleton>
+            </template>
+            <div
+              v-for="card in stats"
+              v-else
+              :key="card.key"
+              class="figma-shell__stat-card"
+            >
+              <div class="figma-shell__stat-icon" :class="`is-${card.tone || 'primary'}`">
+                <i :class="card.icon"></i>
+              </div>
+              <div class="figma-shell__stat-label">{{ card.label }}</div>
+              <div class="figma-shell__stat-value">{{ card.value }}</div>
+            </div>
+          </div>
+
+          <div class="figma-shell__content">
+            <div class="figma-shell__toolbar">
+              <div class="figma-shell__toolbar-main">
+                <slot name="filters"></slot>
+              </div>
+              <div class="figma-shell__toolbar-extra">
+                <slot name="actions"></slot>
+              </div>
+            </div>
+
+            <div class="figma-shell__table">
+              <slot></slot>
+            </div>
+
+            <div class="figma-shell__pagination">
+              <slot name="pagination"></slot>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+</template>
+
+<script setup>
+import { computed } from 'vue'
+import { storeToRefs } from 'pinia'
+import { useI18n } from 'vue-i18n'
+import { useRoute, useRouter } from 'vue-router'
+import { useAuthorizeStore } from '@/stores/modules/authorizeStore'
+
+defineOptions({ name: 'FigmaResourceShell' })
+
+const props = defineProps({
+  activeTab: {
+    type: String,
+    default: 'serviceProviders',
+  },
+  stats: {
+    type: Array,
+    default: () => [],
+  },
+  statsLoading: {
+    type: Boolean,
+    default: false,
+  },
+})
+
+const { t } = useI18n()
+const route = useRoute()
+const router = useRouter()
+const { user } = storeToRefs(useAuthorizeStore())
+
+const topMenus = [
+  { key: 'overview', label: 'ec.organization.figma.top.overview' },
+  { key: 'service', label: 'ec.organization.figma.top.service' },
+  { key: 'monitor', label: 'ec.organization.figma.top.monitor' },
+  { key: 'inspection', label: 'ec.organization.figma.top.inspection' },
+  { key: 'board', label: 'ec.organization.figma.top.board' },
+  { key: 'config', label: 'ec.organization.figma.top.config' },
+]
+
+const displayUserName = computed(() => {
+  const rawName = user.value?.name || user.value?.nickname || user.value?.username || t('ec.organization.figma.defaultUser')
+  return String(rawName).startsWith('ec.') ? t(rawName) : rawName
+})
+
+const accountInitial = computed(() => {
+  return String(displayUserName.value || '').trim().charAt(0) || '管'
+})
+
+const sideMenus = computed(() => {
+  return [
+    {
+      key: 'workbench',
+      label: 'ec.organization.figma.side.workbench',
+      icon: 'ri-home-4-line',
+      path: '/dashboard/dashboardWorkbench',
+      active: route.path.startsWith('/dashboard'),
+    },
+    {
+      key: 'organization',
+      label: 'ec.menu.name.organization',
+      icon: 'ri-team-line',
+      path: '/organization/service-providers',
+      active: route.path.startsWith('/organization'),
+    },
+    {
+      key: 'project',
+      label: 'ec.menu.name.project',
+      icon: 'ri-briefcase-4-line',
+      path: '/project/projects',
+      active: route.path.startsWith('/project'),
+    },
+    {
+      key: 'software',
+      label: 'ec.menu.name.software',
+      icon: 'ri-apps-2-line',
+      path: '/software/informationSystems',
+      active: route.path.startsWith('/software'),
+    },
+    {
+      key: 'hardware',
+      label: 'ec.menu.name.hardware',
+      icon: 'ri-database-2-line',
+      path: '/hardware/hardwareAssets',
+      active: route.path.startsWith('/hardware'),
+    },
+    {
+      key: 'data',
+      label: 'ec.organization.figma.side.data',
+      icon: 'ri-stack-line',
+      disabled: true,
+      active: false,
+    },
+  ]
+})
+
+const subTabs = [
+  {
+    key: 'serviceProviders',
+    label: 'ec.menu.name.organizationServiceProviders',
+    path: '/organization/service-providers',
+  },
+  {
+    key: 'persons',
+    label: 'ec.menu.name.organizationPersons',
+    path: '/organization/persons',
+  },
+]
+
+const navigate = (item) => {
+  if (!item.path || item.disabled || item.path === route.path) return
+  router.push(item.path)
+}
+</script>
+
+<style lang="scss" scoped>
+.figma-shell {
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at left bottom, rgba(145, 202, 255, 0.18), transparent 28%),
+    linear-gradient(180deg, #f8f9fe 0%, #f4f6fc 100%);
+  color: #151b26;
+}
+
+.figma-shell__header {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  height: 56px;
+  padding: 0 24px;
+  background: rgba(255, 255, 255, 0.92);
+  border-bottom: 1px solid #edf0f6;
+  backdrop-filter: blur(12px);
+}
+
+.figma-shell__brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.figma-shell__brand-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #8fc7ff 0%, #2e5ef0 72%);
+
+  span {
+    width: 14px;
+    height: 14px;
+    border: 2px solid rgba(255, 255, 255, 0.95);
+    border-radius: 4px;
+    transform: rotate(45deg);
+  }
+}
+
+.figma-shell__brand-title {
+  font-size: 20px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.figma-shell__top-nav {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.figma-shell__top-link {
+  padding: 5px 12px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: #444a57;
+  cursor: default;
+  font-size: 14px;
+}
+
+.figma-shell__tools {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+}
+
+.figma-shell__tool-button {
+  position: relative;
+  width: 32px;
+  height: 32px;
+  border: 0;
+  border-radius: 10px;
+  background: #f5f7fb;
+  color: #444a57;
+  font-size: 16px;
+}
+
+.figma-shell__tool-dot {
+  position: absolute;
+  top: 6px;
+  right: 7px;
+  width: 6px;
+  height: 6px;
+  background: #ff6b6b;
+  border-radius: 50%;
+}
+
+.figma-shell__account {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: 4px;
+  color: #444a57;
+  font-size: 14px;
+}
+
+.figma-shell__avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #6f91ff 0%, #2e5ef0 100%);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.figma-shell__body {
+  display: flex;
+  min-height: calc(100vh - 56px);
+}
+
+.figma-shell__aside {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 220px;
+  padding: 16px 10px;
+  border-right: 1px solid #edf0f6;
+  background: rgba(255, 255, 255, 0.42);
+}
+
+.figma-shell__side-link {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  height: 40px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: #151b26;
+  font-size: 14px;
+  text-align: left;
+  transition: all 0.2s ease;
+  cursor: pointer;
+
+  i {
+    font-size: 16px;
+  }
+
+  &.is-active {
+    background: #ebf0ff;
+    color: #2e5ef0;
+  }
+
+  &.is-disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+}
+
+.figma-shell__main {
+  flex: 1;
+  min-width: 0;
+  padding: 24px 16px 16px;
+}
+
+.figma-shell__panel {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-height: calc(100vh - 96px);
+  padding: 0 16px 16px;
+  background: rgba(255, 255, 255, 0.62);
+  border: 1px solid rgba(237, 240, 246, 0.88);
+  border-radius: 18px;
+  box-shadow: 0 12px 40px rgba(28, 53, 91, 0.06);
+}
+
+.figma-shell__tabs {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  min-height: 40px;
+  padding-top: 2px;
+  border-bottom: 1px solid #e6e8ed;
+}
+
+.figma-shell__tab {
+  position: relative;
+  padding: 10px 0 9px;
+  border: 0;
+  background: transparent;
+  color: #444a57;
+  font-size: 14px;
+  cursor: pointer;
+
+  &.is-active {
+    color: #2e5ef0;
+  }
+
+  &.is-active::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    bottom: -1px;
+    left: 0;
+    height: 2px;
+    background: #2e5ef0;
+    border-radius: 999px;
+  }
+}
+
+.figma-shell__stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 14px;
+  padding: 10px 16px 0;
+}
+
+.figma-shell__stat-card {
+  position: relative;
+  min-height: 88px;
+  padding: 18px 18px 16px;
+  overflow: hidden;
+  background:
+    linear-gradient(92deg, rgba(110, 161, 255, 0.14) 0%, rgba(204, 231, 245, 0.12) 58%, rgba(174, 121, 255, 0.05) 100%),
+    rgba(255, 255, 255, 0.88);
+  border: 1px solid rgba(237, 240, 246, 0.9);
+  border-radius: 14px;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(120deg, rgba(255, 255, 255, 0.35), transparent 56%);
+    pointer-events: none;
+  }
+}
+
+.figma-shell__stat-skeleton {
+  width: 100%;
+}
+
+.figma-shell__stat-icon {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 10px;
+  font-size: 16px;
+
+  &.is-primary {
+    background: rgba(46, 94, 240, 0.12);
+    color: #2e5ef0;
+  }
+
+  &.is-cyan {
+    background: rgba(45, 181, 225, 0.14);
+    color: #2db5e1;
+  }
+
+  &.is-green {
+    background: rgba(54, 178, 62, 0.12);
+    color: #36b23e;
+  }
+
+  &.is-orange {
+    background: rgba(255, 153, 0, 0.14);
+    color: #ff9900;
+  }
+
+  &.is-violet {
+    background: rgba(142, 84, 255, 0.14);
+    color: #8e54ff;
+  }
+}
+
+.figma-shell__stat-label {
+  color: #858a99;
+  font-size: 14px;
+  line-height: 22px;
+}
+
+.figma-shell__stat-value {
+  margin-top: 6px;
+  color: #151b26;
+  font-size: 34px;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.figma-shell__content {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+  padding: 0 16px 16px;
+  background: rgba(255, 255, 255, 0.92);
+  border-radius: 14px;
+}
+
+.figma-shell__toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 0;
+}
+
+.figma-shell__toolbar-main,
+.figma-shell__toolbar-extra {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.figma-shell__toolbar-main {
+  flex: 1;
+  overflow: auto hidden;
+}
+
+.figma-shell__toolbar-extra {
+  flex-shrink: 0;
+}
+
+.figma-shell__table {
+  flex: 1;
+  min-height: 0;
+}
+
+.figma-shell__pagination {
+  padding-top: 12px;
+}
+
+@media only screen and (max-width: 991px) {
+  .figma-shell__header {
+    padding: 0 16px;
+  }
+
+  .figma-shell__body {
+    flex-direction: column;
+  }
+
+  .figma-shell__aside {
+    width: auto;
+    flex-direction: row;
+    overflow-x: auto;
+    padding-bottom: 8px;
+    border-right: 0;
+    border-bottom: 1px solid #edf0f6;
+  }
+
+  .figma-shell__main {
+    padding: 16px 12px 12px;
+  }
+
+  .figma-shell__panel {
+    min-height: auto;
+    padding: 0 12px 12px;
+    border-radius: 16px;
+  }
+
+  .figma-shell__stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    padding-inline: 0;
+  }
+
+  .figma-shell__content {
+    padding-inline: 0;
+    background: transparent;
+  }
+
+  .figma-shell__toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .figma-shell__toolbar-main,
+  .figma-shell__toolbar-extra {
+    flex-wrap: wrap;
+  }
+
+  .figma-shell__toolbar-extra {
+    justify-content: flex-end;
+  }
+
+  .figma-shell__account > span {
+    display: none;
+  }
+}
+</style>

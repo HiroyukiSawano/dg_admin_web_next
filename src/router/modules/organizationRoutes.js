@@ -37,6 +37,7 @@ const organizationRoutes = {
       meta: {
         title: '服务商管理',
         locale: 'ec.menu.name.organizationServiceProviders',
+        fullpage: true,
         type: 'menu',
       },
     },
@@ -47,6 +48,7 @@ const organizationRoutes = {
       meta: {
         title: '人员管理',
         locale: 'ec.menu.name.organizationPersons',
+        fullpage: true,
         type: 'menu',
       },
     },

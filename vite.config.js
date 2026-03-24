@@ -11,12 +11,32 @@ import { viteMockServe } from 'vite-plugin-mock';
 export default defineConfig(({ mode }) => {
   const root = process.cwd()
   const env = loadEnv(mode, root)
+  const isProd = mode === 'production'
+  const useProxy = env.VITE_APP_PROXY === 'true'
+  const proxyTarget = env.VITE_APP_API_URL || 'http://localhost:8080'
   return {
     base: env.VITE_APP_CONTEXT,
     server: {
       port: env.VITE_APP_PORT,
       host: true,
       open: false,
+      proxy: useProxy
+        ? {
+            '/api': {
+              target: proxyTarget,
+              changeOrigin: true,
+            },
+            '/bspplus': {
+              target: proxyTarget,
+              changeOrigin: true,
+            },
+            '/ws': {
+              target: proxyTarget,
+              changeOrigin: true,
+              ws: true,
+            },
+          }
+        : undefined,
     },
     resolve: {
       alias: {
@@ -59,7 +79,7 @@ export default defineConfig(({ mode }) => {
           // }
         }
       }),
-      vueDevTools(),
+      !isProd && vueDevTools(),
       viteCompression({
         verbose: true,
         disable: false,
@@ -77,8 +97,8 @@ export default defineConfig(({ mode }) => {
       viteMockServe({
         mockPath: 'mock',
         ignore: /^index/,
-        localEnabled: true, // 是否在开发环境使用Mock
-        prodEnabled: true, // 是否在生产环境使用Mock
+        localEnabled: !isProd, // 是否在开发环境使用Mock
+        prodEnabled: false, // 正式发布包禁止注入生产 Mock
         logger: true,
         supportTs: false,
         watchFiles: true,
@@ -86,7 +106,7 @@ export default defineConfig(({ mode }) => {
         // 如果直接把代码写到文件中，就会始终打包
         injectCode: `import { setupProdMockServer } from '/mock/index'; setupProdMockServer(); `,
       })
-    ],
+    ].filter(Boolean),
     build: {
       cache: true,
       assetsDir: 'static',

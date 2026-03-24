@@ -1,69 +1,128 @@
 <template>
-  <el-card class="organization-page">
-    <el-form :model="queryForm" inline @submit.prevent>
-      <el-form-item :label="t('ec.organization.serviceProvider.form.keyword')">
+  <figma-resource-shell active-tab="serviceProviders" :stats="serviceProviderStatCards" :stats-loading="statsLoading">
+    <template #filters>
+      <div class="organization-figma-toolbar">
         <el-input
           v-model="queryForm.keyword"
           clearable
+          class="organization-figma-field organization-figma-field--keyword"
           :placeholder="t('ec.organization.serviceProvider.form.keywordPlaceholder')"
           @keyup.enter="handleSearch"
         />
-      </el-form-item>
-      <el-form-item :label="t('ec.organization.serviceProvider.form.type')">
-        <el-select v-model="queryForm.type" clearable :placeholder="t('ec.organization.serviceProvider.form.typePlaceholder')">
+        <el-select
+          v-model="queryForm.type"
+          clearable
+          class="organization-figma-field"
+          :placeholder="t('ec.organization.serviceProvider.form.typePlaceholder')"
+        >
           <el-option
-            v-for="option in serviceProviderTypeOptions"
+            v-for="option in serviceProviderFilterOptions"
             :key="option.value"
             :label="option.label"
             :value="option.value"
           />
         </el-select>
-      </el-form-item>
-      <el-form-item :label="t('ec.organization.serviceProvider.form.status')">
-        <el-select v-model="queryForm.status" clearable :placeholder="t('ec.organization.serviceProvider.form.statusPlaceholder')">
-          <el-option v-for="item in serviceProviderStatusOptions" :key="item.value" :label="item.displayLabel" :value="item.value" />
+        <el-select
+          v-model="queryForm.status"
+          clearable
+          class="organization-figma-field"
+          :placeholder="t('ec.organization.serviceProvider.form.statusPlaceholder')"
+        >
+          <el-option
+            v-for="item in serviceProviderStatusOptions"
+            :key="item.value"
+            :label="item.displayLabel"
+            :value="item.value"
+          />
         </el-select>
-      </el-form-item>
-      <el-form-item>
-        <el-button type="primary" @click="handleSearch">{{ t('ec.global.button.text.search') }}</el-button>
-        <el-button @click="handleReset">{{ t('ec.global.button.text.reset') }}</el-button>
-      </el-form-item>
-      <el-form-item class="margin-left-auto">
-        <el-button type="primary" @click="openCreate">{{ t('ec.organization.common.create') }}</el-button>
-      </el-form-item>
-    </el-form>
+        <el-button class="organization-figma-search" type="primary" @click="handleSearch">
+          {{ t('ec.global.button.text.search') }}
+        </el-button>
+        <el-button class="organization-figma-reset" @click="handleReset">
+          {{ t('ec.global.button.text.reset') }}
+        </el-button>
+      </div>
+    </template>
 
-    <el-table v-loading="tableLoading" :data="tableData" row-key="id">
-      <el-table-column prop="code" :label="t('ec.organization.common.code')" min-width="160" show-overflow-tooltip />
-      <el-table-column prop="name" :label="t('ec.organization.common.name')" min-width="200" show-overflow-tooltip />
-      <el-table-column :label="t('ec.organization.serviceProvider.table.type')" min-width="160">
-        <template #default="{ row }">
-          {{ getServiceProviderTypeLabel(row.type) }}
-        </template>
-      </el-table-column>
+    <template #actions>
+      <el-button class="organization-figma-primary" type="primary" @click="openCreate">
+        {{ t('ec.organization.serviceProvider.figma.create') }}
+      </el-button>
+    </template>
+
+    <el-table
+      v-loading="tableLoading"
+      :data="tableData"
+      row-key="id"
+      class="organization-figma-table"
+    >
+      <el-table-column
+        type="index"
+        width="64"
+        :label="t('ec.organization.figma.table.index')"
+        :index="indexMethod"
+      />
+      <el-table-column
+        prop="code"
+        :label="t('ec.organization.common.code')"
+        min-width="150"
+        show-overflow-tooltip
+      />
+      <el-table-column
+        prop="name"
+        :label="t('ec.organization.common.name')"
+        min-width="180"
+        show-overflow-tooltip
+      />
       <el-table-column
         prop="unifiedSocialCreditCode"
         :label="t('ec.organization.serviceProvider.table.unifiedSocialCreditCode')"
-        min-width="200"
+        min-width="220"
         show-overflow-tooltip
       />
-      <el-table-column prop="ratingLevel" :label="t('ec.organization.serviceProvider.table.ratingLevel')" width="120" show-overflow-tooltip />
-      <el-table-column :label="t('ec.organization.common.status')" width="140">
+      <el-table-column
+        :label="t('ec.organization.serviceProvider.table.type')"
+        width="120"
+      >
         <template #default="{ row }">
-          <el-tag :type="getStatusTagType(row.status, serviceProviderStatusMap)">{{ getStatusLabel(row.status, serviceProviderStatusMap) }}</el-tag>
+          <span class="organization-figma-tag" :class="`is-${getServiceProviderTypeVisual(row.type).tone}`">
+            {{ getServiceProviderTypeVisual(row.type).label }}
+          </span>
         </template>
       </el-table-column>
-      <el-table-column :label="t('ec.organization.common.updatedAt')" width="180">
+      <el-table-column
+        :label="t('ec.organization.serviceProvider.table.ratingLevel')"
+        min-width="140"
+      >
         <template #default="{ row }">
-          {{ formatDateTime(row.updatedAt) }}
+          <figma-rating-stars :value="row.ratingLevel" />
         </template>
       </el-table-column>
-      <el-table-column :label="t('ec.organization.common.actions')" fixed="right" width="250">
+      <el-table-column
+        :label="t('ec.organization.common.actions')"
+        fixed="right"
+        width="150"
+      >
         <template #default="{ row }">
-          <el-button type="primary" link @click="openDetail(row)">{{ t('ec.organization.common.detail') }}</el-button>
-          <el-button type="primary" link @click="openEdit(row)">{{ t('ec.organization.common.edit') }}</el-button>
-          <el-button type="primary" link @click="openRelationDialog(row)">{{ t('ec.organization.common.relations') }}</el-button>
-          <el-button type="danger" link @click="handleDelete(row)">{{ t('ec.organization.common.delete') }}</el-button>
+          <div class="organization-figma-actions">
+            <button class="organization-figma-icon-button" type="button" @click="openEdit(row)">
+              <i class="ri-edit-line"></i>
+            </button>
+            <button class="organization-figma-icon-button is-danger" type="button" @click="handleDelete(row)">
+              <i class="ri-delete-bin-line"></i>
+            </button>
+            <el-dropdown trigger="click" @command="(command) => handleRowCommand(command, row)">
+              <button class="organization-figma-icon-button" type="button">
+                <i class="ri-more-line"></i>
+              </button>
+              <template #dropdown>
+                <el-dropdown-menu>
+                  <el-dropdown-item command="detail">{{ t('ec.organization.common.detail') }}</el-dropdown-item>
+                  <el-dropdown-item command="relations">{{ t('ec.organization.common.relations') }}</el-dropdown-item>
+                </el-dropdown-menu>
+              </template>
+            </el-dropdown>
+          </div>
         </template>
       </el-table-column>
       <template #empty>
@@ -71,22 +130,26 @@
       </template>
     </el-table>
 
-    <el-pagination
-      v-model:current-page="pagination.currentPage"
-      background
-      :layout="paginationLayout"
-      :total="pagination.total"
-      :page-size="pagination.pageSize"
-      :page-sizes="pagination.pageSizes"
-      @current-change="handlePageChange"
-      @update:page-size="handlePageSizeChange"
-    />
-  </el-card>
+    <template #pagination>
+      <el-pagination
+        v-model:current-page="pagination.currentPage"
+        background
+        class="organization-figma-pagination"
+        :layout="paginationLayout"
+        :total="pagination.total"
+        :page-size="pagination.pageSize"
+        :page-sizes="pagination.pageSizes"
+        @current-change="handlePageChange"
+        @update:page-size="handlePageSizeChange"
+      />
+    </template>
+  </figma-resource-shell>
 
   <el-dialog
     v-model="dialogVisible"
     :title="dialogMode === 'create' ? t('ec.organization.serviceProvider.dialog.createTitle') : t('ec.organization.serviceProvider.dialog.editTitle')"
     :width="680"
+    :fullscreen="device === 'mobile'"
     destroy-on-close
     append-to-body
     @closed="handleDialogClosed"
@@ -141,9 +204,10 @@
     v-model="detailVisible"
     :title="t('ec.organization.serviceProvider.drawer.title')"
     size="620px"
+    :fullscreen="device === 'mobile'"
     append-to-body
   >
-    <div v-loading="detailLoading" class="organization-detail" v-if="detailRecord">
+    <div v-if="detailRecord" v-loading="detailLoading" class="organization-detail">
       <div class="organization-detail__grid">
         <div class="organization-detail__item">
           <span>{{ t('ec.organization.common.code') }}</span>
@@ -155,7 +219,7 @@
         </div>
         <div class="organization-detail__item">
           <span>{{ t('ec.organization.serviceProvider.table.type') }}</span>
-          <strong>{{ getServiceProviderTypeLabel(detailRecord.serviceProvider?.type) }}</strong>
+          <strong>{{ getServiceProviderTypeVisual(detailRecord.serviceProvider?.type).label }}</strong>
         </div>
         <div class="organization-detail__item">
           <span>{{ t('ec.organization.common.status') }}</span>
@@ -216,6 +280,7 @@
     v-model="relationDialog.visible"
     :title="t('ec.organization.serviceProvider.dialog.relationsTitle')"
     :width="720"
+    :fullscreen="device === 'mobile'"
     destroy-on-close
     append-to-body
     @closed="handleRelationClosed"
@@ -290,23 +355,24 @@ import {
   syncServiceProviderRelations,
   updateServiceProvider,
 } from '@/services/modules/organizationService'
-import { buildListLabelMap, formatDateTime, getStatusLabel, getStatusTagType, mapIdsToLabels, normalizeRelationIds } from './helpers'
+import {
+  buildListLabelMap,
+  formatDateTime,
+  getStatusLabel,
+  loadAllPagedRecords,
+  mapIdsToLabels,
+  normalizeRelationIds,
+} from './helpers'
+import FigmaRatingStars from './components/FigmaRatingStars.vue'
+import FigmaResourceShell from './components/FigmaResourceShell.vue'
 
 defineOptions({ name: 'OrganizationServiceProviders' })
 
 const { t, locale } = useI18n()
 const { device } = storeToRefs(useSystemStore())
 
-const serviceProviderTypeOptions = computed(() => {
-  return [
-    { label: t('ec.organization.serviceProvider.type.supplier'), value: 'SUPPLIER' },
-    { label: t('ec.organization.serviceProvider.type.serviceProvider'), value: 'SERVICE_PROVIDER' },
-    { label: t('ec.organization.serviceProvider.type.integrator'), value: 'INTEGRATOR' },
-    { label: t('ec.organization.serviceProvider.type.maintenance'), value: 'MAINTENANCE' },
-  ]
-})
-
 const tableLoading = ref(false)
+const statsLoading = ref(false)
 const detailLoading = ref(false)
 const submitLoading = ref(false)
 const relationSubmitLoading = ref(false)
@@ -321,6 +387,14 @@ const hardwareOptions = ref([])
 const informationSystemOptions = ref([])
 const personOptions = ref([])
 const projectOptions = ref([])
+
+const statValues = reactive({
+  total: 0,
+  development: 0,
+  ops: 0,
+  hardware: 0,
+  integration: 0,
+})
 
 const relationDialog = reactive({
   visible: false,
@@ -364,8 +438,43 @@ const formRules = {
   status: [{ required: true, message: t('ec.organization.serviceProvider.validation.statusRequired'), trigger: 'change' }],
 }
 
+const serviceProviderTypeOptions = computed(() => {
+  return [
+    { label: t('ec.organization.serviceProvider.type.supplier'), value: 'SUPPLIER' },
+    { label: t('ec.organization.serviceProvider.type.serviceProvider'), value: 'SERVICE_PROVIDER' },
+    { label: t('ec.organization.serviceProvider.type.integrator'), value: 'INTEGRATOR' },
+    { label: t('ec.organization.serviceProvider.type.maintenance'), value: 'MAINTENANCE' },
+  ]
+})
+
+const serviceProviderVisualTypes = computed(() => ({
+  SERVICE_PROVIDER: {
+    label: t('ec.organization.serviceProvider.figma.type.development'),
+    tone: 'blue',
+  },
+  MAINTENANCE: {
+    label: t('ec.organization.serviceProvider.figma.type.ops'),
+    tone: 'green',
+  },
+  SUPPLIER: {
+    label: t('ec.organization.serviceProvider.figma.type.hardware'),
+    tone: 'orange',
+  },
+  INTEGRATOR: {
+    label: t('ec.organization.serviceProvider.figma.type.integration'),
+    tone: 'violet',
+  },
+}))
+
+const serviceProviderFilterOptions = computed(() => {
+  return serviceProviderTypeOptions.value.map((option) => ({
+    value: option.value,
+    label: getServiceProviderTypeVisual(option.value).label,
+  }))
+})
+
 const paginationLayout = computed(() => {
-  return device.value === 'mobile' ? 'total, prev, next' : 'total, prev, pager, next, sizes'
+  return device.value === 'mobile' ? 'prev, pager, next' : 'total, sizes, prev, pager, next, jumper'
 })
 
 const serviceProviderStatusOptions = computed(() => {
@@ -385,12 +494,67 @@ const informationSystemRelationLabels = computed(() => mapIdsToLabels(detailReco
 const personRelationLabels = computed(() => mapIdsToLabels(detailRecord.value?.personIds, personNameMap.value))
 const projectRelationLabels = computed(() => mapIdsToLabels(detailRecord.value?.projectIds, projectNameMap.value))
 
-const getServiceProviderTypeLabel = (value) => {
-  return serviceProviderTypeOptions.value.find((item) => item.value === value)?.label || value || '-'
-}
+const serviceProviderStatCards = computed(() => {
+  return [
+    {
+      key: 'total',
+      label: t('ec.organization.serviceProvider.figma.stats.total'),
+      value: statValues.total,
+      icon: 'ri-building-line',
+      tone: 'primary',
+    },
+    {
+      key: 'development',
+      label: t('ec.organization.serviceProvider.figma.stats.development'),
+      value: statValues.development,
+      icon: 'ri-code-box-line',
+      tone: 'cyan',
+    },
+    {
+      key: 'ops',
+      label: t('ec.organization.serviceProvider.figma.stats.ops'),
+      value: statValues.ops,
+      icon: 'ri-settings-3-line',
+      tone: 'green',
+    },
+    {
+      key: 'hardware',
+      label: t('ec.organization.serviceProvider.figma.stats.hardware'),
+      value: statValues.hardware,
+      icon: 'ri-hard-drive-3-line',
+      tone: 'orange',
+    },
+    {
+      key: 'integration',
+      label: t('ec.organization.serviceProvider.figma.stats.integration'),
+      value: statValues.integration,
+      icon: 'ri-links-line',
+      tone: 'violet',
+    },
+  ]
+})
 
 const buildDisplayLabel = (primary, secondary) => {
   return [primary, secondary].filter(Boolean).join(' / ') || '-'
+}
+
+const indexMethod = (index) => {
+  return (pagination.currentPage - 1) * pagination.pageSize + index + 1
+}
+
+const getServiceProviderTypeVisual = (value) => {
+  return serviceProviderVisualTypes.value[value] || {
+    label: value || '-',
+    tone: 'blue',
+  }
+}
+
+const resetStatValues = () => {
+  statValues.total = 0
+  statValues.development = 0
+  statValues.ops = 0
+  statValues.hardware = 0
+  statValues.integration = 0
 }
 
 const resetFormData = () => {
@@ -402,25 +566,6 @@ const resetFormData = () => {
   formData.ratingLevel = ''
   formData.status = ''
   formData.remark = ''
-}
-
-const loadData = async () => {
-  tableLoading.value = true
-  try {
-    const pageData = await getServiceProviderList({
-      pageNo: pagination.currentPage,
-      pageSize: pagination.pageSize,
-      keyword: queryForm.keyword || undefined,
-      type: queryForm.type || undefined,
-      status: queryForm.status || undefined,
-    })
-    tableData.value = pageData.records
-    pagination.total = pageData.total
-  } catch (error) {
-    ElMessage.error(error.message || t('ec.organization.serviceProvider.message.loadFailed'))
-  } finally {
-    tableLoading.value = false
-  }
 }
 
 const loadStatusOptions = async () => {
@@ -453,6 +598,58 @@ const loadSupportOptions = async () => {
   }))
 }
 
+const loadData = async () => {
+  tableLoading.value = true
+  try {
+    const pageData = await getServiceProviderList({
+      pageNo: pagination.currentPage,
+      pageSize: pagination.pageSize,
+      keyword: queryForm.keyword || undefined,
+      type: queryForm.type || undefined,
+      status: queryForm.status || undefined,
+    })
+    tableData.value = pageData.records
+    pagination.total = pageData.total
+  } catch (error) {
+    ElMessage.error(error.message || t('ec.organization.serviceProvider.message.loadFailed'))
+  } finally {
+    tableLoading.value = false
+  }
+}
+
+const loadStats = async () => {
+  statsLoading.value = true
+  try {
+    const allRecords = await loadAllPagedRecords(getServiceProviderList)
+    resetStatValues()
+    statValues.total = allRecords.length
+
+    allRecords.forEach((item) => {
+      switch (item.type) {
+        case 'SERVICE_PROVIDER':
+          statValues.development += 1
+          break
+        case 'MAINTENANCE':
+          statValues.ops += 1
+          break
+        case 'SUPPLIER':
+          statValues.hardware += 1
+          break
+        case 'INTEGRATOR':
+          statValues.integration += 1
+          break
+        default:
+          break
+      }
+    })
+  } catch (error) {
+    resetStatValues()
+    ElMessage.error(error.message || t('ec.organization.serviceProvider.figma.statsLoadFailed'))
+  } finally {
+    statsLoading.value = false
+  }
+}
+
 const handleSearch = () => {
   pagination.currentPage = 1
   loadData()
@@ -475,6 +672,17 @@ const handlePageSizeChange = (pageSize) => {
   pagination.pageSize = pageSize
   pagination.currentPage = 1
   loadData()
+}
+
+const handleRowCommand = (command, row) => {
+  if (command === 'detail') {
+    openDetail(row)
+    return
+  }
+
+  if (command === 'relations') {
+    openRelationDialog(row)
+  }
 }
 
 const openCreate = () => {
@@ -555,7 +763,7 @@ const handleSubmit = async () => {
 
     ElMessage.success(t('ec.organization.common.saveSuccess'))
     dialogVisible.value = false
-    await loadData()
+    await Promise.all([loadData(), loadStats()])
   } catch (error) {
     ElMessage.error(error.message || t('ec.organization.common.saveFailed'))
   } finally {
@@ -578,7 +786,7 @@ const handleDelete = async (row) => {
 
     await deleteServiceProvider(row.id)
     ElMessage.success(t('ec.organization.common.deleteSuccess'))
-    await loadData()
+    await Promise.all([loadData(), loadStats()])
   } catch (error) {
     if (error === 'cancel' || error === 'close') return
     ElMessage.error(error.message || t('ec.organization.common.deleteFailed'))
@@ -624,30 +832,128 @@ onMounted(async () => {
   } catch (error) {
     ElMessage.error(error.message || t('ec.organization.serviceProvider.message.loadFailed'))
   }
-  loadData()
+
+  await loadData()
+  loadStats()
 })
 </script>
 
 <style lang="scss" scoped>
-.organization-page {
-  :deep(.el-form.el-form--inline) {
-    margin: -8px -8px 8px;
+.organization-figma-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  width: 100%;
+}
 
-    .el-form-item {
-      margin: 0;
-      padding: 8px;
-    }
+.organization-figma-field {
+  width: 200px;
+}
 
-    .el-input,
-    .el-select {
-      width: 220px;
-    }
+.organization-figma-field--keyword {
+  width: 240px;
+}
+
+.organization-figma-search,
+.organization-figma-reset,
+.organization-figma-primary {
+  min-width: 96px;
+  height: 32px;
+  padding-inline: 14px;
+  border-radius: 8px;
+}
+
+.organization-figma-primary {
+  min-width: 120px;
+}
+
+.organization-figma-table {
+  :deep(.el-table__inner-wrapper::before) {
+    display: none;
   }
 
-  .el-pagination {
-    justify-content: flex-end;
-    margin-top: 16px;
+  :deep(th.el-table__cell) {
+    height: 46px;
+    padding: 0;
+    background: #f5f6f9;
+    color: #151b26;
+    font-weight: 600;
   }
+
+  :deep(td.el-table__cell) {
+    height: 46px;
+    padding: 0;
+    color: #444a57;
+  }
+
+  :deep(.cell) {
+    line-height: 22px;
+  }
+}
+
+.organization-figma-tag {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 52px;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  line-height: 20px;
+
+  &.is-blue {
+    background: #ebf0ff;
+    color: #2e5ef0;
+  }
+
+  &.is-green {
+    background: #dff6e2;
+    color: #36b23e;
+  }
+
+  &.is-orange {
+    background: #fff2e7;
+    color: #ff8a24;
+  }
+
+  &.is-violet {
+    background: #f2ebff;
+    color: #8e54ff;
+  }
+}
+
+.organization-figma-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.organization-figma-icon-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: #6d7485;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: #f5f6f9;
+    color: #2e5ef0;
+  }
+
+  &.is-danger:hover {
+    color: #f56c6c;
+  }
+}
+
+.organization-figma-pagination {
+  justify-content: space-between;
 }
 
 .organization-detail {
@@ -710,30 +1016,19 @@ onMounted(async () => {
 }
 
 @media only screen and (max-width: 991px) {
-  .organization-page {
-    :deep(.el-form.el-form--inline) {
-      flex-direction: column;
+  .organization-figma-field,
+  .organization-figma-field--keyword {
+    width: 100%;
+  }
 
-      .el-form-item {
-        display: flex;
-        flex-direction: column;
-        align-items: flex-start;
-        width: 100%;
+  .organization-figma-search,
+  .organization-figma-reset,
+  .organization-figma-primary {
+    flex: 1;
+  }
 
-        .el-form-item__content {
-          width: 100%;
-        }
-      }
-
-      .el-input,
-      .el-select {
-        width: 100%;
-      }
-    }
-
-    .el-pagination {
-      justify-content: center;
-    }
+  .organization-figma-pagination {
+    justify-content: center;
   }
 
   .organization-detail__grid {

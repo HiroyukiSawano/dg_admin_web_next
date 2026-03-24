@@ -1,5 +1,6 @@
 import { computed, ref } from 'vue'
 import { defineStore } from 'pinia'
+import { APP_API_URL } from '@/configs'
 import {
   ackAllMonitorAlerts,
   ackMonitorAlert,
@@ -356,7 +357,7 @@ const toNumber = (value) => {
 }
 
 const resolveMonitorSocketUrl = () => {
-  const apiBase = import.meta.env.VITE_APP_API_URL
+  const apiBase = APP_API_URL
   if (apiBase) {
     try {
       const normalized = new URL(apiBase, window.location.origin)

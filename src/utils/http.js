@@ -2,10 +2,17 @@
 import axios from 'axios'
 import { useAuthorizeStore } from '@/stores/modules/authorizeStore'
 import { ElNotification } from 'element-plus'
-import { REQUEST_CONTENT_TYPE, REQUEST_TIMEOUT, REQUEST_CACHE, REQUEST_HEADERS, REQUEST_TEMPLATE_TOKEN } from '@/configs'
+import {
+  APP_API_URL,
+  REQUEST_CONTENT_TYPE,
+  REQUEST_TIMEOUT,
+  REQUEST_CACHE,
+  REQUEST_HEADERS,
+  REQUEST_TEMPLATE_TOKEN,
+} from '@/configs'
 const instance = axios.create(
   {
-    baseURL: import.meta.env.VITE_APP_API_URL,
+    baseURL: APP_API_URL,
     timeout: REQUEST_TIMEOUT,
     headers: { 'Content-Type': REQUEST_CONTENT_TYPE },
   }

@@ -1,65 +1,132 @@
 <template>
-  <el-card class="organization-page">
-    <el-form :model="queryForm" inline @submit.prevent>
-      <el-form-item :label="t('ec.organization.person.form.keyword')">
+  <figma-resource-shell active-tab="persons" :stats="personStatCards" :stats-loading="statsLoading">
+    <template #filters>
+      <div class="organization-figma-toolbar">
         <el-input
           v-model="queryForm.keyword"
           clearable
+          class="organization-figma-field organization-figma-field--keyword"
           :placeholder="t('ec.organization.person.form.keywordPlaceholder')"
           @keyup.enter="handleSearch"
         />
-      </el-form-item>
-      <el-form-item :label="t('ec.organization.person.form.department')">
         <el-tree-select
           v-model="queryForm.departmentId"
           clearable
           check-strictly
           node-key="id"
+          class="organization-figma-field"
           :data="departmentOptions"
           :props="{ label: 'name', children: 'children' }"
           :placeholder="t('ec.organization.person.form.departmentPlaceholder')"
-          style="width: 220px;"
         />
-      </el-form-item>
-      <el-form-item :label="t('ec.organization.person.form.status')">
-        <el-select v-model="queryForm.status" clearable :placeholder="t('ec.organization.person.form.statusPlaceholder')">
-          <el-option v-for="item in personStatusOptions" :key="item.value" :label="item.displayLabel" :value="item.value" />
+        <el-select
+          v-model="queryForm.status"
+          clearable
+          class="organization-figma-field"
+          :placeholder="t('ec.organization.person.form.statusPlaceholder')"
+        >
+          <el-option
+            v-for="item in personStatusOptions"
+            :key="item.value"
+            :label="item.displayLabel"
+            :value="item.value"
+          />
         </el-select>
-      </el-form-item>
-      <el-form-item>
-        <el-button type="primary" @click="handleSearch">{{ t('ec.global.button.text.search') }}</el-button>
-        <el-button @click="handleReset">{{ t('ec.global.button.text.reset') }}</el-button>
-      </el-form-item>
-      <el-form-item class="margin-left-auto">
-        <el-button type="primary" @click="openCreate">{{ t('ec.organization.common.create') }}</el-button>
-      </el-form-item>
-    </el-form>
+        <el-button class="organization-figma-search" type="primary" @click="handleSearch">
+          {{ t('ec.global.button.text.search') }}
+        </el-button>
+        <el-button class="organization-figma-reset" @click="handleReset">
+          {{ t('ec.global.button.text.reset') }}
+        </el-button>
+      </div>
+    </template>
 
-    <el-table v-loading="tableLoading" :data="tableData" row-key="id">
-      <el-table-column prop="name" :label="t('ec.organization.common.name')" min-width="160" show-overflow-tooltip />
-      <el-table-column prop="employeeNo" :label="t('ec.organization.person.table.employeeNo')" min-width="140" show-overflow-tooltip />
-      <el-table-column prop="mobile" :label="t('ec.organization.person.table.mobile')" min-width="160" show-overflow-tooltip />
-      <el-table-column :label="t('ec.organization.person.table.departmentName')" min-width="180" show-overflow-tooltip>
+    <template #actions>
+      <el-button class="organization-figma-primary" type="primary" @click="openCreate">
+        {{ t('ec.organization.common.create') }}
+      </el-button>
+    </template>
+
+    <el-table
+      v-loading="tableLoading"
+      :data="tableData"
+      row-key="id"
+      class="organization-figma-table"
+    >
+      <el-table-column
+        type="index"
+        width="64"
+        :label="t('ec.organization.figma.table.index')"
+        :index="indexMethod"
+      />
+      <el-table-column
+        prop="name"
+        :label="t('ec.organization.common.name')"
+        min-width="130"
+        show-overflow-tooltip
+      />
+      <el-table-column
+        prop="gender"
+        :label="t('ec.organization.person.table.gender')"
+        min-width="90"
+        show-overflow-tooltip
+      />
+      <el-table-column
+        prop="idCardNo"
+        :label="t('ec.organization.person.table.idCardNo')"
+        min-width="180"
+        show-overflow-tooltip
+      />
+      <el-table-column
+        :label="t('ec.organization.person.figma.table.company')"
+        min-width="160"
+        show-overflow-tooltip
+      >
         <template #default="{ row }">
-          {{ departmentNameMap[row.departmentId] || '-' }}
+          {{ getDepartmentLabel(row) }}
         </template>
       </el-table-column>
-      <el-table-column :label="t('ec.organization.common.status')" width="140">
+      <el-table-column
+        prop="mobile"
+        :label="t('ec.organization.person.table.mobile')"
+        min-width="140"
+        show-overflow-tooltip
+      />
+      <el-table-column
+        :label="t('ec.organization.person.figma.table.type')"
+        width="110"
+      >
         <template #default="{ row }">
-          <el-tag :type="getStatusTagType(row.status, personStatusMap)">{{ getStatusLabel(row.status, personStatusMap) }}</el-tag>
+          <span class="organization-figma-tag" :class="`is-${getPersonTypeVisual(row.id).tone}`">
+            {{ getPersonTypeVisual(row.id).label }}
+          </span>
         </template>
       </el-table-column>
-      <el-table-column :label="t('ec.organization.common.updatedAt')" width="180">
+      <el-table-column
+        :label="t('ec.organization.common.actions')"
+        fixed="right"
+        width="150"
+      >
         <template #default="{ row }">
-          {{ formatDateTime(row.updatedAt) }}
-        </template>
-      </el-table-column>
-      <el-table-column :label="t('ec.organization.common.actions')" fixed="right" width="250">
-        <template #default="{ row }">
-          <el-button type="primary" link @click="openDetail(row)">{{ t('ec.organization.common.detail') }}</el-button>
-          <el-button type="primary" link @click="openEdit(row)">{{ t('ec.organization.common.edit') }}</el-button>
-          <el-button type="primary" link @click="openRelationDialog(row)">{{ t('ec.organization.common.relations') }}</el-button>
-          <el-button type="danger" link @click="handleDelete(row)">{{ t('ec.organization.common.delete') }}</el-button>
+          <div class="organization-figma-actions">
+            <button class="organization-figma-icon-button" type="button" @click="openEdit(row)">
+              <i class="ri-edit-line"></i>
+            </button>
+            <button class="organization-figma-icon-button is-danger" type="button" @click="handleDelete(row)">
+              <i class="ri-delete-bin-line"></i>
+            </button>
+            <el-dropdown trigger="click" @command="(command) => handleRowCommand(command, row)">
+              <button class="organization-figma-icon-button" type="button">
+                <i class="ri-more-line"></i>
+              </button>
+              <template #dropdown>
+                <el-dropdown-menu>
+                  <el-dropdown-item command="detail">{{ t('ec.organization.common.detail') }}</el-dropdown-item>
+                  <el-dropdown-item command="relations">{{ t('ec.organization.common.relations') }}</el-dropdown-item>
+                </el-dropdown-menu>
+              </template>
+            </el-dropdown>
+          </div>
         </template>
       </el-table-column>
       <template #empty>
@@ -67,22 +134,26 @@
       </template>
     </el-table>
 
-    <el-pagination
-      v-model:current-page="pagination.currentPage"
-      background
-      :layout="paginationLayout"
-      :total="pagination.total"
-      :page-size="pagination.pageSize"
-      :page-sizes="pagination.pageSizes"
-      @current-change="handlePageChange"
-      @update:page-size="handlePageSizeChange"
-    />
-  </el-card>
+    <template #pagination>
+      <el-pagination
+        v-model:current-page="pagination.currentPage"
+        background
+        class="organization-figma-pagination"
+        :layout="paginationLayout"
+        :total="pagination.total"
+        :page-size="pagination.pageSize"
+        :page-sizes="pagination.pageSizes"
+        @current-change="handlePageChange"
+        @update:page-size="handlePageSizeChange"
+      />
+    </template>
+  </figma-resource-shell>
 
   <el-dialog
     v-model="dialogVisible"
     :title="dialogMode === 'create' ? t('ec.organization.person.dialog.createTitle') : t('ec.organization.person.dialog.editTitle')"
     :width="720"
+    :fullscreen="device === 'mobile'"
     destroy-on-close
     append-to-body
     @closed="handleDialogClosed"
@@ -137,9 +208,10 @@
     v-model="detailVisible"
     :title="t('ec.organization.person.drawer.title')"
     size="620px"
+    :fullscreen="device === 'mobile'"
     append-to-body
   >
-    <div v-loading="detailLoading" class="organization-detail" v-if="detailRecord">
+    <div v-if="detailRecord" v-loading="detailLoading" class="organization-detail">
       <div class="organization-detail__grid">
         <div class="organization-detail__item">
           <span>{{ t('ec.organization.common.name') }}</span>
@@ -166,7 +238,7 @@
           <strong>{{ detailRecord.person?.account || '-' }}</strong>
         </div>
         <div class="organization-detail__item">
-          <span>{{ t('ec.organization.person.table.departmentName') }}</span>
+          <span>{{ t('ec.organization.person.figma.table.company') }}</span>
           <strong>{{ departmentNameMap[detailRecord.person?.departmentId] || '-' }}</strong>
         </div>
         <div class="organization-detail__item is-full">
@@ -178,8 +250,8 @@
           <strong>{{ getStatusLabel(detailRecord.person?.status, personStatusMap) }}</strong>
         </div>
         <div class="organization-detail__item">
-          <span>{{ t('ec.organization.common.updatedAt') }}</span>
-          <strong>{{ formatDateTime(detailRecord.person?.updatedAt) }}</strong>
+          <span>{{ t('ec.organization.person.figma.table.type') }}</span>
+          <strong>{{ getPersonTypeVisual(detailRecord.person?.id).label }}</strong>
         </div>
       </div>
 
@@ -213,6 +285,7 @@
     v-model="relationDialog.visible"
     :title="t('ec.organization.person.dialog.relationsTitle')"
     :width="720"
+    :fullscreen="device === 'mobile'"
     destroy-on-close
     append-to-body
     @closed="handleRelationClosed"
@@ -267,6 +340,7 @@ import {
   deletePerson,
   getOrganizationHardwareOptions,
   getOrganizationInformationSystemOptions,
+  getOrganizationPersonOptions,
   getOrganizationProjectOptions,
   getPersonDepartmentOptions,
   getPersonDetail,
@@ -274,7 +348,15 @@ import {
   syncPersonRelations,
   updatePerson,
 } from '@/services/modules/organizationService'
-import { buildIdNameMap, buildListLabelMap, formatDateTime, getStatusLabel, getStatusTagType, mapIdsToLabels, normalizeRelationIds } from './helpers'
+import {
+  buildIdNameMap,
+  buildListLabelMap,
+  getStatusLabel,
+  mapIdsToLabels,
+  normalizeRelationIds,
+  runInBatches,
+} from './helpers'
+import FigmaResourceShell from './components/FigmaResourceShell.vue'
 
 defineOptions({ name: 'OrganizationPersons' })
 
@@ -282,6 +364,7 @@ const { t, locale } = useI18n()
 const { device } = storeToRefs(useSystemStore())
 
 const tableLoading = ref(false)
+const statsLoading = ref(false)
 const detailLoading = ref(false)
 const submitLoading = ref(false)
 const relationSubmitLoading = ref(false)
@@ -296,6 +379,14 @@ const statusDictionaries = ref({})
 const hardwareOptions = ref([])
 const informationSystemOptions = ref([])
 const projectOptions = ref([])
+const personTypeMap = ref({})
+
+const personStatValues = reactive({
+  total: 0,
+  development: 0,
+  ops: 0,
+  hardwareOwners: 0,
+})
 
 const relationDialog = reactive({
   visible: false,
@@ -339,12 +430,10 @@ const formRules = {
 }
 
 const paginationLayout = computed(() => {
-  return device.value === 'mobile' ? 'total, prev, next' : 'total, prev, pager, next, sizes'
+  return device.value === 'mobile' ? 'prev, pager, next' : 'total, sizes, prev, pager, next, jumper'
 })
 
-const departmentNameMap = computed(() => {
-  return buildIdNameMap(departmentOptions.value)
-})
+const departmentNameMap = computed(() => buildIdNameMap(departmentOptions.value))
 
 const personStatusOptions = computed(() => {
   return Object.values(buildStatusOptionMap(statusDictionaries.value.personStatus, locale.value))
@@ -361,8 +450,76 @@ const hardwareRelationLabels = computed(() => mapIdsToLabels(detailRecord.value?
 const informationSystemRelationLabels = computed(() => mapIdsToLabels(detailRecord.value?.informationSystemIds, informationSystemNameMap.value))
 const projectRelationLabels = computed(() => mapIdsToLabels(detailRecord.value?.projectIds, projectNameMap.value))
 
+const personTypeOptions = computed(() => ({
+  DEV: {
+    label: t('ec.organization.person.figma.type.dev'),
+    tone: 'blue',
+  },
+  OPS: {
+    label: t('ec.organization.person.figma.type.ops'),
+    tone: 'green',
+  },
+}))
+
+const personStatCards = computed(() => {
+  return [
+    {
+      key: 'total',
+      label: t('ec.organization.person.figma.stats.total'),
+      value: personStatValues.total,
+      icon: 'ri-user-3-line',
+      tone: 'primary',
+    },
+    {
+      key: 'development',
+      label: t('ec.organization.person.figma.stats.development'),
+      value: personStatValues.development,
+      icon: 'ri-code-box-line',
+      tone: 'cyan',
+    },
+    {
+      key: 'ops',
+      label: t('ec.organization.person.figma.stats.ops'),
+      value: personStatValues.ops,
+      icon: 'ri-settings-3-line',
+      tone: 'green',
+    },
+    {
+      key: 'hardwareOwners',
+      label: t('ec.organization.person.figma.stats.hardwareOwners'),
+      value: personStatValues.hardwareOwners,
+      icon: 'ri-hard-drive-3-line',
+      tone: 'violet',
+    },
+  ]
+})
+
 const buildDisplayLabel = (primary, secondary) => {
   return [primary, secondary].filter(Boolean).join(' / ') || '-'
+}
+
+const indexMethod = (index) => {
+  return (pagination.currentPage - 1) * pagination.pageSize + index + 1
+}
+
+const getPersonTypeCode = (detail) => {
+  return normalizeRelationIds(detail?.hardwareAssetIds).length > 0 ? 'OPS' : 'DEV'
+}
+
+const getPersonTypeVisual = (personId) => {
+  const code = personTypeMap.value[personId] || 'DEV'
+  return personTypeOptions.value[code] || personTypeOptions.value.DEV
+}
+
+const getDepartmentLabel = (row) => {
+  return departmentNameMap.value[row.departmentId] || '-'
+}
+
+const resetPersonStats = () => {
+  personStatValues.total = 0
+  personStatValues.development = 0
+  personStatValues.ops = 0
+  personStatValues.hardwareOwners = 0
 }
 
 const resetFormData = () => {
@@ -426,6 +583,58 @@ const loadData = async () => {
   }
 }
 
+const loadPersonStats = async () => {
+  statsLoading.value = true
+  try {
+    const personOptions = await getOrganizationPersonOptions()
+    const personIds = personOptions.map((item) => item.id).filter(Boolean)
+    const nextTypeMap = {}
+
+    personIds.forEach((id) => {
+      nextTypeMap[id] = 'DEV'
+    })
+
+    resetPersonStats()
+    personStatValues.total = personIds.length
+
+    const settled = await runInBatches(
+      personIds,
+      async (personId) => getPersonDetail(personId),
+      8,
+    )
+
+    settled.forEach((result) => {
+      if (result.status !== 'fulfilled') return
+      const detail = result.value
+      const personId = detail?.person?.id
+      if (!personId) return
+
+      const typeCode = getPersonTypeCode(detail)
+      nextTypeMap[personId] = typeCode
+
+      if (typeCode === 'OPS') {
+        personStatValues.hardwareOwners += 1
+      }
+    })
+
+    Object.values(nextTypeMap).forEach((typeCode) => {
+      if (typeCode === 'OPS') {
+        personStatValues.ops += 1
+        return
+      }
+      personStatValues.development += 1
+    })
+
+    personTypeMap.value = nextTypeMap
+  } catch (error) {
+    resetPersonStats()
+    personTypeMap.value = {}
+    ElMessage.error(error.message || t('ec.organization.person.figma.statsLoadFailed'))
+  } finally {
+    statsLoading.value = false
+  }
+}
+
 const handleSearch = () => {
   pagination.currentPage = 1
   loadData()
@@ -448,6 +657,17 @@ const handlePageSizeChange = (pageSize) => {
   pagination.pageSize = pageSize
   pagination.currentPage = 1
   loadData()
+}
+
+const handleRowCommand = (command, row) => {
+  if (command === 'detail') {
+    openDetail(row)
+    return
+  }
+
+  if (command === 'relations') {
+    openRelationDialog(row)
+  }
 }
 
 const openCreate = () => {
@@ -531,7 +751,7 @@ const handleSubmit = async () => {
 
     ElMessage.success(t('ec.organization.common.saveSuccess'))
     dialogVisible.value = false
-    await loadData()
+    await Promise.all([loadData(), loadPersonStats()])
   } catch (error) {
     ElMessage.error(error.message || t('ec.organization.common.saveFailed'))
   } finally {
@@ -554,7 +774,7 @@ const handleDelete = async (row) => {
 
     await deletePerson(row.id)
     ElMessage.success(t('ec.organization.common.deleteSuccess'))
-    await loadData()
+    await Promise.all([loadData(), loadPersonStats()])
   } catch (error) {
     if (error === 'cancel' || error === 'close') return
     ElMessage.error(error.message || t('ec.organization.common.deleteFailed'))
@@ -575,6 +795,7 @@ const handleRelationSubmit = async () => {
     })
     ElMessage.success(t('ec.organization.person.relation.saveSuccess'))
     relationDialog.visible = false
+    await loadPersonStats()
     if (detailVisible.value && detailRecord.value?.person?.id === relationDialog.personId) {
       detailRecord.value = await getPersonDetail(relationDialog.personId)
     }
@@ -598,30 +819,118 @@ onMounted(async () => {
   } catch (error) {
     ElMessage.error(error.message || t('ec.organization.person.message.departmentLoadFailed'))
   }
-  loadData()
+
+  await loadData()
+  loadPersonStats()
 })
 </script>
 
 <style lang="scss" scoped>
-.organization-page {
-  :deep(.el-form.el-form--inline) {
-    margin: -8px -8px 8px;
+.organization-figma-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  width: 100%;
+}
 
-    .el-form-item {
-      margin: 0;
-      padding: 8px;
-    }
+.organization-figma-field {
+  width: 200px;
+}
 
-    .el-input,
-    .el-select {
-      width: 220px;
-    }
+.organization-figma-field--keyword {
+  width: 240px;
+}
+
+.organization-figma-search,
+.organization-figma-reset,
+.organization-figma-primary {
+  min-width: 84px;
+  height: 32px;
+  padding-inline: 14px;
+  border-radius: 8px;
+}
+
+.organization-figma-primary {
+  min-width: 96px;
+}
+
+.organization-figma-table {
+  :deep(.el-table__inner-wrapper::before) {
+    display: none;
   }
 
-  .el-pagination {
-    justify-content: flex-end;
-    margin-top: 16px;
+  :deep(th.el-table__cell) {
+    height: 46px;
+    padding: 0;
+    background: #f5f6f9;
+    color: #151b26;
+    font-weight: 600;
   }
+
+  :deep(td.el-table__cell) {
+    height: 46px;
+    padding: 0;
+    color: #444a57;
+  }
+
+  :deep(.cell) {
+    line-height: 22px;
+  }
+}
+
+.organization-figma-tag {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  line-height: 20px;
+
+  &.is-blue {
+    background: #ebf0ff;
+    color: #2e5ef0;
+  }
+
+  &.is-green {
+    background: #dff6e2;
+    color: #36b23e;
+  }
+}
+
+.organization-figma-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.organization-figma-icon-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: #6d7485;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: #f5f6f9;
+    color: #2e5ef0;
+  }
+
+  &.is-danger:hover {
+    color: #f56c6c;
+  }
+}
+
+.organization-figma-pagination {
+  justify-content: space-between;
 }
 
 .organization-detail {
@@ -684,30 +993,19 @@ onMounted(async () => {
 }
 
 @media only screen and (max-width: 991px) {
-  .organization-page {
-    :deep(.el-form.el-form--inline) {
-      flex-direction: column;
+  .organization-figma-field,
+  .organization-figma-field--keyword {
+    width: 100%;
+  }
 
-      .el-form-item {
-        display: flex;
-        flex-direction: column;
-        align-items: flex-start;
-        width: 100%;
+  .organization-figma-search,
+  .organization-figma-reset,
+  .organization-figma-primary {
+    flex: 1;
+  }
 
-        .el-form-item__content {
-          width: 100%;
-        }
-      }
-
-      .el-input,
-      .el-select {
-        width: 100%;
-      }
-    }
-
-    .el-pagination {
-      justify-content: center;
-    }
+  .organization-figma-pagination {
+    justify-content: center;
   }
 
   .organization-detail__grid {

@@ -117,3 +117,41 @@ export const normalizeRelationIds = (value) => {
 export const mapIdsToLabels = (ids = [], mapping = {}) => {
   return normalizeRelationIds(ids).map((item) => mapping[item] || String(item))
 }
+
+export const loadAllPagedRecords = async (fetcher, params = {}, pageSize = 100) => {
+  let pageNo = 1
+  let total = 0
+  const records = []
+
+  while (pageNo === 1 || records.length < total) {
+    const pageData = await fetcher({
+      ...params,
+      pageNo,
+      pageSize,
+    })
+
+    const pageRecords = Array.isArray(pageData?.records) ? pageData.records : []
+    total = Number(pageData?.total || 0)
+    records.push(...pageRecords)
+
+    if (pageRecords.length < pageSize) {
+      break
+    }
+
+    pageNo += 1
+  }
+
+  return records
+}
+
+export const runInBatches = async (items = [], handler, batchSize = 8) => {
+  const results = []
+
+  for (let index = 0; index < items.length; index += batchSize) {
+    const batch = items.slice(index, index + batchSize)
+    const settled = await Promise.allSettled(batch.map((item) => handler(item)))
+    results.push(...settled)
+  }
+
+  return results
+}

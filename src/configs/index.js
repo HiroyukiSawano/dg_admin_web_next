@@ -1,10 +1,13 @@
+const hasRuntimeApiBase = Object.prototype.hasOwnProperty.call(import.meta.env, 'VITE_APP_API_URL')
+const buildTimeApiBase = hasRuntimeApiBase ? import.meta.env.VITE_APP_API_URL : import.meta.env.VITE_APP_API
+
 const defaultConfig = {
   APP_NAME: '数字政府管理框架',
   APP_NAME_EN: 'ECGAP Web',
   APP_LOGO: '@/assets/images/logo.svg',
   APP_COPYRIGHT: 'COPYRIGHT © ECGAP WEB',
   APP_VERSION: '4.5.05',
-  APP_API_URL: import.meta.env.VITE_APP_API,
+  APP_API_URL: buildTimeApiBase,
   APP_CODE: import.meta.env.VITE_APP_CODE,
 
   // Toggle auth globally. When false, the app bypasses the login flow.
@@ -70,9 +73,15 @@ const defaultConfig = {
   BSP_ENCRYPTION_API_LIST: ['/bspplus/utils/uuid', '/bspplus/user/login', '/bspplus/user/menus'],
 }
 
-if (process.env.NODE_ENV === 'production') {
-  Object.assign(defaultConfig, window.publicConfig)
-}
+const runtimeConfig =
+  import.meta.env.PROD &&
+  typeof window !== 'undefined' &&
+  window.publicConfig &&
+  typeof window.publicConfig === 'object'
+    ? window.publicConfig
+    : {}
+
+Object.assign(defaultConfig, runtimeConfig)
 
 export default defaultConfig
 

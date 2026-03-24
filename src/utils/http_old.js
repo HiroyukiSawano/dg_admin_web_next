@@ -1,6 +1,7 @@
 import axios from 'axios'
 import { useAuthorizeStore } from '@/stores/modules/authorizeStore'
 import { ElMessageBox, ElNotification } from 'element-plus'
+import { APP_API_URL } from '@/configs'
 
 class Http {
   static request(option, origin = false, crypto = false) {
@@ -18,7 +19,7 @@ class Http {
     )
     const _option = {
       method: 'post',
-      baseURL: import.meta.env.VITE_APP_API_URL,
+      baseURL: APP_API_URL,
       url: option.url,
     }
     let preference = {}
