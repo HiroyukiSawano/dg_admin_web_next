@@ -24,7 +24,7 @@
           <el-option
             v-for="item in hardwareStatusOptions"
             :key="item.value"
-            :label="item.label"
+            :label="item.displayLabel"
             :value="item.value"
           />
         </el-select>
@@ -531,6 +531,8 @@ import { useI18n } from 'vue-i18n'
 import { storeToRefs } from 'pinia'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { useSystemStore } from '@/stores/modules/systemStore'
+import { getStatusDictionaries } from '@/services/modules/dictionaryService'
+import { buildStatusOptionMap, getStatusLabel, getStatusTagType } from '@/utils/statusDictionary'
 import {
   batchImportHardwareAssets,
   createHardwareAsset,
@@ -560,7 +562,7 @@ import {
 
 defineOptions({ name: 'HardwareAssets' })
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
 const { device } = storeToRefs(useSystemStore())
 
 const formRef = ref(null)
@@ -575,6 +577,7 @@ const importSubmitLoading = ref(false)
 const detailVisible = ref(false)
 const detailRecord = ref(null)
 const tableData = ref([])
+const statusDictionaries = ref({})
 const departmentOptions = ref([])
 const locationOptions = ref([])
 const personOptions = ref([])
@@ -672,16 +675,11 @@ const hardwareCategoryOptions = computed(() => {
 })
 
 const hardwareStatusOptions = computed(() => {
-  return [
-    { value: 'REGISTERED', label: t('ec.hardware.status.registered') },
-    { value: 'IN_STOCK', label: t('ec.hardware.status.inStock') },
-    { value: 'ASSIGNED', label: t('ec.hardware.status.assigned') },
-    { value: 'CHANGED', label: t('ec.hardware.status.changed') },
-    { value: 'IDLE', label: t('ec.hardware.status.idle') },
-    { value: 'MAINTAINING', label: t('ec.hardware.status.maintaining') },
-    { value: 'OFFLINE', label: t('ec.hardware.status.offline') },
-    { value: 'SCRAPPED', label: t('ec.hardware.status.scrapped') },
-  ]
+  return Object.values(buildStatusOptionMap(statusDictionaries.value.hardwareStatus, locale.value))
+})
+
+const hardwareStatusMap = computed(() => {
+  return buildStatusOptionMap(hardwareStatusOptions.value, locale.value)
 })
 
 const paginationLayout = computed(() => {
@@ -796,17 +794,9 @@ const getHardwareCategoryLabel = (value) => {
   return matched?.label || value || '-'
 }
 
-const getHardwareStatusLabel = (value) => {
-  const matched = hardwareStatusOptions.value.find((item) => item.value === value)
-  return matched?.label || value || '-'
-}
+const getHardwareStatusLabel = (value) => getStatusLabel(value, hardwareStatusMap.value)
 
-const getHardwareStatusTagType = (value) => {
-  if (value === 'ASSIGNED') return 'success'
-  if (value === 'MAINTAINING') return 'warning'
-  if (value === 'OFFLINE' || value === 'SCRAPPED') return 'danger'
-  return 'info'
-}
+const getHardwareStatusTagType = (value) => getStatusTagType(value, hardwareStatusMap.value)
 
 const getLifecycleActionLabel = (value) => {
   const mapping = {
@@ -975,6 +965,10 @@ const loadSupportOptions = async () => {
   personOptions.value = personList
   vendorOptions.value = vendorList
   systemOptions.value = systemList
+}
+
+const loadStatusOptions = async () => {
+  statusDictionaries.value = await getStatusDictionaries()
 }
 
 const loadData = async () => {
@@ -1256,7 +1250,7 @@ const handleLifecycleClosed = () => {
 
 onMounted(async () => {
   try {
-    await loadSupportOptions()
+    await Promise.all([loadSupportOptions(), loadStatusOptions()])
   } catch (error) {
     ElMessage.error(error.message || t('ec.hardware.support.failed'))
   }

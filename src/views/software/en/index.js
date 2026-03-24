@@ -32,7 +32,7 @@ export default {
   'ec.software.form.codePlaceholder': 'Enter system code',
   'ec.software.form.namePlaceholder': 'Enter system name',
   'ec.software.form.systemTypePlaceholder': 'Select system type',
-  'ec.software.form.statusPlaceholder': 'Enter system status',
+  'ec.software.form.statusPlaceholder': 'Select system status',
   'ec.software.form.remarkPlaceholder': 'Enter remark',
   'ec.software.form.createTitle': 'Create Software',
   'ec.software.form.editTitle': 'Edit Software',
@@ -40,7 +40,7 @@ export default {
   'ec.software.validation.codeRequired': 'Please enter the system code',
   'ec.software.validation.nameRequired': 'Please enter the system name',
   'ec.software.validation.systemTypeRequired': 'Please select the system type',
-  'ec.software.validation.statusRequired': 'Please enter the system status',
+  'ec.software.validation.statusRequired': 'Please select the system status',
 
   'ec.software.detail.title': 'Software Detail',
   'ec.software.detail.basic': 'Basic Information',

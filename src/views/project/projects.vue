@@ -16,7 +16,7 @@
       </el-form-item>
       <el-form-item :label="t('ec.project.common.projectStatus')">
         <el-select v-model="queryForm.projectStatus" clearable :placeholder="t('ec.project.form.projectStatusPlaceholder')">
-          <el-option v-for="item in projectStatusOptions" :key="item.value" :label="item.label" :value="item.value" />
+          <el-option v-for="item in projectStatusOptions" :key="item.value" :label="item.displayLabel" :value="item.value" />
         </el-select>
       </el-form-item>
       <el-form-item>
@@ -108,7 +108,7 @@
           </el-form-item>
           <el-form-item :label="t('ec.project.common.projectStatus')" prop="projectStatus">
             <el-select v-model="formData.projectStatus" clearable :placeholder="t('ec.project.form.projectStatusPlaceholder')">
-              <el-option v-for="item in projectStatusOptions" :key="item.value" :label="item.label" :value="item.value" />
+              <el-option v-for="item in projectStatusOptions" :key="item.value" :label="item.displayLabel" :value="item.value" />
             </el-select>
           </el-form-item>
           <el-form-item :label="t('ec.project.common.startDate')" prop="startDate">
@@ -304,6 +304,8 @@
 import { computed, onMounted, reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { ElMessage, ElMessageBox } from 'element-plus'
+import { getStatusDictionaries } from '@/services/modules/dictionaryService'
+import { buildStatusOptionMap, getStatusLabel, getStatusTagType } from '@/utils/statusDictionary'
 import {
   createProject,
   deleteProject,
@@ -320,7 +322,7 @@ import { buildListLabelMap, formatDate, formatDateTime, normalizeIdList } from '
 
 defineOptions({ name: 'ProjectAssets' })
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
 
 const tableLoading = ref(false)
 const detailLoading = ref(false)
@@ -331,6 +333,7 @@ const detailRecord = ref(null)
 const formRef = ref(null)
 
 const tableData = ref([])
+const statusDictionaries = ref({})
 const informationSystemOptions = ref([])
 const serviceProviderOptions = ref([])
 const personOptions = ref([])
@@ -384,14 +387,13 @@ const projectTypeOptions = computed(() => [
   { value: 'UPGRADE', label: t('ec.project.type.upgrade') },
 ])
 
-const projectStatusOptions = computed(() => [
-  { value: 'PLANNING', label: t('ec.project.status.planning') },
-  { value: 'BUILDING', label: t('ec.project.status.building') },
-  { value: 'DELAYED', label: t('ec.project.status.delayed') },
-  { value: 'OPERATING', label: t('ec.project.status.operating') },
-  { value: 'TERMINATED', label: t('ec.project.status.terminated') },
-  { value: 'FINISHED', label: t('ec.project.status.finished') },
-])
+const projectStatusOptions = computed(() => {
+  return Object.values(buildStatusOptionMap(statusDictionaries.value.projectStatus, locale.value))
+})
+
+const projectStatusMap = computed(() => {
+  return buildStatusOptionMap(projectStatusOptions.value, locale.value)
+})
 
 const systemNameMap = computed(() => buildListLabelMap(informationSystemOptions.value, 'displayLabel'))
 const vendorNameMap = computed(() => buildListLabelMap(serviceProviderOptions.value, 'displayLabel'))
@@ -423,17 +425,9 @@ const getProjectTypeLabel = (value) => {
   return matched?.label || value || '-'
 }
 
-const getProjectStatusLabel = (value) => {
-  const matched = projectStatusOptions.value.find((item) => item.value === value)
-  return matched?.label || value || '-'
-}
+const getProjectStatusLabel = (value) => getStatusLabel(value, projectStatusMap.value)
 
-const getProjectStatusTagType = (value) => {
-  if (value === 'OPERATING') return 'success'
-  if (value === 'DELAYED' || value === 'BUILDING') return 'warning'
-  if (value === 'TERMINATED') return 'danger'
-  return 'info'
-}
+const getProjectStatusTagType = (value) => getStatusTagType(value, projectStatusMap.value)
 
 const resetFormData = () => {
   formData.code = ''
@@ -500,6 +494,10 @@ const loadSupportOptions = async () => {
     ...item,
     displayLabel: buildDisplayLabel(item.assetCode, item.assetName),
   }))
+}
+
+const loadStatusOptions = async () => {
+  statusDictionaries.value = await getStatusDictionaries()
 }
 
 const loadData = async () => {
@@ -690,7 +688,7 @@ const handleRelationClosed = () => {
 
 onMounted(async () => {
   try {
-    await loadSupportOptions()
+    await Promise.all([loadSupportOptions(), loadStatusOptions()])
   } catch (error) {
     ElMessage.error(error.message || t('ec.project.message.supportLoadFailed'))
   }

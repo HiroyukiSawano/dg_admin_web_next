@@ -15,7 +15,9 @@
         </el-select>
       </el-form-item>
       <el-form-item :label="t('ec.software.common.status')">
-        <el-input v-model="queryForm.status" clearable :placeholder="t('ec.software.form.statusPlaceholder')" />
+        <el-select v-model="queryForm.status" clearable :placeholder="t('ec.software.form.statusPlaceholder')">
+          <el-option v-for="item in informationSystemStatusOptions" :key="item.value" :label="item.displayLabel" :value="item.value" />
+        </el-select>
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="handleSearch">{{ t('ec.global.button.text.search') }}</el-button>
@@ -34,7 +36,11 @@
           {{ getSystemTypeLabel(row.systemType) }}
         </template>
       </el-table-column>
-      <el-table-column prop="status" :label="t('ec.software.common.status')" width="140" show-overflow-tooltip />
+      <el-table-column :label="t('ec.software.common.status')" width="140" show-overflow-tooltip>
+        <template #default="{ row }">
+          <el-tag :type="getStatusTagType(row.status, informationSystemStatusMap)">{{ getStatusLabel(row.status, informationSystemStatusMap) }}</el-tag>
+        </template>
+      </el-table-column>
       <el-table-column :label="t('ec.software.common.updatedAt')" width="180">
         <template #default="{ row }">
           {{ formatDateTime(row.updatedAt) }}
@@ -89,7 +95,9 @@
             </el-select>
           </el-form-item>
           <el-form-item :label="t('ec.software.common.status')" prop="status">
-            <el-input v-model="formData.status" clearable :placeholder="t('ec.software.form.statusPlaceholder')" />
+            <el-select v-model="formData.status" clearable :placeholder="t('ec.software.form.statusPlaceholder')">
+              <el-option v-for="item in informationSystemStatusOptions" :key="item.value" :label="item.displayLabel" :value="item.value" />
+            </el-select>
           </el-form-item>
           <el-form-item class="is-full" :label="t('ec.software.common.remark')" prop="remark">
             <el-input
@@ -132,7 +140,7 @@
           </div>
           <div class="software-detail__item">
             <span>{{ t('ec.software.common.status') }}</span>
-            <strong>{{ detailRecord.informationSystem?.status || '-' }}</strong>
+            <strong>{{ getStatusLabel(detailRecord.informationSystem?.status, informationSystemStatusMap) }}</strong>
           </div>
           <div class="software-detail__item is-full">
             <span>{{ t('ec.software.common.remark') }}</span>
@@ -237,6 +245,8 @@
 import { computed, onMounted, reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { ElMessage, ElMessageBox } from 'element-plus'
+import { getStatusDictionaries } from '@/services/modules/dictionaryService'
+import { buildStatusOptionMap, getStatusLabel, getStatusTagType } from '@/utils/statusDictionary'
 import {
   createInformationSystem,
   deleteInformationSystem,
@@ -252,7 +262,7 @@ import { buildListLabelMap, formatDateTime, normalizeIdList } from './helpers'
 
 defineOptions({ name: 'SoftwareAssets' })
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
 
 const tableLoading = ref(false)
 const detailLoading = ref(false)
@@ -263,6 +273,7 @@ const detailRecord = ref(null)
 const formRef = ref(null)
 
 const tableData = ref([])
+const statusDictionaries = ref({})
 const serviceProviderOptions = ref([])
 const personOptions = ref([])
 const projectOptions = ref([])
@@ -312,6 +323,14 @@ const systemTypeOptions = computed(() => [
   { value: 'SUPPORT_SYSTEM', label: t('ec.software.type.supportSystem') },
 ])
 
+const informationSystemStatusOptions = computed(() => {
+  return Object.values(buildStatusOptionMap(statusDictionaries.value.informationSystemStatus, locale.value))
+})
+
+const informationSystemStatusMap = computed(() => {
+  return buildStatusOptionMap(informationSystemStatusOptions.value, locale.value)
+})
+
 const vendorNameMap = computed(() => buildListLabelMap(serviceProviderOptions.value, 'displayLabel'))
 const personNameMap = computed(() => buildListLabelMap(personOptions.value, 'displayLabel'))
 const projectNameMap = computed(() => buildListLabelMap(projectOptions.value, 'displayLabel'))
@@ -324,7 +343,7 @@ const formRules = computed(() => ({
   code: [{ required: true, message: t('ec.software.validation.codeRequired'), trigger: 'blur' }],
   name: [{ required: true, message: t('ec.software.validation.nameRequired'), trigger: 'blur' }],
   systemType: [{ required: true, message: t('ec.software.validation.systemTypeRequired'), trigger: 'change' }],
-  status: [{ required: true, message: t('ec.software.validation.statusRequired'), trigger: 'blur' }],
+  status: [{ required: true, message: t('ec.software.validation.statusRequired'), trigger: 'change' }],
 }))
 
 const buildDisplayLabel = (primary, secondary) => {
@@ -393,6 +412,10 @@ const loadSupportOptions = async () => {
     ...item,
     displayLabel: buildDisplayLabel(item.code, item.name),
   }))
+}
+
+const loadStatusOptions = async () => {
+  statusDictionaries.value = await getStatusDictionaries()
 }
 
 const loadData = async () => {
@@ -581,7 +604,7 @@ const handleRelationClosed = () => {
 
 onMounted(async () => {
   try {
-    await loadSupportOptions()
+    await Promise.all([loadSupportOptions(), loadStatusOptions()])
   } catch (error) {
     ElMessage.error(error.message || t('ec.software.message.supportLoadFailed'))
   }

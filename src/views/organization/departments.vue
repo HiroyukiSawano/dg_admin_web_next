@@ -34,7 +34,7 @@
       </el-table-column>
       <el-table-column :label="t('ec.organization.common.status')" width="140">
         <template #default="{ row }">
-          <el-tag :type="getStatusTagType(row.status)">{{ row.status || '-' }}</el-tag>
+          <el-tag :type="getStatusTagType(row.status, departmentStatusMap)">{{ getStatusLabel(row.status, departmentStatusMap) }}</el-tag>
         </template>
       </el-table-column>
       <el-table-column :label="t('ec.organization.common.updatedAt')" width="180">
@@ -84,7 +84,9 @@
         />
       </el-form-item>
       <el-form-item :label="t('ec.organization.common.status')" prop="status">
-        <el-input v-model="formData.status" clearable :placeholder="t('ec.organization.department.form.statusPlaceholder')" />
+        <el-select v-model="formData.status" clearable :placeholder="t('ec.organization.department.form.statusPlaceholder')" style="width: 100%;">
+          <el-option v-for="item in departmentStatusOptions" :key="item.value" :label="item.displayLabel" :value="item.value" />
+        </el-select>
       </el-form-item>
     </el-form>
     <template #footer>
@@ -115,7 +117,7 @@
         </div>
         <div class="organization-detail__item">
           <span>{{ t('ec.organization.common.status') }}</span>
-          <strong>{{ detailRecord.status || '-' }}</strong>
+          <strong>{{ getStatusLabel(detailRecord.status, departmentStatusMap) }}</strong>
         </div>
         <div class="organization-detail__item">
           <span>{{ t('ec.organization.common.createdAt') }}</span>
@@ -134,6 +136,8 @@
 import { computed, onMounted, reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { ElMessage, ElMessageBox } from 'element-plus'
+import { getStatusDictionaries } from '@/services/modules/dictionaryService'
+import { buildStatusOptionMap } from '@/utils/statusDictionary'
 import {
   createDepartment,
   deleteDepartment,
@@ -147,12 +151,13 @@ import {
   collectDescendantIds,
   filterTreeByKeyword,
   formatDateTime,
+  getStatusLabel,
   getStatusTagType,
 } from './helpers'
 
 defineOptions({ name: 'OrganizationDepartments' })
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
 
 const tableLoading = ref(false)
 const detailLoading = ref(false)
@@ -162,6 +167,7 @@ const detailVisible = ref(false)
 const dialogMode = ref('create')
 const formRef = ref(null)
 const sourceDepartments = ref([])
+const statusDictionaries = ref({})
 const detailRecord = ref(null)
 const editingDepartmentId = ref(null)
 const searchKeyword = ref('')
@@ -181,11 +187,19 @@ const formData = reactive({
 const formRules = {
   code: [{ required: true, message: t('ec.organization.department.validation.codeRequired'), trigger: 'blur' }],
   name: [{ required: true, message: t('ec.organization.department.validation.nameRequired'), trigger: 'blur' }],
-  status: [{ required: true, message: t('ec.organization.department.validation.statusRequired'), trigger: 'blur' }],
+  status: [{ required: true, message: t('ec.organization.department.validation.statusRequired'), trigger: 'change' }],
 }
 
 const departmentNameMap = computed(() => {
   return buildIdNameMap(sourceDepartments.value)
+})
+
+const departmentStatusOptions = computed(() => {
+  return Object.values(buildStatusOptionMap(statusDictionaries.value.departmentStatus, locale.value))
+})
+
+const departmentStatusMap = computed(() => {
+  return buildStatusOptionMap(departmentStatusOptions.value, locale.value)
 })
 
 const filteredDepartments = computed(() => {
@@ -220,6 +234,10 @@ const loadDepartments = async () => {
   } finally {
     tableLoading.value = false
   }
+}
+
+const loadStatusOptions = async () => {
+  statusDictionaries.value = await getStatusDictionaries()
 }
 
 const handleSearch = () => {
@@ -322,7 +340,9 @@ const handleDialogClosed = () => {
 }
 
 onMounted(() => {
-  loadDepartments()
+  Promise.all([loadDepartments(), loadStatusOptions()]).catch((error) => {
+    ElMessage.error(error.message || t('ec.organization.department.message.loadFailed'))
+  })
 })
 </script>
 
@@ -336,7 +356,8 @@ onMounted(() => {
       padding: 8px;
     }
 
-    .el-input {
+    .el-input,
+    .el-select {
       width: 240px;
     }
   }
@@ -384,7 +405,8 @@ onMounted(() => {
         }
       }
 
-      .el-input {
+      .el-input,
+      .el-select {
         width: 100%;
       }
     }

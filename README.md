@@ -1,111 +1,140 @@
-# dg_admin_web_next
+# 信息化资产管理中心前端
 
-## AI Coding Usage
+## 请先读这里
 
-For AI-assisted work in this repository, choose the prompt template by task type:
+这是“信息化资产管理中心”的前端项目，基于现有后台接口做联调、演示和收口。
 
-- Continue refactoring or migrating an existing page: `@docs/ai/refactor/prompt-template.md`
-- Create a new business page or module: `@docs/ai/new-page/prompt-template.md`
+- 项目名称：信息化资产管理中心前端
+- 当前范围：组织资源、项目资源、软件资源、硬件资源
+- 明确不做：数据资源模块
+- 当前阶段：不是从零开发，而是全模块打通闭环、查漏补缺、稳定演示
 
-Supporting docs:
+## 当前结构
 
-- Refactor workflow: `@docs/ai/refactor/workflow.md`
-- Global frontend rules: `docs/frontend-framework-spec.md`
-- Visual baseline: `docs/frontend-visual-baseline.md`
+当前前端主要按下面方式组织：
 
-Recommended usage:
+- `src/router/modules`：模块路由
+- `src/services/modules`：接口封装
+- `src/views`：业务页面
+- `src/views/**/zh-CN`、`src/views/**/en`：模块级国际化文案
+- `src/stores/modules`：登录态、菜单、系统配置等状态管理
 
-- Refactor example: `请按 @docs/ai/refactor/prompt-template.md 执行，继续迁移 monitor 模块的某个旧页面。`
-- New page example: `请按 @docs/ai/new-page/prompt-template.md 执行，新增 asset 模块下的标准台账列表页。`
+默认继续沿用这套接入方式，不做大规模前端架构重构。
 
+## 已接入模块
 
+当前业务模块都已接入前端：
 
-## Getting started
+- 组织资源
+  - 部门
+  - 位置
+  - 服务商
+  - 人员
+- 项目资源
+  - 项目台账
+  - 详情抽屉
+  - 新增 / 编辑
+  - 关系维护
+- 软件资源
+  - 信息系统台账
+  - 详情抽屉
+  - 新增 / 编辑
+  - 关系维护
+- 硬件资源
+  - 列表页
+  - 详情抽屉
+  - 新增 / 编辑
+  - 关联系统 / 负责人 / 服务商
+  - 生命周期操作
+  - JSON 批量导入
+  - CSV 导出
 
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
+## 已完成的联调收口
 
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
+近期已完成的前端收口包括：
 
-## Add your files
+- 项目资源、软件资源页面和服务封装已补齐
+- 组织详情页已补齐跨模块名称回显，不再只显示 ID
+- 前端支撑下拉统一优先走 `/options` 接口
+- 项目 / 软件 / 硬件页面在关键入口会刷新支撑数据，减少跨模块新增后的旧缓存问题
+- 本地演示模式下已规避 `/bspplus/utils/uuid` 误请求，避免首页卡在 loading
 
-- [ ] [Create](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#create-a-file) or [upload](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#upload-a-file) files
-- [ ] [Add files using the command line](https://docs.gitlab.com/ee/gitlab-basics/add-file.html#add-a-file-using-the-command-line) or push an existing Git repository with the following command:
+## 登录与演示模式
 
-```
-cd existing_repo
-git remote add origin http://git.inspur.com/dgued/product/dg_admin_web_vue3_pinia.git
-git branch -M main
-git push -uf origin main
-```
+当前登录支持两种模式：
 
-## Integrate with your tools
+- `AUTH_LOGIN_MODE = 'local'`
+  - 使用本地演示账号
+- `AUTH_LOGIN_MODE = 'backend'`
+  - 走后台 `/bspplus/user/login` 和验证码接口
 
-- [ ] [Set up project integrations](http://git.inspur.com/dgued/product/dg_admin_web_vue3_pinia/-/settings/integrations)
+当前本地演示账号：
 
-## Collaborate with your team
+- `eam_demo / 123456`
+  - 系统名称显示“资产管理系统”
+  - 仅显示“组织 / 项目 / 软件 / 硬件”
+- `ops_demo / 123456`
+  - 系统名称显示“运营管理系统”
+  - 仅显示“监控中心”
+- `platformadmin / admin`
+  - 全量管理员视图，用于调试所有菜单
 
-- [ ] [Invite team members and collaborators](https://docs.gitlab.com/ee/user/project/members/)
-- [ ] [Create a new merge request](https://docs.gitlab.com/ee/user/project/merge_requests/creating_merge_requests.html)
-- [ ] [Automatically close issues from merge requests](https://docs.gitlab.com/ee/user/project/issues/managing_issues.html#closing-issues-automatically)
-- [ ] [Enable merge request approvals](https://docs.gitlab.com/ee/user/project/merge_requests/approvals/)
-- [ ] [Set auto-merge](https://docs.gitlab.com/ee/user/project/merge_requests/merge_when_pipeline_succeeds.html)
+当前“两套系统”是按前端本地映射拆分的：
 
-## Test and Deploy
+- 资产管理系统
+  - 组织资源
+  - 项目资源
+  - 软件资源
+  - 硬件资源
+- 运营管理系统
+  - 监控中心
 
-Use the built-in continuous integration in GitLab.
+系统名称、左上角 Logo 标题、登录页名称、浏览器标题都会跟随当前账号切换。
 
-- [ ] [Get started with GitLab CI/CD](https://docs.gitlab.com/ee/ci/quick_start/index.html)
-- [ ] [Analyze your code for known vulnerabilities with Static Application Security Testing (SAST)](https://docs.gitlab.com/ee/user/application_security/sast/)
-- [ ] [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/ee/topics/autodevops/requirements.html)
-- [ ] [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/ee/user/clusters/agent/)
-- [ ] [Set up protected environments](https://docs.gitlab.com/ee/ci/environments/protected_environments.html)
+## 当前重点
 
-***
+后续前端工作默认优先级如下：
 
-# Editing this README
+1. 先做全模块联调查漏补缺
+2. 重点验证组织 / 项目 / 软件 / 硬件之间的支撑数据与关系回显
+3. 再验证两套演示系统的菜单、首页和登录体验
+4. 最后再考虑按钮级权限、错误提示细化、后台真实菜单接通
 
-When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!). Thanks to [makeareadme.com](https://www.makeareadme.com/) for this template.
+不要再把重点放回“继续铺更多新页面”。
 
-## Suggestions for a good README
+## 开发约束
 
-Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
+后续会话默认遵守以下约束：
 
-## Name
-Choose a self-explaining name for your project.
+- 不做数据资源模块
+- 保持当前 `views + router/modules + services/modules + i18n + store` 结构
+- 优先复用现有组织 / 硬件页面模式
+- 页面注释、交接说明保持中文
+- 如果文档和代码冲突，以代码为准，并及时更新文档
 
-## Description
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
+## 常用文件
 
-## Badges
-On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
+下个会话建议优先看这些文件：
 
-## Visuals
-Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
+- `src/router/modules/organizationRoutes.js`
+- `src/router/modules/hardwareRoutes.js`
+- `src/router/modules/projectRoutes.js`
+- `src/router/modules/softwareRoutes.js`
+- `src/services/modules/organizationService.js`
+- `src/services/modules/hardwareService.js`
+- `src/services/modules/projectService.js`
+- `src/services/modules/softwareService.js`
+- `src/stores/modules/authorizeStore.js`
+- `src/stores/modules/permissionStore.js`
+- `src/configs/systemProfile.js`
+- `src/services/modules/bspService.js`
 
-## Installation
-Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
+## 常用命令
 
-## Usage
-Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
+- 本地开发：`npm run dev`
+- 生产构建：`npm run build`
 
-## Support
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
+## 额外说明
 
-## Roadmap
-If you have ideas for releases in the future, it is a good idea to list them in the README.
-
-## Contributing
-State if you are open to contributions and what your requirements are for accepting them.
-
-For people who want to make changes to your project, it's helpful to have some documentation on how to get started. Perhaps there is a script that they should run or some environment variables that they need to set. Make these steps explicit. These instructions could also be useful to your future self.
-
-You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce the likelihood that the changes inadvertently break something. Having instructions for running tests is especially helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
-
-## Authors and acknowledgment
-Show your appreciation to those who have contributed to the project.
-
-## License
-For open source projects, say how it is licensed.
-
-## Project status
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
+- 这个 README 已经替换掉原来的模板内容，后续请继续按真实项目状态维护
+- 如果下一次状态变化较大，优先同步更新根目录 `README.MD` 和本文件

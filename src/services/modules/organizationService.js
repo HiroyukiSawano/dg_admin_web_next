@@ -165,6 +165,14 @@ export const deleteServiceProvider = (id) => {
   })
 }
 
+export const syncServiceProviderRelations = (id, payload) => {
+  return resolveEamResponse({
+    url: `/api/v1/service-providers/${id}/relations`,
+    method: 'PUT',
+    data: payload,
+  })
+}
+
 export const getPersonList = async (params = {}) => {
   const payload = await resolveEamResponse({
     url: '/api/v1/persons',
@@ -205,6 +213,14 @@ export const deletePerson = (id) => {
   })
 }
 
+export const syncPersonRelations = (id, payload) => {
+  return resolveEamResponse({
+    url: `/api/v1/persons/${id}/relations`,
+    method: 'PUT',
+    data: payload,
+  })
+}
+
 export const getPersonDepartmentOptions = () => {
   return getDepartmentOptions()
 }
@@ -230,6 +246,15 @@ export const getOrganizationInformationSystemOptions = async () => {
 export const getOrganizationProjectOptions = async () => {
   const payload = await resolveEamResponse({
     url: '/api/v1/projects/options',
+    method: 'GET',
+  })
+
+  return Array.isArray(payload) ? payload : []
+}
+
+export const getOrganizationPersonOptions = async () => {
+  const payload = await resolveEamResponse({
+    url: '/api/v1/persons/options',
     method: 'GET',
   })
 

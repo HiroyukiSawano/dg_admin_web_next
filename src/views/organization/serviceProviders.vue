@@ -20,7 +20,9 @@
         </el-select>
       </el-form-item>
       <el-form-item :label="t('ec.organization.serviceProvider.form.status')">
-        <el-input v-model="queryForm.status" clearable :placeholder="t('ec.organization.serviceProvider.form.statusPlaceholder')" />
+        <el-select v-model="queryForm.status" clearable :placeholder="t('ec.organization.serviceProvider.form.statusPlaceholder')">
+          <el-option v-for="item in serviceProviderStatusOptions" :key="item.value" :label="item.displayLabel" :value="item.value" />
+        </el-select>
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="handleSearch">{{ t('ec.global.button.text.search') }}</el-button>
@@ -48,7 +50,7 @@
       <el-table-column prop="ratingLevel" :label="t('ec.organization.serviceProvider.table.ratingLevel')" width="120" show-overflow-tooltip />
       <el-table-column :label="t('ec.organization.common.status')" width="140">
         <template #default="{ row }">
-          <el-tag :type="getStatusTagType(row.status)">{{ row.status || '-' }}</el-tag>
+          <el-tag :type="getStatusTagType(row.status, serviceProviderStatusMap)">{{ getStatusLabel(row.status, serviceProviderStatusMap) }}</el-tag>
         </template>
       </el-table-column>
       <el-table-column :label="t('ec.organization.common.updatedAt')" width="180">
@@ -56,10 +58,11 @@
           {{ formatDateTime(row.updatedAt) }}
         </template>
       </el-table-column>
-      <el-table-column :label="t('ec.organization.common.actions')" fixed="right" width="180">
+      <el-table-column :label="t('ec.organization.common.actions')" fixed="right" width="250">
         <template #default="{ row }">
           <el-button type="primary" link @click="openDetail(row)">{{ t('ec.organization.common.detail') }}</el-button>
           <el-button type="primary" link @click="openEdit(row)">{{ t('ec.organization.common.edit') }}</el-button>
+          <el-button type="primary" link @click="openRelationDialog(row)">{{ t('ec.organization.common.relations') }}</el-button>
           <el-button type="danger" link @click="handleDelete(row)">{{ t('ec.organization.common.delete') }}</el-button>
         </template>
       </el-table-column>
@@ -120,7 +123,9 @@
         />
       </el-form-item>
       <el-form-item :label="t('ec.organization.common.status')" prop="status">
-        <el-input v-model="formData.status" clearable :placeholder="t('ec.organization.serviceProvider.form.statusPlaceholder')" />
+        <el-select v-model="formData.status" clearable :placeholder="t('ec.organization.serviceProvider.form.statusPlaceholder')" style="width: 100%;">
+          <el-option v-for="item in serviceProviderStatusOptions" :key="item.value" :label="item.displayLabel" :value="item.value" />
+        </el-select>
       </el-form-item>
       <el-form-item :label="t('ec.organization.serviceProvider.table.remark')" prop="remark">
         <el-input v-model="formData.remark" type="textarea" :rows="3" :placeholder="t('ec.organization.serviceProvider.form.remarkPlaceholder')" />
@@ -154,7 +159,7 @@
         </div>
         <div class="organization-detail__item">
           <span>{{ t('ec.organization.common.status') }}</span>
-          <strong>{{ detailRecord.serviceProvider?.status || '-' }}</strong>
+          <strong>{{ getStatusLabel(detailRecord.serviceProvider?.status, serviceProviderStatusMap) }}</strong>
         </div>
         <div class="organization-detail__item is-full">
           <span>{{ t('ec.organization.serviceProvider.table.unifiedSocialCreditCode') }}</span>
@@ -190,6 +195,13 @@
           </div>
         </div>
         <div class="organization-detail__relation-block">
+          <span>{{ t('ec.organization.serviceProvider.relations.persons') }}</span>
+          <div class="organization-detail__tags">
+            <el-tag v-for="item in personRelationLabels" :key="`person-${item}`">{{ item }}</el-tag>
+            <el-empty v-if="personRelationLabels.length === 0" :image-size="56" :description="t('ec.organization.common.noRelation')" />
+          </div>
+        </div>
+        <div class="organization-detail__relation-block">
           <span>{{ t('ec.organization.serviceProvider.relations.projects') }}</span>
           <div class="organization-detail__tags">
             <el-tag v-for="item in projectRelationLabels" :key="`project-${item}`">{{ item }}</el-tag>
@@ -199,6 +211,63 @@
       </div>
     </div>
   </el-drawer>
+
+  <el-dialog
+    v-model="relationDialog.visible"
+    :title="t('ec.organization.serviceProvider.dialog.relationsTitle')"
+    :width="720"
+    destroy-on-close
+    append-to-body
+    @closed="handleRelationClosed"
+  >
+    <div v-loading="relationDialog.loading">
+      <el-form :model="relationDialog.form" label-width="110px">
+        <el-form-item :label="t('ec.organization.serviceProvider.relations.hardwareAssets')">
+          <el-select
+            v-model="relationDialog.form.hardwareAssetIds"
+            multiple
+            filterable
+            collapse-tags
+            collapse-tags-tooltip
+            :placeholder="t('ec.organization.serviceProvider.relation.hardwareAssetsPlaceholder')"
+            style="width: 100%;"
+          >
+            <el-option v-for="item in hardwareOptions" :key="item.id" :label="item.displayLabel" :value="item.id" />
+          </el-select>
+        </el-form-item>
+        <el-form-item :label="t('ec.organization.serviceProvider.relations.informationSystems')">
+          <el-select
+            v-model="relationDialog.form.informationSystemIds"
+            multiple
+            filterable
+            collapse-tags
+            collapse-tags-tooltip
+            :placeholder="t('ec.organization.serviceProvider.relation.informationSystemsPlaceholder')"
+            style="width: 100%;"
+          >
+            <el-option v-for="item in informationSystemOptions" :key="item.id" :label="item.displayLabel" :value="item.id" />
+          </el-select>
+        </el-form-item>
+        <el-form-item :label="t('ec.organization.serviceProvider.relations.persons')">
+          <el-select
+            v-model="relationDialog.form.personIds"
+            multiple
+            filterable
+            collapse-tags
+            collapse-tags-tooltip
+            :placeholder="t('ec.organization.serviceProvider.relation.personsPlaceholder')"
+            style="width: 100%;"
+          >
+            <el-option v-for="item in personOptions" :key="item.id" :label="item.displayLabel" :value="item.id" />
+          </el-select>
+        </el-form-item>
+      </el-form>
+    </div>
+    <template #footer>
+      <el-button @click="relationDialog.visible = false">{{ t('ec.global.button.text.cancel') }}</el-button>
+      <el-button type="primary" :loading="relationSubmitLoading" @click="handleRelationSubmit">{{ t('ec.global.button.text.submit') }}</el-button>
+    </template>
+  </el-dialog>
 </template>
 
 <script setup>
@@ -207,21 +276,25 @@ import { useI18n } from 'vue-i18n'
 import { storeToRefs } from 'pinia'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { useSystemStore } from '@/stores/modules/systemStore'
+import { getStatusDictionaries } from '@/services/modules/dictionaryService'
+import { buildStatusOptionMap } from '@/utils/statusDictionary'
 import {
   createServiceProvider,
   deleteServiceProvider,
   getOrganizationHardwareOptions,
   getOrganizationInformationSystemOptions,
+  getOrganizationPersonOptions,
   getOrganizationProjectOptions,
   getServiceProviderDetail,
   getServiceProviderList,
+  syncServiceProviderRelations,
   updateServiceProvider,
 } from '@/services/modules/organizationService'
-import { buildListLabelMap, formatDateTime, getStatusTagType, mapIdsToLabels } from './helpers'
+import { buildListLabelMap, formatDateTime, getStatusLabel, getStatusTagType, mapIdsToLabels, normalizeRelationIds } from './helpers'
 
 defineOptions({ name: 'OrganizationServiceProviders' })
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
 const { device } = storeToRefs(useSystemStore())
 
 const serviceProviderTypeOptions = computed(() => {
@@ -236,15 +309,29 @@ const serviceProviderTypeOptions = computed(() => {
 const tableLoading = ref(false)
 const detailLoading = ref(false)
 const submitLoading = ref(false)
+const relationSubmitLoading = ref(false)
 const dialogVisible = ref(false)
 const detailVisible = ref(false)
 const dialogMode = ref('create')
 const formRef = ref(null)
 const tableData = ref([])
 const detailRecord = ref(null)
+const statusDictionaries = ref({})
 const hardwareOptions = ref([])
 const informationSystemOptions = ref([])
+const personOptions = ref([])
 const projectOptions = ref([])
+
+const relationDialog = reactive({
+  visible: false,
+  serviceProviderId: null,
+  loading: false,
+  form: {
+    hardwareAssetIds: [],
+    informationSystemIds: [],
+    personIds: [],
+  },
+})
 
 const queryForm = reactive({
   keyword: '',
@@ -274,18 +361,28 @@ const formRules = {
   code: [{ required: true, message: t('ec.organization.serviceProvider.validation.codeRequired'), trigger: 'blur' }],
   name: [{ required: true, message: t('ec.organization.serviceProvider.validation.nameRequired'), trigger: 'blur' }],
   type: [{ required: true, message: t('ec.organization.serviceProvider.validation.typeRequired'), trigger: 'change' }],
-  status: [{ required: true, message: t('ec.organization.serviceProvider.validation.statusRequired'), trigger: 'blur' }],
+  status: [{ required: true, message: t('ec.organization.serviceProvider.validation.statusRequired'), trigger: 'change' }],
 }
 
 const paginationLayout = computed(() => {
   return device.value === 'mobile' ? 'total, prev, next' : 'total, prev, pager, next, sizes'
 })
 
+const serviceProviderStatusOptions = computed(() => {
+  return Object.values(buildStatusOptionMap(statusDictionaries.value.serviceProviderStatus, locale.value))
+})
+
+const serviceProviderStatusMap = computed(() => {
+  return buildStatusOptionMap(serviceProviderStatusOptions.value, locale.value)
+})
+
 const hardwareNameMap = computed(() => buildListLabelMap(hardwareOptions.value, 'displayLabel'))
 const informationSystemNameMap = computed(() => buildListLabelMap(informationSystemOptions.value, 'displayLabel'))
+const personNameMap = computed(() => buildListLabelMap(personOptions.value, 'displayLabel'))
 const projectNameMap = computed(() => buildListLabelMap(projectOptions.value, 'displayLabel'))
 const hardwareRelationLabels = computed(() => mapIdsToLabels(detailRecord.value?.hardwareAssetIds, hardwareNameMap.value))
 const informationSystemRelationLabels = computed(() => mapIdsToLabels(detailRecord.value?.informationSystemIds, informationSystemNameMap.value))
+const personRelationLabels = computed(() => mapIdsToLabels(detailRecord.value?.personIds, personNameMap.value))
 const projectRelationLabels = computed(() => mapIdsToLabels(detailRecord.value?.projectIds, projectNameMap.value))
 
 const getServiceProviderTypeLabel = (value) => {
@@ -326,10 +423,15 @@ const loadData = async () => {
   }
 }
 
+const loadStatusOptions = async () => {
+  statusDictionaries.value = await getStatusDictionaries()
+}
+
 const loadSupportOptions = async () => {
-  const [hardwareAssets, informationSystems, projects] = await Promise.all([
+  const [hardwareAssets, informationSystems, persons, projects] = await Promise.all([
     getOrganizationHardwareOptions(),
     getOrganizationInformationSystemOptions(),
+    getOrganizationPersonOptions(),
     getOrganizationProjectOptions(),
   ])
 
@@ -340,6 +442,10 @@ const loadSupportOptions = async () => {
   informationSystemOptions.value = informationSystems.map((item) => ({
     ...item,
     displayLabel: buildDisplayLabel(item.code, item.name),
+  }))
+  personOptions.value = persons.map((item) => ({
+    ...item,
+    displayLabel: buildDisplayLabel(item.name, item.employeeNo),
   }))
   projectOptions.value = projects.map((item) => ({
     ...item,
@@ -405,6 +511,24 @@ const openDetail = async (row) => {
   }
 }
 
+const openRelationDialog = async (row) => {
+  relationDialog.visible = true
+  relationDialog.serviceProviderId = row.id
+  relationDialog.loading = true
+  try {
+    await loadSupportOptions()
+    const detail = await getServiceProviderDetail(row.id)
+    relationDialog.form.hardwareAssetIds = normalizeRelationIds(detail.hardwareAssetIds)
+    relationDialog.form.informationSystemIds = normalizeRelationIds(detail.informationSystemIds)
+    relationDialog.form.personIds = normalizeRelationIds(detail.personIds)
+  } catch (error) {
+    ElMessage.error(error.message || t('ec.organization.serviceProvider.message.detailFailed'))
+    relationDialog.visible = false
+  } finally {
+    relationDialog.loading = false
+  }
+}
+
 const handleSubmit = async () => {
   if (!formRef.value) return
 
@@ -466,8 +590,40 @@ const handleDialogClosed = () => {
   resetFormData()
 }
 
-onMounted(() => {
-  loadSupportOptions().catch(() => {})
+const handleRelationSubmit = async () => {
+  relationSubmitLoading.value = true
+  try {
+    await syncServiceProviderRelations(relationDialog.serviceProviderId, {
+      hardwareAssetIds: relationDialog.form.hardwareAssetIds,
+      informationSystemIds: relationDialog.form.informationSystemIds,
+      personIds: relationDialog.form.personIds,
+    })
+    ElMessage.success(t('ec.organization.serviceProvider.relation.saveSuccess'))
+    relationDialog.visible = false
+    if (detailVisible.value && detailRecord.value?.serviceProvider?.id === relationDialog.serviceProviderId) {
+      detailRecord.value = await getServiceProviderDetail(relationDialog.serviceProviderId)
+    }
+  } catch (error) {
+    ElMessage.error(error.message || t('ec.organization.serviceProvider.relation.saveFailed'))
+  } finally {
+    relationSubmitLoading.value = false
+  }
+}
+
+const handleRelationClosed = () => {
+  relationDialog.serviceProviderId = null
+  relationDialog.loading = false
+  relationDialog.form.hardwareAssetIds = []
+  relationDialog.form.informationSystemIds = []
+  relationDialog.form.personIds = []
+}
+
+onMounted(async () => {
+  try {
+    await Promise.all([loadSupportOptions(), loadStatusOptions()])
+  } catch (error) {
+    ElMessage.error(error.message || t('ec.organization.serviceProvider.message.loadFailed'))
+  }
   loadData()
 })
 </script>

@@ -1,4 +1,5 @@
 import dayjs from 'dayjs'
+import { getStatusLabel as resolveStatusLabel, getStatusTagType as resolveStatusTagType } from '@/utils/statusDictionary'
 
 const cloneTree = (tree = []) => {
   return tree.map((node) => ({
@@ -105,9 +106,9 @@ export const cloneTreeWithDisabled = (tree = [], disabledIds = new Set()) => {
   }))
 }
 
-export const getStatusTagType = (status) => {
-  return status === 'ACTIVE' ? 'success' : 'info'
-}
+export const getStatusLabel = (status, optionMap = {}) => resolveStatusLabel(status, optionMap)
+
+export const getStatusTagType = (status, optionMap = {}) => resolveStatusTagType(status, optionMap)
 
 export const normalizeRelationIds = (value) => {
   return Array.isArray(value) ? value : []

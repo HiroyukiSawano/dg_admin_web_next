@@ -32,7 +32,7 @@ export default {
   'ec.software.form.codePlaceholder': '请输入系统编码',
   'ec.software.form.namePlaceholder': '请输入系统名称',
   'ec.software.form.systemTypePlaceholder': '请选择系统类型',
-  'ec.software.form.statusPlaceholder': '请输入系统状态',
+  'ec.software.form.statusPlaceholder': '请选择系统状态',
   'ec.software.form.remarkPlaceholder': '请输入备注',
   'ec.software.form.createTitle': '新增软件',
   'ec.software.form.editTitle': '编辑软件',
@@ -40,7 +40,7 @@ export default {
   'ec.software.validation.codeRequired': '请输入系统编码',
   'ec.software.validation.nameRequired': '请输入系统名称',
   'ec.software.validation.systemTypeRequired': '请选择系统类型',
-  'ec.software.validation.statusRequired': '请输入系统状态',
+  'ec.software.validation.statusRequired': '请选择系统状态',
 
   'ec.software.detail.title': '软件详情',
   'ec.software.detail.basic': '基础信息',
