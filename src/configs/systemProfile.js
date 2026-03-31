@@ -8,6 +8,15 @@ const SYSTEM_PROFILES = [
     allowedPrefixes: ['/organization', '/project', '/software', '/hardware'],
   },
   {
+    name: '组织资源新版演示',
+    usernames: ['eam_figma_demo'],
+    roles: ['ROLE_EAM_FIGMA'],
+    allowedPrefixes: ['/organization'],
+    excludedRouteNames: ['organizationDepartments', 'organizationLocations'],
+    menuRouteNames: ['organization', 'organizationServiceProviders', 'organizationPersons'],
+    homepage: '/organization/service-providers',
+  },
+  {
     name: '运营管理系统',
     usernames: ['ops_demo'],
     roles: ['ROLE_EAM_OPERATIONS'],
@@ -41,6 +50,9 @@ export const resolveSystemProfile = ({ user = {}, roles = [] } = {}) => {
       usernames: [],
       roles: [],
       allowedPrefixes: [],
+      excludedRouteNames: [],
+      menuRouteNames: [],
+      homepage: null,
     }
   )
 }

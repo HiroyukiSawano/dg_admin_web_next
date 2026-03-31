@@ -65,7 +65,7 @@
             </button>
           </div>
 
-          <div class="figma-shell__stats">
+          <div v-if="!hideStats && (statsLoading || stats.length > 0)" class="figma-shell__stats">
             <template v-if="statsLoading">
               <el-skeleton
                 v-for="index in stats.length || 4"
@@ -138,6 +138,10 @@ const props = defineProps({
     default: () => [],
   },
   statsLoading: {
+    type: Boolean,
+    default: false,
+  },
+  hideStats: {
     type: Boolean,
     default: false,
   },
@@ -216,12 +220,12 @@ const sideMenus = computed(() => {
 const subTabs = [
   {
     key: 'serviceProviders',
-    label: 'ec.menu.name.organizationServiceProviders',
+    label: 'ec.organization.figma.tab.serviceProviders',
     path: '/organization/service-providers',
   },
   {
     key: 'persons',
-    label: 'ec.menu.name.organizationPersons',
+    label: 'ec.organization.figma.tab.persons',
     path: '/organization/persons',
   },
 ]
@@ -410,7 +414,7 @@ const navigate = (item) => {
   flex-direction: column;
   gap: 12px;
   min-height: calc(100vh - 96px);
-  padding: 0 16px 16px;
+  padding: 0 14px 14px;
   background: rgba(255, 255, 255, 0.62);
   border: 1px solid rgba(237, 240, 246, 0.88);
   border-radius: 18px;
@@ -420,19 +424,20 @@ const navigate = (item) => {
 .figma-shell__tabs {
   display: flex;
   align-items: center;
-  gap: 28px;
-  min-height: 40px;
-  padding-top: 2px;
+  gap: 24px;
+  min-height: 36px;
+  padding: 4px 0 0;
   border-bottom: 1px solid #e6e8ed;
 }
 
 .figma-shell__tab {
   position: relative;
-  padding: 10px 0 9px;
+  padding: 8px 0 10px;
   border: 0;
   background: transparent;
   color: #444a57;
-  font-size: 14px;
+  font-size: 15px;
+  font-weight: 500;
   cursor: pointer;
 
   &.is-active {
@@ -452,22 +457,39 @@ const navigate = (item) => {
 }
 
 .figma-shell__stats {
+  position: relative;
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-  gap: 14px;
-  padding: 10px 16px 0;
+  gap: 12px;
+  padding: 14px 16px 12px;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 18% 0%, rgba(220, 231, 255, 0.95), transparent 32%),
+    radial-gradient(circle at 82% 0%, rgba(214, 239, 255, 0.72), transparent 28%),
+    linear-gradient(180deg, rgba(243, 247, 255, 0.98) 0%, rgba(247, 249, 254, 0.92) 100%);
+  border: 1px solid #eef2fb;
+  border-radius: 14px;
+}
+
+.figma-shell__stats::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 35% 45%, rgba(102, 148, 255, 0.08), transparent 20%),
+    radial-gradient(circle at 70% 30%, rgba(84, 196, 255, 0.08), transparent 18%);
+  pointer-events: none;
 }
 
 .figma-shell__stat-card {
   position: relative;
-  min-height: 88px;
-  padding: 18px 18px 16px;
+  min-height: 74px;
+  padding: 16px 18px 14px;
   overflow: hidden;
-  background:
-    linear-gradient(92deg, rgba(110, 161, 255, 0.14) 0%, rgba(204, 231, 245, 0.12) 58%, rgba(174, 121, 255, 0.05) 100%),
-    rgba(255, 255, 255, 0.88);
-  border: 1px solid rgba(237, 240, 246, 0.9);
-  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.82);
+  border: 1px solid rgba(232, 238, 250, 0.96);
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(69, 104, 173, 0.05);
 
   &::before {
     content: '';
@@ -484,15 +506,15 @@ const navigate = (item) => {
 
 .figma-shell__stat-icon {
   position: absolute;
-  top: 16px;
+  top: 14px;
   right: 16px;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 28px;
-  height: 28px;
-  border-radius: 10px;
-  font-size: 16px;
+  width: 26px;
+  height: 26px;
+  border-radius: 8px;
+  font-size: 14px;
 
   &.is-primary {
     background: rgba(46, 94, 240, 0.12);
@@ -522,14 +544,14 @@ const navigate = (item) => {
 
 .figma-shell__stat-label {
   color: #858a99;
-  font-size: 14px;
-  line-height: 22px;
+  font-size: 13px;
+  line-height: 20px;
 }
 
 .figma-shell__stat-value {
-  margin-top: 6px;
+  margin-top: 8px;
   color: #151b26;
-  font-size: 34px;
+  font-size: 18px;
   font-weight: 700;
   line-height: 1.1;
 }
@@ -539,7 +561,7 @@ const navigate = (item) => {
   flex: 1;
   flex-direction: column;
   min-height: 0;
-  padding: 0 16px 16px;
+  padding: 0 14px 14px;
   background: rgba(255, 255, 255, 0.92);
   border-radius: 14px;
 }
@@ -549,7 +571,7 @@ const navigate = (item) => {
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  padding: 16px 0;
+  padding: 12px 0;
 }
 
 .figma-shell__toolbar-main,

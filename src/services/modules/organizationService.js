@@ -135,6 +135,13 @@ export const getServiceProviderList = async (params = {}) => {
   return normalizePageResponse(payload)
 }
 
+export const getServiceProviderStats = () => {
+  return resolveEamResponse({
+    url: '/api/v1/service-providers/stats',
+    method: 'GET',
+  })
+}
+
 export const getServiceProviderDetail = (id) => {
   return resolveEamResponse({
     url: `/api/v1/service-providers/${id}`,
@@ -155,6 +162,20 @@ export const updateServiceProvider = (id, payload) => {
     url: `/api/v1/service-providers/${id}`,
     method: 'PUT',
     data: payload,
+  })
+}
+
+export const uploadOrganizationImage = async (file) => {
+  const formData = new FormData()
+  formData.append('file', file)
+
+  return resolveEamResponse({
+    url: '/api/v1/files/images',
+    method: 'POST',
+    data: formData,
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
   })
 }
 
@@ -181,6 +202,13 @@ export const getPersonList = async (params = {}) => {
   })
 
   return normalizePageResponse(payload)
+}
+
+export const getPersonStats = () => {
+  return resolveEamResponse({
+    url: '/api/v1/persons/stats',
+    method: 'GET',
+  })
 }
 
 export const getPersonDetail = (id) => {
@@ -255,6 +283,15 @@ export const getOrganizationProjectOptions = async () => {
 export const getOrganizationPersonOptions = async () => {
   const payload = await resolveEamResponse({
     url: '/api/v1/persons/options',
+    method: 'GET',
+  })
+
+  return Array.isArray(payload) ? payload : []
+}
+
+export const getOrganizationServiceProviderOptions = async () => {
+  const payload = await resolveEamResponse({
+    url: '/api/v1/service-providers/options',
     method: 'GET',
   })
 
