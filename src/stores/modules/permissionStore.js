@@ -41,8 +41,9 @@ const usePermissionStore = defineStore('permission', {
     },
     // 生成路由
     async GenerateRoutes() {
-      const { roles, Logout } = useAuthorizeStore()
+      const { roles, user, Logout } = useAuthorizeStore()
       try {
+        const profile = resolveSystemProfile({ user, roles })
         // 获取后端路由
         const backendRoutes = await fetchBackendRoutes()
         // 合并路由
@@ -51,10 +52,10 @@ const usePermissionStore = defineStore('permission', {
         // 开启国际化路由
         if(configs.SYSTEM_LOCALE_ENABLED) routes = formatRoutes(routes)
         // 开启过滤权限路由
-        if(configs.ROUTES_CONTROL) routes = filterRoutes(routes, roles)
+        if(configs.ROUTES_CONTROL) routes = filterRoutes(routes, roles, profile)
 
         // 设置菜单，过滤掉不显示的菜单
-        const menus = filterMenus(routes)
+        const menus = filterMenus(routes, profile)
         this.SetPermissionMenus(menus)
 
         // 设置扁平化的路由
@@ -62,7 +63,7 @@ const usePermissionStore = defineStore('permission', {
         this.SetPermissionRoutes(flattens)
 
         // 设置路由中第一个为菜单的路径为首页（如果默认首页为空的话）
-        const homepage = this.homepage ?? flattens.find((r) => r.meta?.type === 'menu')?.path
+        const homepage = profile.homepage || this.homepage || flattens.find((r) => r.meta?.type === 'menu')?.path
         this.SetPermissionHomepage(homepage)
 
         // 路由重置
@@ -189,17 +190,21 @@ const flattenRoutes = (data, breadcrumb = []) => {
  * @param {Array} data - 包含所有路由信息的数组，每个路由都有可能包含子路由（children）
  * @param {Array} roles - 当前用户的角色数组，用于判断用户是否有访问特定路由的权限
  */
-const filterRoutes = (data, roles = []) => {
-  const { allowedPrefixes = [] } = resolveSystemProfile({ roles })
+const filterRoutes = (data, roles = [], profile = {}) => {
+  const { allowedPrefixes = [], excludedRouteNames = [], homepage = '' } = profile
 
   return data.reduce((acc, item) => {
     if (allowedPrefixes.length > 0 && !hasRoutePrefixAccess(item, allowedPrefixes)) return acc
+    if (excludedRouteNames.includes(item.name)) return acc
     // 如果用户不具备访问此路由的角色权限，则跳过此路由，不加入到结果中
     if (item.meta?.roles && !item.meta?.roles.some((r) => roles.includes(r))) return acc
     // 复制当前路由项，以避免修改原始数据结构
     const _item = { ...item }
+    if (_item.name === 'organization' && homepage) {
+      _item.redirect = homepage
+    }
     // 则递归过滤子路由
-    if (item.children?.length > 0) _item.children = filterRoutes(item.children, roles)
+    if (item.children?.length > 0) _item.children = filterRoutes(item.children, roles, profile)
     // 将处理后的当前路由项添加到结果数组中
     return [...acc, _item]
   }, [])
@@ -215,14 +220,21 @@ const hasRoutePrefixAccess = (route, allowedPrefixes = []) => {
  * 该函数接收一个菜单项数组，并返回一个新的数组，新数组中不包含任何元数据中标记为隐藏的菜单项
  * @param {Array} data - 菜单项数组
  */
-const filterMenus = (data) => {
+const filterMenus = (data, profile = {}) => {
+  const { menuRouteNames = [] } = profile
+
   return data.reduce((acc, item) => {
     // 如果菜单项的元数据中标记为隐藏，则跳过该项
-    if (item.meta?.hidden) return acc
+    if (item.meta?.hidden && !menuRouteNames.includes(item.name)) return acc
     // 复制当前菜单项以避免修改原始数据
-    const _item = { ...item }
+    const _item = {
+      ...item,
+      meta: item.meta?.hidden && menuRouteNames.includes(item.name)
+        ? { ...item.meta, hidden: false, active: null }
+        : { ...item.meta },
+    }
     // 如果菜单项有子菜单项，则递归调用filterMenus函数进行过滤
-    if (item.children?.length > 0) _item.children = filterMenus(item.children)
+    if (item.children?.length > 0) _item.children = filterMenus(item.children, profile)
     // 将过滤后的菜单项添加到结果数组中
     return [...acc, _item]
   }, [])

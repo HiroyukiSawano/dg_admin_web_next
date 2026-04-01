@@ -70,7 +70,7 @@ useAutoexitHook(autoexit.value, async () => {
 // 更新布局主题相关
 const { layout, collapse, strategy, tabs } = storeToRefs(useStyleStore())
 const { UpdateStyle } = useStyleStore()
-const styles = ['layout', 'theme', 'effect', 'strategy']
+const styles = ['layout', 'theme', 'effect', 'strategy', 'color']
 styles.forEach((key) => {
   UpdateStyle({ key, value: useStyleStore()[key] })
 })
@@ -125,4 +125,3 @@ const exitMaximize = () => document.getElementById('app').classList.remove('app-
   }
 }
 </style>
-

@@ -38,7 +38,7 @@
           </el-form-item>
 
           <el-form-item :label="$t('ec.setting.form.label.color')">
-            <el-color-picker v-model="color" :predefine="['#427af4', '#69c861', '#efa141', '#e97b77', '#1a94bc', '#207f4c', '#e16723', '#9b1e64', '#2e317c', '#5e616d']" />
+            <el-color-picker v-model="color" :predefine="['#2e5ef0', '#427af4', '#69c861', '#efa141', '#e97b77', '#1a94bc', '#207f4c', '#e16723', '#9b1e64', '#2e317c', '#5e616d']" />
           </el-form-item>
           <el-form-item :label="$t('ec.setting.form.label.dark')">
             <el-switch v-model="dark" inline-prompt active-icon="ri-moon-line" inactive-icon="ri-sun-line" />

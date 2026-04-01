@@ -66,15 +66,18 @@ const getVerifyCode = async () => {
     const { flag } = await apiUtilsSendSlideCode()
     if (!flag) return verifyRef.value.fail()
     verify.value.status = true
+    verify.value.failed = false
     verifyRef.value.success()
   } catch (e) {
+    verify.value.status = false
     verifyRef.value.fail()
   }
 }
 
 const resetVerifyCode = () => {
   verify.value.status = false
-  verifyRef.value.reset()
+  verify.value.failed = false
+  verifyRef.value?.reset()
 }
 const getPhoneCode = async () => {
   const validate = await formsRef.value.validateField('phone').catch(() => {})
@@ -97,7 +100,10 @@ const formsRef = ref(null)
 const handleLogin = async () => {
   const validate = await formsRef.value.validate().catch(() => {})
   if (!validate) return false
-  if (!verify.value.status) return verify.value.failed = true
+  if (!verify.value.status) {
+    verify.value.failed = true
+    return false
+  }
   try {
     logined.value = true
     const params = {

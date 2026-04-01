@@ -23,10 +23,15 @@ const normalizePageResponse = (payload) => {
 const normalizeProjectDetail = (payload) => {
   return {
     project: payload?.project || null,
+    documents: Array.isArray(payload?.documents) ? payload.documents : [],
     informationSystemIds: Array.isArray(payload?.informationSystemIds) ? payload.informationSystemIds : [],
     serviceProviderIds: Array.isArray(payload?.serviceProviderIds) ? payload.serviceProviderIds : [],
     personIds: Array.isArray(payload?.personIds) ? payload.personIds : [],
     hardwareAssetIds: Array.isArray(payload?.hardwareAssetIds) ? payload.hardwareAssetIds : [],
+    persons: Array.isArray(payload?.persons) ? payload.persons : [],
+    informationSystems: Array.isArray(payload?.informationSystems) ? payload.informationSystems : [],
+    hardwareAssets: Array.isArray(payload?.hardwareAssets) ? payload.hardwareAssets : [],
+    serviceProviders: Array.isArray(payload?.serviceProviders) ? payload.serviceProviders : [],
   }
 }
 
@@ -47,6 +52,13 @@ export const getProjectDetail = async (id) => {
   })
 
   return normalizeProjectDetail(payload)
+}
+
+export const getProjectStats = () => {
+  return resolveEamResponse({
+    url: '/api/v1/projects/stats',
+    method: 'GET',
+  })
 }
 
 export const createProject = (payload) => {
@@ -87,6 +99,20 @@ export const getProjectOptions = async () => {
   })
 
   return Array.isArray(payload) ? payload : []
+}
+
+export const uploadProjectDocument = async (file) => {
+  const formData = new FormData()
+  formData.append('file', file)
+
+  return resolveEamResponse({
+    url: '/api/v1/files',
+    method: 'POST',
+    data: formData,
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  })
 }
 
 export const getProjectInformationSystemOptions = async () => {

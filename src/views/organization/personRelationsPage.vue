@@ -21,41 +21,60 @@
       </div>
 
       <el-form label-position="top" class="organization-form-grid">
-        <el-form-item :label="t('ec.organization.person.relations.hardwareAssets')">
-          <el-select
-            v-model="relationForm.hardwareAssetIds"
-            multiple
-            filterable
-            collapse-tags
-            collapse-tags-tooltip
-            :placeholder="t('ec.organization.person.relation.hardwareAssetsPlaceholder')"
-          >
-            <el-option v-for="item in hardwareOptions" :key="item.id" :label="item.displayLabel" :value="item.id" />
-          </el-select>
-        </el-form-item>
         <el-form-item :label="t('ec.organization.person.relations.informationSystems')">
-          <el-select
+          <ec-object-multi-transfer
             v-model="relationForm.informationSystemIds"
-            multiple
-            filterable
-            collapse-tags
-            collapse-tags-tooltip
             :placeholder="t('ec.organization.person.relation.informationSystemsPlaceholder')"
-          >
-            <el-option v-for="item in informationSystemOptions" :key="item.id" :label="item.displayLabel" :value="item.id" />
-          </el-select>
+            :title="`${t('ec.organization.person.relations.informationSystems')}${t('ec.organization.selector.titleSuffix')}`"
+            :selected-title="t('ec.organization.selector.selected')"
+            :search-placeholder="t('ec.organization.selector.searchPlaceholder')"
+            :options="informationSystemOptions"
+            label-key="name"
+            value-key="id"
+            subtitle-key="code"
+          />
         </el-form-item>
+
+        <el-form-item :label="t('ec.organization.person.relations.hardwareAssets')">
+          <ec-object-multi-transfer
+            v-model="relationForm.hardwareAssetIds"
+            :placeholder="t('ec.organization.person.relation.hardwareAssetsPlaceholder')"
+            :title="`${t('ec.organization.person.relations.hardwareAssets')}${t('ec.organization.selector.titleSuffix')}`"
+            :selected-title="t('ec.organization.selector.selected')"
+            :search-placeholder="t('ec.organization.selector.searchPlaceholder')"
+            :options="hardwareOptions"
+            label-key="assetName"
+            value-key="id"
+            subtitle-key="assetCode"
+          />
+        </el-form-item>
+
+        <el-form-item :label="t('ec.organization.person.relations.relatedServiceProviders')" class="is-span-2">
+          <ec-object-multi-transfer
+            v-model="relationForm.relatedServiceProviderIds"
+            :placeholder="t('ec.organization.person.relation.relatedServiceProvidersPlaceholder')"
+            :title="`${t('ec.organization.person.relations.relatedServiceProviders')}${t('ec.organization.selector.titleSuffix')}`"
+            :selected-title="t('ec.organization.selector.selected')"
+            :search-placeholder="t('ec.organization.selector.searchPlaceholder')"
+            :options="relatedServiceProviderOptions"
+            label-key="name"
+            value-key="id"
+            subtitle-key="code"
+          />
+        </el-form-item>
+
         <el-form-item :label="t('ec.organization.person.relations.projects')" class="is-span-2">
-          <el-select
+          <ec-object-multi-transfer
             v-model="relationForm.projectIds"
-            multiple
-            filterable
-            collapse-tags
-            collapse-tags-tooltip
             :placeholder="t('ec.organization.person.relation.projectsPlaceholder')"
-          >
-            <el-option v-for="item in projectOptions" :key="item.id" :label="item.displayLabel" :value="item.id" />
-          </el-select>
+            :title="`${t('ec.organization.person.relations.projects')}${t('ec.organization.selector.titleSuffix')}`"
+            :selected-title="t('ec.organization.selector.selected')"
+            :search-placeholder="t('ec.organization.selector.searchPlaceholder')"
+            :options="projectOptions"
+            label-key="name"
+            value-key="id"
+            subtitle-key="code"
+          />
         </el-form-item>
       </el-form>
     </div>
@@ -63,7 +82,7 @@
 </template>
 
 <script setup>
-import { onMounted, reactive, ref } from 'vue'
+import { computed, onMounted, reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
@@ -71,9 +90,11 @@ import {
   getOrganizationHardwareOptions,
   getOrganizationInformationSystemOptions,
   getOrganizationProjectOptions,
+  getOrganizationServiceProviderOptions,
   getPersonDetail,
   syncPersonRelations,
 } from '@/services/modules/organizationService'
+import EcObjectMultiTransfer from '@/components/EcObjectMultiTransfer.vue'
 import FigmaResourcePage from './components/FigmaResourcePage.vue'
 
 defineOptions({ name: 'OrganizationPersonRelationsPage' })
@@ -87,41 +108,37 @@ const submitLoading = ref(false)
 const detailRecord = ref({ person: null })
 const hardwareOptions = ref([])
 const informationSystemOptions = ref([])
+const serviceProviderOptions = ref([])
 const projectOptions = ref([])
 
 const relationForm = reactive({
   hardwareAssetIds: [],
   informationSystemIds: [],
+  relatedServiceProviderIds: [],
   projectIds: [],
 })
 
-const buildDisplayLabel = (primary, secondary) => {
-  return [primary, secondary].filter(Boolean).join(' / ') || '-'
-}
+const relatedServiceProviderOptions = computed(() => {
+  const primaryId = detailRecord.value.person?.serviceProviderId
+  return serviceProviderOptions.value.filter((item) => item.id !== primaryId)
+})
 
 const normalizeIds = (value) => {
   return Array.isArray(value) ? value : []
 }
 
 const loadSupportOptions = async () => {
-  const [hardwareAssets, informationSystems, projects] = await Promise.all([
+  const [hardwareAssets, informationSystems, serviceProviders, projects] = await Promise.all([
     getOrganizationHardwareOptions(),
     getOrganizationInformationSystemOptions(),
+    getOrganizationServiceProviderOptions(),
     getOrganizationProjectOptions(),
   ])
 
-  hardwareOptions.value = hardwareAssets.map((item) => ({
-    ...item,
-    displayLabel: buildDisplayLabel(item.assetCode, item.assetName),
-  }))
-  informationSystemOptions.value = informationSystems.map((item) => ({
-    ...item,
-    displayLabel: buildDisplayLabel(item.code, item.name),
-  }))
-  projectOptions.value = projects.map((item) => ({
-    ...item,
-    displayLabel: buildDisplayLabel(item.code, item.name),
-  }))
+  hardwareOptions.value = Array.isArray(hardwareAssets) ? hardwareAssets : []
+  informationSystemOptions.value = Array.isArray(informationSystems) ? informationSystems : []
+  serviceProviderOptions.value = Array.isArray(serviceProviders) ? serviceProviders : []
+  projectOptions.value = Array.isArray(projects) ? projects : []
 }
 
 const loadDetail = async () => {
@@ -132,6 +149,7 @@ const loadDetail = async () => {
     detailRecord.value = detail
     relationForm.hardwareAssetIds = normalizeIds(detail.hardwareAssetIds)
     relationForm.informationSystemIds = normalizeIds(detail.informationSystemIds)
+    relationForm.relatedServiceProviderIds = normalizeIds(detail.relatedServiceProviderIds)
     relationForm.projectIds = normalizeIds(detail.projectIds)
   } catch (error) {
     ElMessage.error(error.message || t('ec.organization.person.message.detailFailed'))
@@ -146,6 +164,7 @@ const handleSubmit = async () => {
     await syncPersonRelations(route.params.id, {
       hardwareAssetIds: relationForm.hardwareAssetIds,
       informationSystemIds: relationForm.informationSystemIds,
+      relatedServiceProviderIds: relationForm.relatedServiceProviderIds,
       projectIds: relationForm.projectIds,
     })
     ElMessage.success(t('ec.organization.person.relation.saveSuccess'))

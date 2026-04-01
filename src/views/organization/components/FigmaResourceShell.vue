@@ -27,6 +27,10 @@
           <i class="ri-notification-3-line"></i>
           <span class="figma-shell__tool-dot"></span>
         </button>
+        <button class="figma-shell__theme-button" type="button" @click="openThemeSetting">
+          <i class="ri-palette-line"></i>
+          <span class="hidden-sm-and-down">{{ t('ec.user.dropdowm.item.text.setting') }}</span>
+        </button>
         <div class="figma-shell__account">
           <div class="figma-shell__avatar">{{ accountInitial }}</div>
           <span>{{ displayUserName }}</span>
@@ -52,9 +56,9 @@
 
       <main class="figma-shell__main">
         <section class="figma-shell__panel">
-          <div class="figma-shell__tabs">
+          <div v-if="!hideTabs && currentSubTabs.length > 0" class="figma-shell__tabs">
             <button
-              v-for="item in subTabs"
+              v-for="item in currentSubTabs"
               :key="item.key"
               class="figma-shell__tab"
               :class="{ 'is-active': item.key === activeTab }"
@@ -116,6 +120,7 @@
         </section>
       </main>
     </div>
+    <layout-setting />
   </div>
 </template>
 
@@ -125,6 +130,8 @@ import { storeToRefs } from 'pinia'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuthorizeStore } from '@/stores/modules/authorizeStore'
+import { $pub } from '@/plugins/mitt'
+import LayoutSetting from '@/layouts/components/LayoutSetting'
 
 defineOptions({ name: 'FigmaResourceShell' })
 
@@ -132,6 +139,10 @@ const props = defineProps({
   activeTab: {
     type: String,
     default: 'serviceProviders',
+  },
+  subTabs: {
+    type: Array,
+    default: () => [],
   },
   stats: {
     type: Array,
@@ -142,6 +153,10 @@ const props = defineProps({
     default: false,
   },
   hideStats: {
+    type: Boolean,
+    default: false,
+  },
+  hideTabs: {
     type: Boolean,
     default: false,
   },
@@ -217,7 +232,7 @@ const sideMenus = computed(() => {
   ]
 })
 
-const subTabs = [
+const defaultOrganizationTabs = [
   {
     key: 'serviceProviders',
     label: 'ec.organization.figma.tab.serviceProviders',
@@ -230,9 +245,17 @@ const subTabs = [
   },
 ]
 
+const currentSubTabs = computed(() => {
+  return props.subTabs.length > 0 ? props.subTabs : defaultOrganizationTabs
+})
+
 const navigate = (item) => {
   if (!item.path || item.disabled || item.path === route.path) return
   router.push(item.path)
+}
+
+const openThemeSetting = () => {
+  $pub('layoutSetting:visible')
 }
 </script>
 
@@ -324,6 +347,24 @@ const navigate = (item) => {
   background: #f5f7fb;
   color: #444a57;
   font-size: 16px;
+}
+
+.figma-shell__theme-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 32px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 10px;
+  background: #f5f7fb;
+  color: #444a57;
+  font-size: 13px;
+  cursor: pointer;
+
+  i {
+    font-size: 16px;
+  }
 }
 
 .figma-shell__tool-dot {
@@ -506,39 +547,40 @@ const navigate = (item) => {
 
 .figma-shell__stat-icon {
   position: absolute;
-  top: 14px;
-  right: 16px;
+  top: 16px;
+  right: 18px;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 26px;
-  height: 26px;
-  border-radius: 8px;
-  font-size: 14px;
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  font-size: 12px;
+  box-shadow: 0 6px 14px rgba(46, 94, 240, 0.16);
 
   &.is-primary {
-    background: rgba(46, 94, 240, 0.12);
-    color: #2e5ef0;
+    background: linear-gradient(180deg, #6f92ff 0%, #3f68f4 100%);
+    color: #fff;
   }
 
   &.is-cyan {
-    background: rgba(45, 181, 225, 0.14);
-    color: #2db5e1;
+    background: linear-gradient(180deg, #6f92ff 0%, #3f68f4 100%);
+    color: #fff;
   }
 
   &.is-green {
-    background: rgba(54, 178, 62, 0.12);
-    color: #36b23e;
+    background: linear-gradient(180deg, #6f92ff 0%, #3f68f4 100%);
+    color: #fff;
   }
 
   &.is-orange {
-    background: rgba(255, 153, 0, 0.14);
-    color: #ff9900;
+    background: linear-gradient(180deg, #6f92ff 0%, #3f68f4 100%);
+    color: #fff;
   }
 
   &.is-violet {
-    background: rgba(142, 84, 255, 0.14);
-    color: #8e54ff;
+    background: linear-gradient(180deg, #6f92ff 0%, #3f68f4 100%);
+    color: #fff;
   }
 }
 

@@ -28,6 +28,19 @@ const LOCAL_LOGIN_USERS = {
       permission: '',
     },
   },
+  eam_figma_demo: {
+    password: 'e10adc3949ba59abbe56e057f20f883e',
+    token: 'local-asset-figma-demo-token',
+    user: {
+      id: 'local-asset-figma-demo-user',
+      name: '组织资源新版演示账号',
+      organName: '组织资源新版演示',
+      username: 'eam_figma_demo',
+      avatar: '',
+      role: 'ROLE_EAM_FIGMA',
+      permission: '',
+    },
+  },
   ops_demo: {
     password: 'e10adc3949ba59abbe56e057f20f883e',
     token: 'local-operations-demo-token',

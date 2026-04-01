@@ -1,63 +1,85 @@
 # 信息化资产管理中心前端
 
-## 请先读这里
+## 项目定位
 
-这是“信息化资产管理中心”的前端项目，基于现有后台接口做联调、演示和收口。
+这是“信息化资产管理中心”的前端项目，当前不是从零开发，而是在现有业务基础上继续按新版 Figma 做正式交付收口。
 
-- 项目名称：信息化资产管理中心前端
 - 当前范围：组织资源、项目资源、软件资源、硬件资源
 - 明确不做：数据资源模块
-- 当前阶段：不是从零开发，而是全模块打通闭环、查漏补缺、稳定演示
+- 当前重点：继续收口新版页面、打通联调、稳定演示
 
 ## 当前结构
 
-当前前端主要按下面方式组织：
-
 - `src/router/modules`：模块路由
 - `src/services/modules`：接口封装
-- `src/views`：业务页面
-- `src/views/**/zh-CN`、`src/views/**/en`：模块级国际化文案
-- `src/stores/modules`：登录态、菜单、系统配置等状态管理
+- `src/views`：页面实现
+- `src/views/**/zh-CN`、`src/views/**/en`：模块级文案
+- `src/stores/modules`：登录态、权限、主题、系统配置
 
-默认继续沿用这套接入方式，不做大规模前端架构重构。
+默认继续沿用这套结构，不做大规模架构重构。
 
-## 已接入模块
+## 当前真实完成度
 
-当前业务模块都已接入前端：
+### 组织资源
 
-- 组织资源
-  - 部门
-  - 位置
-  - 服务商
-  - 人员
-- 项目资源
-  - 项目台账
-  - 详情抽屉
-  - 新增 / 编辑
-  - 关系维护
-- 软件资源
-  - 信息系统台账
-  - 详情抽屉
-  - 新增 / 编辑
-  - 关系维护
-- 硬件资源
-  - 列表页
-  - 详情抽屉
-  - 新增 / 编辑
-  - 关联系统 / 负责人 / 服务商
-  - 生命周期操作
-  - JSON 批量导入
-  - CSV 导出
+组织资源新版 Figma 已进入正式入口：
 
-## 已完成的联调收口
+- 服务商：列表 / 新增 / 编辑 / 详情 / 关联维护
+- 人员：列表 / 新增 / 编辑 / 详情 / 关联维护
 
-近期已完成的前端收口包括：
+主要文件：
 
-- 项目资源、软件资源页面和服务封装已补齐
-- 组织详情页已补齐跨模块名称回显，不再只显示 ID
-- 前端支撑下拉统一优先走 `/options` 接口
-- 项目 / 软件 / 硬件页面在关键入口会刷新支撑数据，减少跨模块新增后的旧缓存问题
-- 本地演示模式下已规避 `/bspplus/utils/uuid` 误请求，避免首页卡在 loading
+- `src/views/organization/serviceProvidersFigma.vue`
+- `src/views/organization/serviceProviderFormPage.vue`
+- `src/views/organization/serviceProviderDetailPage.vue`
+- `src/views/organization/serviceProviderRelationsPage.vue`
+- `src/views/organization/personsFigma.vue`
+- `src/views/organization/personFormPage.vue`
+- `src/views/organization/personDetailPage.vue`
+- `src/views/organization/personRelationsPage.vue`
+
+### 项目资源
+
+项目资源新版 Figma 已进入正式入口：
+
+- 列表页
+- 新增页
+- 编辑页
+- 详情页
+- 关联维护页
+
+主要文件：
+
+- `src/views/project/projectsFigma.vue`
+- `src/views/project/projectFormPage.vue`
+- `src/views/project/projectDetailPage.vue`
+- `src/views/project/projectRelationsPage.vue`
+- `src/router/modules/projectRoutes.js`
+- `src/services/modules/projectService.js`
+
+### 软件资源 / 硬件资源
+
+- 已有旧版接入和基础联调能力
+- 仍作为后续继续收口对象
+
+## 新版页面约束
+
+后续继续做新版页面时，默认遵守以下规则：
+
+- 新增 / 编辑 / 详情使用独立路由，不回退到弹窗 / 抽屉
+- 上传走真实后端接口，不做纯前端假数据
+- 旧版页面只作参考，不再作为正式入口
+- 页面主题色统一跟全局主色走
+
+对象选择规范已统一：
+
+- 单选对象：搜索下拉面板
+- 多选对象：穿梭弹窗
+
+对应通用组件：
+
+- `src/components/EcObjectSingleSelect.vue`
+- `src/components/EcObjectMultiTransfer.vue`
 
 ## 登录与演示模式
 
@@ -66,75 +88,60 @@
 - `AUTH_LOGIN_MODE = 'local'`
   - 使用本地演示账号
 - `AUTH_LOGIN_MODE = 'backend'`
-  - 走后台 `/bspplus/user/login` 和验证码接口
+  - 走后台 `/bspplus/user/login`
 
 当前本地演示账号：
 
 - `eam_demo / 123456`
-  - 系统名称显示“资产管理系统”
-  - 仅显示“组织 / 项目 / 软件 / 硬件”
+  - 显示资产管理系统菜单
+- `eam_figma_demo / 123456`
+  - 系统名称显示“组织资源新版演示”
+  - 默认进入 `/organization/service-providers`
+  - 当前可访问新版组织资源与新版项目资源
 - `ops_demo / 123456`
-  - 系统名称显示“运营管理系统”
-  - 仅显示“监控中心”
+  - 仅显示监控中心
 - `platformadmin / admin`
-  - 全量管理员视图，用于调试所有菜单
+  - 全量菜单调试账号
 
-当前“两套系统”是按前端本地映射拆分的：
+菜单与系统名称由前端本地映射控制，关键文件：
 
-- 资产管理系统
-  - 组织资源
-  - 项目资源
-  - 软件资源
-  - 硬件资源
-- 运营管理系统
-  - 监控中心
+- `src/configs/systemProfile.js`
+- `src/services/modules/bspService.js`
 
-系统名称、左上角 Logo 标题、登录页名称、浏览器标题都会跟随当前账号切换。
+## 近期已完成的收口
+
+- 组织资源新版服务商、人员主线页面已完成首轮交付
+- 项目资源新版列表 / 新增 / 编辑 / 详情 / 关联维护已完成首轮交付
+- 项目资源接入项目统计和项目文档真实上传
+- 主题色改回跟全局主题走，默认主色为蓝色 `#2e5ef0`
+- 组织资源新版壳层可直接打开主题设置抽屉
 
 ## 当前重点
 
-后续前端工作默认优先级如下：
+推荐后续优先级：
 
-1. 先做全模块联调查漏补缺
-2. 重点验证组织 / 项目 / 软件 / 硬件之间的支撑数据与关系回显
-3. 再验证两套演示系统的菜单、首页和登录体验
-4. 最后再考虑按钮级权限、错误提示细化、后台真实菜单接通
-
-不要再把重点放回“继续铺更多新页面”。
-
-## 开发约束
-
-后续会话默认遵守以下约束：
-
-- 不做数据资源模块
-- 保持当前 `views + router/modules + services/modules + i18n + store` 结构
-- 优先复用现有组织 / 硬件页面模式
-- 页面注释、交接说明保持中文
-- 如果文档和代码冲突，以代码为准，并及时更新文档
-
-## 常用文件
-
-下个会话建议优先看这些文件：
-
-- `src/router/modules/organizationRoutes.js`
-- `src/router/modules/hardwareRoutes.js`
-- `src/router/modules/projectRoutes.js`
-- `src/router/modules/softwareRoutes.js`
-- `src/services/modules/organizationService.js`
-- `src/services/modules/hardwareService.js`
-- `src/services/modules/projectService.js`
-- `src/services/modules/softwareService.js`
-- `src/stores/modules/authorizeStore.js`
-- `src/stores/modules/permissionStore.js`
-- `src/configs/systemProfile.js`
-- `src/services/modules/bspService.js`
+1. 继续优化项目资源新版细节
+2. 开始软件资源新版 Figma 收口
+3. 再处理旧版页面清理和全模块联调细节
 
 ## 常用命令
 
 - 本地开发：`npm run dev`
 - 生产构建：`npm run build`
 
+## 下个会话建议优先阅读
+
+- `src/router/modules/projectRoutes.js`
+- `src/services/modules/projectService.js`
+- `src/views/project/projectsFigma.vue`
+- `src/views/project/projectFormPage.vue`
+- `src/views/project/projectDetailPage.vue`
+- `src/views/project/projectRelationsPage.vue`
+- `src/views/organization/components/FigmaResourceShell.vue`
+- `src/configs/systemProfile.js`
+- `src/stores/modules/styleStore.js`
+
 ## 额外说明
 
-- 这个 README 已经替换掉原来的模板内容，后续请继续按真实项目状态维护
-- 如果下一次状态变化较大，优先同步更新根目录 `README.MD` 和本文件
+- 如果 README 与代码不一致，以代码为准，并及时回补文档
+- 下次如果继续推进项目资源，请先检查 Figma、接口、上传链路和详情回显，不要重复重做已完成的组织资源页面

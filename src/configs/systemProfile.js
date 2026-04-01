@@ -11,9 +11,9 @@ const SYSTEM_PROFILES = [
     name: '组织资源新版演示',
     usernames: ['eam_figma_demo'],
     roles: ['ROLE_EAM_FIGMA'],
-    allowedPrefixes: ['/organization'],
+    allowedPrefixes: ['/organization', '/project'],
     excludedRouteNames: ['organizationDepartments', 'organizationLocations'],
-    menuRouteNames: ['organization', 'organizationServiceProviders', 'organizationPersons'],
+    menuRouteNames: ['organization', 'organizationServiceProviders', 'organizationPersons', 'project', 'projectAssets'],
     homepage: '/organization/service-providers',
   },
   {

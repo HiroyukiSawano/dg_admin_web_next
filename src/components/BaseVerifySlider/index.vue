@@ -83,7 +83,7 @@ const click = () => {
     reset()
   }
 }
-defineExpose({ success, fail })
+defineExpose({ reset, success, fail })
 </script>
 
 <style lang="scss" scoped>

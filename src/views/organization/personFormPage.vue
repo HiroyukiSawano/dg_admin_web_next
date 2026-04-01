@@ -15,110 +15,148 @@
     </template>
 
     <div v-loading="pageLoading" class="organization-page-card">
-      <el-form ref="formRef" :model="formData" :rules="formRules" label-position="top" class="organization-form-grid">
-        <el-form-item :label="t('ec.organization.common.name')" prop="name">
-          <el-input v-model="formData.name" clearable :placeholder="t('ec.organization.person.form.namePlaceholder')" />
-        </el-form-item>
-        <el-form-item :label="t('ec.organization.person.table.employeeNo')">
-          <el-input v-model="formData.employeeNo" clearable :placeholder="t('ec.organization.person.form.employeeNoPlaceholder')" />
-        </el-form-item>
-        <el-form-item :label="t('ec.organization.person.table.gender')">
-          <el-input v-model="formData.gender" clearable :placeholder="t('ec.organization.person.form.genderPlaceholder')" />
-        </el-form-item>
-        <el-form-item :label="t('ec.organization.person.table.mobile')">
-          <el-input v-model="formData.mobile" clearable :placeholder="t('ec.organization.person.form.mobilePlaceholder')" />
-        </el-form-item>
-        <el-form-item :label="t('ec.organization.person.table.idCardNo')">
-          <el-input v-model="formData.idCardNo" clearable :placeholder="t('ec.organization.person.form.idCardNoPlaceholder')" />
-        </el-form-item>
-        <el-form-item :label="t('ec.organization.person.table.account')">
-          <el-input v-model="formData.account" clearable :placeholder="t('ec.organization.person.form.accountPlaceholder')" />
-        </el-form-item>
-        <el-form-item :label="t('ec.organization.person.table.photoUrl')">
-          <el-input v-model="formData.photoUrl" clearable :placeholder="t('ec.organization.person.form.photoUrlPlaceholder')" />
-        </el-form-item>
-        <el-form-item :label="t('ec.organization.person.form.department')">
-          <el-tree-select
-            v-model="formData.departmentId"
-            clearable
-            check-strictly
-            node-key="id"
-            :data="departmentOptions"
-            :props="{ label: 'name', children: 'children' }"
-            :placeholder="t('ec.organization.person.form.departmentPlaceholder')"
-          />
-        </el-form-item>
-        <el-form-item :label="t('ec.organization.person.form.serviceProvider')" prop="serviceProviderId">
-          <el-select
-            v-model="formData.serviceProviderId"
-            clearable
-            filterable
-            :placeholder="t('ec.organization.person.form.serviceProviderPlaceholder')"
-          >
-            <el-option v-for="item in serviceProviderOptions" :key="item.id" :label="item.displayLabel" :value="item.id" />
-          </el-select>
-        </el-form-item>
-        <el-form-item :label="t('ec.organization.person.form.personType')" prop="personType">
-          <el-select v-model="formData.personType" clearable :placeholder="t('ec.organization.person.form.personTypePlaceholder')">
-            <el-option v-for="item in personTypeOptions" :key="item.value" :label="item.label" :value="item.value" />
-          </el-select>
-        </el-form-item>
-        <el-form-item :label="t('ec.organization.common.status')" prop="status">
-          <el-select v-model="formData.status" clearable :placeholder="t('ec.organization.person.form.statusPlaceholder')">
-            <el-option v-for="item in personStatusOptions" :key="item.value" :label="item.displayLabel" :value="item.value" />
-          </el-select>
-        </el-form-item>
-      </el-form>
+      <el-form ref="formRef" :model="formData" :rules="formRules" label-position="top">
+        <section class="organization-form-section">
+          <div class="organization-section-title">{{ t('ec.organization.person.section.basicInfo') }}</div>
+          <div class="organization-form-grid">
+            <el-form-item :label="t('ec.organization.common.name')" prop="name">
+              <el-input v-model="formData.name" clearable :placeholder="t('ec.organization.person.form.namePlaceholder')" />
+            </el-form-item>
+            <el-form-item :label="t('ec.organization.person.table.employeeNo')">
+              <el-input v-model="formData.employeeNo" clearable :placeholder="t('ec.organization.person.form.employeeNoPlaceholder')" />
+            </el-form-item>
 
-      <div v-if="formData.photoUrl" class="organization-page-preview">
-        <div class="organization-page-preview__label">{{ t('ec.organization.person.form.photoPreview') }}</div>
-        <img class="organization-page-preview__image" :src="formData.photoUrl" alt="photo preview" />
-      </div>
+            <el-form-item :label="t('ec.organization.person.table.gender')" prop="gender">
+              <el-select v-model="formData.gender" clearable :placeholder="t('ec.organization.person.form.genderPlaceholder')">
+                <el-option v-for="item in genderOptions" :key="item.value" :label="item.label" :value="item.value" />
+              </el-select>
+            </el-form-item>
+            <el-form-item :label="t('ec.organization.person.table.idCardNo')" prop="idCardNo">
+              <el-input v-model="formData.idCardNo" clearable :placeholder="t('ec.organization.person.form.idCardNoPlaceholder')" />
+            </el-form-item>
+
+            <el-form-item :label="t('ec.organization.person.table.mobile')" prop="mobile">
+              <el-input v-model="formData.mobile" clearable :placeholder="t('ec.organization.person.form.mobilePlaceholder')" />
+            </el-form-item>
+            <el-form-item :label="t('ec.organization.person.form.serviceProvider')" prop="serviceProviderId">
+              <ec-object-single-select
+                v-model="formData.serviceProviderId"
+                :placeholder="t('ec.organization.person.form.serviceProviderPlaceholder')"
+                :title="`${t('ec.organization.person.form.serviceProvider')}${t('ec.organization.selector.titleSuffix')}`"
+                :search-placeholder="t('ec.organization.selector.searchPlaceholder')"
+                :options="serviceProviderOptions"
+                label-key="name"
+                value-key="id"
+                subtitle-key="code"
+              />
+            </el-form-item>
+
+            <el-form-item :label="t('ec.organization.person.form.personType')" prop="personType">
+              <el-select v-model="formData.personType" clearable :placeholder="t('ec.organization.person.form.personTypePlaceholder')">
+                <el-option v-for="item in personTypeOptions" :key="item.value" :label="item.label" :value="item.value" />
+              </el-select>
+            </el-form-item>
+            <el-form-item :label="t('ec.organization.person.form.hasOpsAccount')" prop="hasOpsAccount">
+              <div class="organization-switch-field">
+                <el-switch v-model="formData.hasOpsAccount" />
+              </div>
+            </el-form-item>
+          </div>
+        </section>
+
+        <section class="organization-form-section">
+          <div class="organization-section-title">{{ t('ec.organization.person.section.relationInfo') }}</div>
+          <div class="organization-form-grid">
+            <el-form-item :label="t('ec.organization.person.relations.informationSystems')">
+              <ec-object-multi-transfer
+                v-model="formData.informationSystemIds"
+                :placeholder="t('ec.organization.person.relation.informationSystemsPlaceholder')"
+                :title="`${t('ec.organization.person.relations.informationSystems')}${t('ec.organization.selector.titleSuffix')}`"
+                :selected-title="t('ec.organization.selector.selected')"
+                :search-placeholder="t('ec.organization.selector.searchPlaceholder')"
+                :options="informationSystemOptions"
+                label-key="name"
+                value-key="id"
+                subtitle-key="code"
+              />
+            </el-form-item>
+
+            <el-form-item :label="t('ec.organization.person.relations.hardwareAssets')">
+              <ec-object-multi-transfer
+                v-model="formData.hardwareAssetIds"
+                :placeholder="t('ec.organization.person.relation.hardwareAssetsPlaceholder')"
+                :title="`${t('ec.organization.person.relations.hardwareAssets')}${t('ec.organization.selector.titleSuffix')}`"
+                :selected-title="t('ec.organization.selector.selected')"
+                :search-placeholder="t('ec.organization.selector.searchPlaceholder')"
+                :options="hardwareOptions"
+                label-key="assetName"
+                value-key="id"
+                subtitle-key="assetCode"
+              />
+            </el-form-item>
+
+            <el-form-item :label="t('ec.organization.person.relations.relatedServiceProviders')" class="is-span-2">
+              <ec-object-multi-transfer
+                v-model="formData.relatedServiceProviderIds"
+                :placeholder="t('ec.organization.person.relation.relatedServiceProvidersPlaceholder')"
+                :title="`${t('ec.organization.person.relations.relatedServiceProviders')}${t('ec.organization.selector.titleSuffix')}`"
+                :selected-title="t('ec.organization.selector.selected')"
+                :search-placeholder="t('ec.organization.selector.searchPlaceholder')"
+                :options="relatedServiceProviderOptions"
+                label-key="name"
+                value-key="id"
+                subtitle-key="code"
+              />
+            </el-form-item>
+          </div>
+        </section>
+      </el-form>
     </div>
   </figma-resource-page>
 </template>
 
 <script setup>
-import { computed, onMounted, reactive, ref } from 'vue'
+import { computed, onMounted, reactive, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
-import { getStatusDictionaries } from '@/services/modules/dictionaryService'
-import { buildStatusOptionMap } from '@/utils/statusDictionary'
 import {
   createPerson,
+  getOrganizationHardwareOptions,
+  getOrganizationInformationSystemOptions,
   getOrganizationServiceProviderOptions,
-  getPersonDepartmentOptions,
   getPersonDetail,
   updatePerson,
 } from '@/services/modules/organizationService'
+import EcObjectMultiTransfer from '@/components/EcObjectMultiTransfer.vue'
+import EcObjectSingleSelect from '@/components/EcObjectSingleSelect.vue'
 import FigmaResourcePage from './components/FigmaResourcePage.vue'
 
 defineOptions({ name: 'OrganizationPersonFormPage' })
 
-const { t, locale } = useI18n()
+const { t } = useI18n()
 const route = useRoute()
 const router = useRouter()
 
 const formRef = ref(null)
 const pageLoading = ref(false)
 const submitLoading = ref(false)
-const statusDictionaries = ref({})
-const departmentOptions = ref([])
+const hardwareOptions = ref([])
+const informationSystemOptions = ref([])
 const serviceProviderOptions = ref([])
 
 const formData = reactive({
   name: '',
+  employeeNo: '',
   gender: '',
   idCardNo: '',
   mobile: '',
-  employeeNo: '',
-  photoUrl: '',
-  account: '',
-  departmentId: null,
   serviceProviderId: null,
   personType: '',
-  status: '',
+  hasOpsAccount: false,
+  informationSystemIds: [],
+  hardwareAssetIds: [],
+  relatedServiceProviderIds: [],
 })
 
 const isEdit = computed(() => Boolean(route.params.id))
@@ -131,54 +169,63 @@ const pageDescription = computed(() => {
   return isEdit.value ? t('ec.organization.person.page.editDescription') : t('ec.organization.person.page.createDescription')
 })
 
+const genderOptions = computed(() => ([
+  { value: '男', label: t('ec.organization.person.form.genderMale') },
+  { value: '女', label: t('ec.organization.person.form.genderFemale') },
+]))
+
 const personTypeOptions = computed(() => ([
   { value: 'DEV', label: t('ec.organization.person.figma.type.dev') },
   { value: 'OPS', label: t('ec.organization.person.figma.type.ops') },
 ]))
 
-const personStatusOptions = computed(() => {
-  return Object.values(buildStatusOptionMap(statusDictionaries.value.personStatus, locale.value))
+const relatedServiceProviderOptions = computed(() => {
+  return serviceProviderOptions.value.filter((item) => item.id !== formData.serviceProviderId)
 })
 
 const formRules = computed(() => ({
   name: [{ required: true, message: t('ec.organization.person.validation.nameRequired'), trigger: 'blur' }],
+  gender: [{ required: true, message: t('ec.organization.person.validation.genderRequired'), trigger: 'change' }],
+  idCardNo: [{ required: true, message: t('ec.organization.person.validation.idCardNoRequired'), trigger: 'blur' }],
+  mobile: [{ required: true, message: t('ec.organization.person.validation.mobileRequired'), trigger: 'blur' }],
   serviceProviderId: [{ required: true, message: t('ec.organization.person.validation.serviceProviderRequired'), trigger: 'change' }],
   personType: [{ required: true, message: t('ec.organization.person.validation.personTypeRequired'), trigger: 'change' }],
-  status: [{ required: true, message: t('ec.organization.person.validation.statusRequired'), trigger: 'change' }],
 }))
 
-const fillForm = (data = {}) => {
-  formData.name = data.name || ''
-  formData.gender = data.gender || ''
-  formData.idCardNo = data.idCardNo || ''
-  formData.mobile = data.mobile || ''
-  formData.employeeNo = data.employeeNo || ''
-  formData.photoUrl = data.photoUrl || ''
-  formData.account = data.account || ''
-  formData.departmentId = data.departmentId ?? null
-  formData.serviceProviderId = data.serviceProviderId ?? null
-  formData.personType = data.personType || ''
-  formData.status = data.status || ''
+const normalizeIds = (value) => {
+  return Array.isArray(value) ? value : []
 }
 
-const loadOptions = async () => {
-  const [statusOptions, departments, serviceProviders] = await Promise.all([
-    getStatusDictionaries(),
-    getPersonDepartmentOptions(),
+const fillForm = (person = {}, detail = {}) => {
+  formData.name = person.name || ''
+  formData.employeeNo = person.employeeNo || ''
+  formData.gender = person.gender || ''
+  formData.idCardNo = person.idCardNo || ''
+  formData.mobile = person.mobile || ''
+  formData.serviceProviderId = person.serviceProviderId ?? null
+  formData.personType = person.personType || ''
+  formData.hasOpsAccount = Boolean(person.hasOpsAccount)
+  formData.informationSystemIds = normalizeIds(detail.informationSystemIds)
+  formData.hardwareAssetIds = normalizeIds(detail.hardwareAssetIds)
+  formData.relatedServiceProviderIds = normalizeIds(detail.relatedServiceProviderIds)
+}
+
+const loadSupportOptions = async () => {
+  const [hardwareAssets, informationSystems, serviceProviders] = await Promise.all([
+    getOrganizationHardwareOptions(),
+    getOrganizationInformationSystemOptions(),
     getOrganizationServiceProviderOptions(),
   ])
-  statusDictionaries.value = statusOptions
-  departmentOptions.value = departments
-  serviceProviderOptions.value = serviceProviders.map((item) => ({
-    ...item,
-    displayLabel: [item.name, item.code].filter(Boolean).join(' / ') || '-',
-  }))
+
+  hardwareOptions.value = Array.isArray(hardwareAssets) ? hardwareAssets : []
+  informationSystemOptions.value = Array.isArray(informationSystems) ? informationSystems : []
+  serviceProviderOptions.value = Array.isArray(serviceProviders) ? serviceProviders : []
 }
 
 const loadDetail = async () => {
   if (!isEdit.value) return
   const detail = await getPersonDetail(route.params.id)
-  fillForm(detail.person)
+  fillForm(detail.person, detail)
 }
 
 const handleSubmit = async () => {
@@ -190,16 +237,16 @@ const handleSubmit = async () => {
   try {
     const payload = {
       name: formData.name,
+      employeeNo: formData.employeeNo || undefined,
       gender: formData.gender,
       idCardNo: formData.idCardNo,
       mobile: formData.mobile,
-      employeeNo: formData.employeeNo,
-      photoUrl: formData.photoUrl,
-      account: formData.account,
-      departmentId: formData.departmentId ?? undefined,
       serviceProviderId: formData.serviceProviderId,
       personType: formData.personType,
-      status: formData.status,
+      hasOpsAccount: formData.hasOpsAccount,
+      informationSystemIds: formData.informationSystemIds,
+      hardwareAssetIds: formData.hardwareAssetIds,
+      relatedServiceProviderIds: formData.relatedServiceProviderIds,
     }
 
     const response = isEdit.value
@@ -218,7 +265,7 @@ const handleSubmit = async () => {
 onMounted(async () => {
   pageLoading.value = true
   try {
-    await loadOptions()
+    await loadSupportOptions()
     await loadDetail()
   } catch (error) {
     ElMessage.error(error.message || t('ec.organization.person.message.loadFailed'))
@@ -226,6 +273,14 @@ onMounted(async () => {
     pageLoading.value = false
   }
 })
+
+watch(
+  () => formData.serviceProviderId,
+  (value) => {
+    if (!value) return
+    formData.relatedServiceProviderIds = formData.relatedServiceProviderIds.filter((item) => item !== value)
+  },
+)
 </script>
 
 <style lang="scss" scoped>
@@ -235,6 +290,19 @@ onMounted(async () => {
   border: 1px solid #edf0f6;
   border-radius: 16px;
   box-shadow: 0 12px 40px rgba(28, 53, 91, 0.05);
+}
+
+.organization-form-section + .organization-form-section {
+  margin-top: 28px;
+  padding-top: 24px;
+  border-top: 1px solid #edf0f6;
+}
+
+.organization-section-title {
+  margin-bottom: 16px;
+  color: #151b26;
+  font-size: 16px;
+  font-weight: 700;
 }
 
 .organization-form-grid {
@@ -247,31 +315,19 @@ onMounted(async () => {
   }
 
   :deep(.el-form-item__content),
-  :deep(.el-select),
-  :deep(.el-tree-select) {
+  :deep(.el-select) {
     width: 100%;
   }
 }
 
-.organization-page-preview {
-  margin-top: 24px;
-  padding-top: 20px;
-  border-top: 1px solid #edf0f6;
+.organization-switch-field {
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
 }
 
-.organization-page-preview__label {
-  margin-bottom: 12px;
-  color: #858a99;
-  font-size: 13px;
-}
-
-.organization-page-preview__image {
-  display: block;
-  max-width: 160px;
-  max-height: 160px;
-  border: 1px solid #edf0f6;
-  border-radius: 12px;
-  object-fit: cover;
+.is-span-2 {
+  grid-column: 1 / -1;
 }
 
 @media only screen and (max-width: 991px) {
@@ -281,6 +337,10 @@ onMounted(async () => {
 
   .organization-form-grid {
     grid-template-columns: 1fr;
+  }
+
+  .is-span-2 {
+    grid-column: auto;
   }
 }
 </style>

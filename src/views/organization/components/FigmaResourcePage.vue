@@ -1,5 +1,5 @@
 <template>
-  <figma-resource-shell :active-tab="activeTab" hide-stats>
+  <figma-resource-shell :active-tab="activeTab" :sub-tabs="subTabs" :hide-tabs="hideTabs" hide-stats>
     <template #filters>
       <div class="organization-page-header">
         <button class="organization-page-header__back" type="button" @click="goBack">
@@ -33,6 +33,10 @@ const props = defineProps({
     type: String,
     default: 'serviceProviders',
   },
+  subTabs: {
+    type: Array,
+    default: () => [],
+  },
   title: {
     type: String,
     default: '',
@@ -44,6 +48,10 @@ const props = defineProps({
   backPath: {
     type: String,
     default: '',
+  },
+  hideTabs: {
+    type: Boolean,
+    default: false,
   },
 })
 

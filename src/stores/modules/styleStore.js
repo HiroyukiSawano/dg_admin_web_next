@@ -3,6 +3,13 @@ import { STYLE_LAYOUT, STYLE_STRATEGY, STYLE_COLLAPSE, STYLE_TABS, STYLE_TABS_PE
 import { colorLighten, colorDarken } from '@/utils/color'
 import { useCssVar } from '@vueuse/core'
 
+const LEGACY_DEFAULT_COLOR = '#207f4c'
+const STYLE_COMPAT_VERSION = 1
+
+const normalizeColor = (value) => {
+  return String(value || '').trim().toLowerCase()
+}
+
 const useStyleStore = defineStore('style', {
   state: () => ({
     // 布局
@@ -13,6 +20,8 @@ const useStyleStore = defineStore('style', {
     theme: STYLE_THEME,
     // 颜色
     color: STYLE_COLOR,
+    // 主题兼容版本
+    compatVersion: 0,
     // 视觉特效
     effect: STYLE_EFFECT,
     // 是否显示顶部TABS
@@ -31,8 +40,18 @@ const useStyleStore = defineStore('style', {
 
   getters: {},
   actions: {
+    EnsureStyleCompatibility() {
+      if (this.compatVersion >= STYLE_COMPAT_VERSION) return
+
+      if (normalizeColor(this.color) === normalizeColor(LEGACY_DEFAULT_COLOR) && normalizeColor(STYLE_COLOR) !== normalizeColor(LEGACY_DEFAULT_COLOR)) {
+        this.color = STYLE_COLOR
+      }
+
+      this.compatVersion = STYLE_COMPAT_VERSION
+    },
     // 更新主颜色并设置相关 CSS 变量
     UpdateStyleColor() {
+      this.EnsureStyleCompatibility()
       // 如果没有颜色设置初始颜色
       if (!this.color) this.color = STYLE_COLOR
       const el = document.documentElement
@@ -65,11 +84,10 @@ const useStyleStore = defineStore('style', {
     // 更新样式设置
     UpdateStyle({ key, value }) {
       if (!Reflect.has(this, key)) return
+      this[key] = value
       if (key === 'color') this.UpdateStyleColor()
       if (key === 'variables') this.UpdateStyleVariables()
       if (key === 'layout' || key === 'effect' || key === 'theme') this.UpdateStyleAttribute(key, value)
-
-      this[key] = value
     },
     // 重置样式
     ResetStyle() {

@@ -22,52 +22,52 @@
 
       <el-form label-position="top" class="organization-form-grid">
         <el-form-item :label="t('ec.organization.serviceProvider.relations.hardwareAssets')">
-          <el-select
+          <ec-object-multi-transfer
             v-model="relationForm.hardwareAssetIds"
-            multiple
-            filterable
-            collapse-tags
-            collapse-tags-tooltip
             :placeholder="t('ec.organization.serviceProvider.relation.hardwareAssetsPlaceholder')"
-          >
-            <el-option v-for="item in hardwareOptions" :key="item.id" :label="item.displayLabel" :value="item.id" />
-          </el-select>
+            :title="`${t('ec.organization.serviceProvider.relations.hardwareAssets')}${t('ec.organization.selector.titleSuffix')}`"
+            :selected-title="t('ec.organization.selector.selected')"
+            :search-placeholder="t('ec.organization.selector.searchPlaceholder')"
+            :options="hardwareOptions"
+            label-key="displayLabel"
+            value-key="id"
+          />
         </el-form-item>
         <el-form-item :label="t('ec.organization.serviceProvider.relations.informationSystems')">
-          <el-select
+          <ec-object-multi-transfer
             v-model="relationForm.informationSystemIds"
-            multiple
-            filterable
-            collapse-tags
-            collapse-tags-tooltip
             :placeholder="t('ec.organization.serviceProvider.relation.informationSystemsPlaceholder')"
-          >
-            <el-option v-for="item in informationSystemOptions" :key="item.id" :label="item.displayLabel" :value="item.id" />
-          </el-select>
+            :title="`${t('ec.organization.serviceProvider.relations.informationSystems')}${t('ec.organization.selector.titleSuffix')}`"
+            :selected-title="t('ec.organization.selector.selected')"
+            :search-placeholder="t('ec.organization.selector.searchPlaceholder')"
+            :options="informationSystemOptions"
+            label-key="displayLabel"
+            value-key="id"
+          />
         </el-form-item>
         <el-form-item :label="t('ec.organization.serviceProvider.relations.persons')" class="is-span-2">
-          <el-select
+          <ec-object-multi-transfer
             v-model="relationForm.personIds"
-            multiple
-            filterable
-            collapse-tags
-            collapse-tags-tooltip
             :placeholder="t('ec.organization.serviceProvider.relation.personsPlaceholder')"
-          >
-            <el-option v-for="item in personOptions" :key="item.id" :label="item.displayLabel" :value="item.id" />
-          </el-select>
+            :title="`${t('ec.organization.serviceProvider.relations.persons')}${t('ec.organization.selector.titleSuffix')}`"
+            :selected-title="t('ec.organization.selector.selected')"
+            :search-placeholder="t('ec.organization.selector.searchPlaceholder')"
+            :options="personOptions"
+            label-key="displayLabel"
+            value-key="id"
+          />
         </el-form-item>
         <el-form-item :label="t('ec.organization.serviceProvider.relations.projects')" class="is-span-2">
-          <el-select
+          <ec-object-multi-transfer
             v-model="relationForm.projectIds"
-            multiple
-            filterable
-            collapse-tags
-            collapse-tags-tooltip
             :placeholder="t('ec.organization.serviceProvider.relation.projectsPlaceholder')"
-          >
-            <el-option v-for="item in projectOptions" :key="item.id" :label="item.displayLabel" :value="item.id" />
-          </el-select>
+            :title="`${t('ec.organization.serviceProvider.relations.projects')}${t('ec.organization.selector.titleSuffix')}`"
+            :selected-title="t('ec.organization.selector.selected')"
+            :search-placeholder="t('ec.organization.selector.searchPlaceholder')"
+            :options="projectOptions"
+            label-key="displayLabel"
+            value-key="id"
+          />
         </el-form-item>
       </el-form>
     </div>
@@ -87,6 +87,7 @@ import {
   getServiceProviderDetail,
   syncServiceProviderRelations,
 } from '@/services/modules/organizationService'
+import EcObjectMultiTransfer from '@/components/EcObjectMultiTransfer.vue'
 import FigmaResourcePage from './components/FigmaResourcePage.vue'
 
 defineOptions({ name: 'OrganizationServiceProviderRelationsPage' })

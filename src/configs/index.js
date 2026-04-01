@@ -42,7 +42,7 @@ const defaultConfig = {
   STYLE_LAYOUT: 'classic',
   STYLE_STRATEGY: 'flexbox',
   STYLE_THEME: 'immersive',
-  STYLE_COLOR: '#207f4c',
+  STYLE_COLOR: '#2e5ef0',
   STYLE_EFFECT: 'none',
   STYLE_COLLAPSE: false,
   STYLE_BREADCRUMB: true,
