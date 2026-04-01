@@ -20,21 +20,7 @@
       </nav>
 
       <div class="figma-shell__tools">
-        <button class="figma-shell__tool-button" type="button">
-          <i class="ri-search-line"></i>
-        </button>
-        <button class="figma-shell__tool-button" type="button">
-          <i class="ri-notification-3-line"></i>
-          <span class="figma-shell__tool-dot"></span>
-        </button>
-        <button class="figma-shell__theme-button" type="button" @click="openThemeSetting">
-          <i class="ri-palette-line"></i>
-          <span class="hidden-sm-and-down">{{ t('ec.user.dropdowm.item.text.setting') }}</span>
-        </button>
-        <div class="figma-shell__account">
-          <div class="figma-shell__avatar">{{ accountInitial }}</div>
-          <span>{{ displayUserName }}</span>
-        </div>
+        <layout-tools />
       </div>
     </header>
 
@@ -130,8 +116,8 @@ import { storeToRefs } from 'pinia'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuthorizeStore } from '@/stores/modules/authorizeStore'
-import { $pub } from '@/plugins/mitt'
 import LayoutSetting from '@/layouts/components/LayoutSetting'
+import LayoutTools from '@/layouts/components/LayoutTools'
 
 defineOptions({ name: 'FigmaResourceShell' })
 
@@ -254,9 +240,6 @@ const navigate = (item) => {
   router.push(item.path)
 }
 
-const openThemeSetting = () => {
-  $pub('layoutSetting:visible')
-}
 </script>
 
 <style lang="scss" scoped>
@@ -334,69 +317,7 @@ const openThemeSetting = () => {
 .figma-shell__tools {
   display: flex;
   align-items: center;
-  gap: 8px;
   margin-left: auto;
-}
-
-.figma-shell__tool-button {
-  position: relative;
-  width: 32px;
-  height: 32px;
-  border: 0;
-  border-radius: 10px;
-  background: #f5f7fb;
-  color: #444a57;
-  font-size: 16px;
-}
-
-.figma-shell__theme-button {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  height: 32px;
-  padding: 0 12px;
-  border: 0;
-  border-radius: 10px;
-  background: #f5f7fb;
-  color: #444a57;
-  font-size: 13px;
-  cursor: pointer;
-
-  i {
-    font-size: 16px;
-  }
-}
-
-.figma-shell__tool-dot {
-  position: absolute;
-  top: 6px;
-  right: 7px;
-  width: 6px;
-  height: 6px;
-  background: #ff6b6b;
-  border-radius: 50%;
-}
-
-.figma-shell__account {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-left: 4px;
-  color: #444a57;
-  font-size: 14px;
-}
-
-.figma-shell__avatar {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 28px;
-  height: 28px;
-  border-radius: 10px;
-  background: linear-gradient(135deg, #6f91ff 0%, #2e5ef0 100%);
-  color: #fff;
-  font-size: 14px;
-  font-weight: 600;
 }
 
 .figma-shell__body {
@@ -694,8 +615,8 @@ const openThemeSetting = () => {
     justify-content: flex-end;
   }
 
-  .figma-shell__account > span {
-    display: none;
+  .figma-shell__tools {
+    margin-left: 0;
   }
 }
 </style>

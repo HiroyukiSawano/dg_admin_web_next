@@ -101,7 +101,7 @@ export const getProjectOptions = async () => {
   return Array.isArray(payload) ? payload : []
 }
 
-export const uploadProjectDocument = async (file) => {
+export const uploadProjectDocument = async (file, options = {}) => {
   const formData = new FormData()
   formData.append('file', file)
 
@@ -109,6 +109,7 @@ export const uploadProjectDocument = async (file) => {
     url: '/api/v1/files',
     method: 'POST',
     data: formData,
+    onUploadProgress: options.onUploadProgress,
     headers: {
       'Content-Type': 'multipart/form-data',
     },

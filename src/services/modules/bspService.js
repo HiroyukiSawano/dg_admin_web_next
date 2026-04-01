@@ -15,26 +15,13 @@ const LOCAL_LOGIN_USERS = {
       permission: 'LIST.ADD,LIST.EDIT,LIST.DELETE,USER.ADD,USER.EDIT,USER.DELETE',
     },
   },
-  eam_demo: {
-    password: 'e10adc3949ba59abbe56e057f20f883e',
-    token: 'local-asset-demo-token',
-    user: {
-      id: 'local-asset-demo-user',
-      name: '资产管理演示账号',
-      organName: '资产管理系统',
-      username: 'eam_demo',
-      avatar: '',
-      role: 'ROLE_EAM_ASSET',
-      permission: '',
-    },
-  },
   eam_figma_demo: {
     password: 'e10adc3949ba59abbe56e057f20f883e',
     token: 'local-asset-figma-demo-token',
     user: {
       id: 'local-asset-figma-demo-user',
-      name: '组织资源新版演示账号',
-      organName: '组织资源新版演示',
+      name: '资产资源新版演示账号',
+      organName: '资产资源新版正式入口',
       username: 'eam_figma_demo',
       avatar: '',
       role: 'ROLE_EAM_FIGMA',

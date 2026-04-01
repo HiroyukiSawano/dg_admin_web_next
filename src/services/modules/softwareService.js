@@ -25,7 +25,12 @@ const normalizeInformationSystemDetail = (payload) => {
     informationSystem: payload?.informationSystem || null,
     serviceProviderIds: Array.isArray(payload?.serviceProviderIds) ? payload.serviceProviderIds : [],
     personIds: Array.isArray(payload?.personIds) ? payload.personIds : [],
+    hardwareAssetIds: Array.isArray(payload?.hardwareAssetIds) ? payload.hardwareAssetIds : [],
     projectIds: Array.isArray(payload?.projectIds) ? payload.projectIds : [],
+    serviceProviders: Array.isArray(payload?.serviceProviders) ? payload.serviceProviders : [],
+    persons: Array.isArray(payload?.persons) ? payload.persons : [],
+    hardwareAssets: Array.isArray(payload?.hardwareAssets) ? payload.hardwareAssets : [],
+    projects: Array.isArray(payload?.projects) ? payload.projects : [],
   }
 }
 
@@ -46,6 +51,13 @@ export const getInformationSystemDetail = async (id) => {
   })
 
   return normalizeInformationSystemDetail(payload)
+}
+
+export const getInformationSystemStats = () => {
+  return resolveEamResponse({
+    url: '/api/v1/information-systems/stats',
+    method: 'GET',
+  })
 }
 
 export const createInformationSystem = (payload) => {
@@ -109,6 +121,15 @@ export const getSoftwarePersonOptions = async () => {
 export const getSoftwareProjectOptions = async () => {
   const payload = await resolveEamResponse({
     url: '/api/v1/projects/options',
+    method: 'GET',
+  })
+
+  return Array.isArray(payload) ? payload : []
+}
+
+export const getSoftwareHardwareOptions = async () => {
+  const payload = await resolveEamResponse({
+    url: '/api/v1/hardware-assets/options',
     method: 'GET',
   })
 

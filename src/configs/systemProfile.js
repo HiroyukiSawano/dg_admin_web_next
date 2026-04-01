@@ -2,18 +2,22 @@ import { APP_NAME } from '@/configs'
 
 const SYSTEM_PROFILES = [
   {
-    name: '资产管理系统',
-    usernames: ['eam_demo'],
-    roles: ['ROLE_EAM_ASSET', 'ROLE_EAM_DEMO'],
-    allowedPrefixes: ['/organization', '/project', '/software', '/hardware'],
-  },
-  {
     name: '组织资源新版演示',
     usernames: ['eam_figma_demo'],
     roles: ['ROLE_EAM_FIGMA'],
-    allowedPrefixes: ['/organization', '/project'],
+    allowedPrefixes: ['/organization', '/project', '/software', '/hardware'],
     excludedRouteNames: ['organizationDepartments', 'organizationLocations'],
-    menuRouteNames: ['organization', 'organizationServiceProviders', 'organizationPersons', 'project', 'projectAssets'],
+    menuRouteNames: [
+      'organization',
+      'organizationServiceProviders',
+      'organizationPersons',
+      'project',
+      'projectAssets',
+      'software',
+      'softwareAssets',
+      'hardware',
+      'hardwareAssets',
+    ],
     homepage: '/organization/service-providers',
   },
   {

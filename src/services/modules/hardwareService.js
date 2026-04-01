@@ -12,25 +12,28 @@ const resolveEamResponse = async (options) => {
   throw new Error(payload?.message || 'Hardware request failed')
 }
 
-const normalizePageResponse = (payload) => {
-  return {
-    records: Array.isArray(payload?.records) ? payload.records : [],
-    total: Number(payload?.total || 0),
-    pageNo: Number(payload?.pageNo || 1),
-    pageSize: Number(payload?.pageSize || 10),
-  }
-}
+const normalizePageResponse = (payload) => ({
+  records: Array.isArray(payload?.records) ? payload.records : [],
+  total: Number(payload?.total || 0),
+  pageNo: Number(payload?.pageNo || 1),
+  pageSize: Number(payload?.pageSize || 10),
+})
 
-const normalizeHardwareDetail = (payload) => {
-  return {
-    hardwareAsset: payload?.hardwareAsset || null,
-    subtypeDetail: payload?.subtypeDetail || null,
-    informationSystemIds: Array.isArray(payload?.informationSystemIds) ? payload.informationSystemIds : [],
-    ownerIds: Array.isArray(payload?.ownerIds) ? payload.ownerIds : [],
-    vendorIds: Array.isArray(payload?.vendorIds) ? payload.vendorIds : [],
-    lifecycleRecords: Array.isArray(payload?.lifecycleRecords) ? payload.lifecycleRecords : [],
-  }
-}
+const normalizeHardwareDetail = (payload) => ({
+  hardwareAsset: payload?.hardwareAsset || null,
+  personIds: Array.isArray(payload?.personIds) ? payload.personIds : [],
+  ownerIds: Array.isArray(payload?.ownerIds) ? payload.ownerIds : [],
+  informationSystemIds: Array.isArray(payload?.informationSystemIds) ? payload.informationSystemIds : [],
+  projectIds: Array.isArray(payload?.projectIds) ? payload.projectIds : [],
+  serviceProviderIds: Array.isArray(payload?.serviceProviderIds) ? payload.serviceProviderIds : [],
+  vendorIds: Array.isArray(payload?.vendorIds) ? payload.vendorIds : [],
+  persons: Array.isArray(payload?.persons) ? payload.persons : [],
+  softwareAssets: Array.isArray(payload?.softwareAssets) ? payload.softwareAssets : [],
+  projects: Array.isArray(payload?.projects) ? payload.projects : [],
+  serviceProviders: Array.isArray(payload?.serviceProviders) ? payload.serviceProviders : [],
+  subtypeDetail: payload?.subtypeDetail || null,
+  lifecycleRecords: Array.isArray(payload?.lifecycleRecords) ? payload.lifecycleRecords : [],
+})
 
 export const getHardwareAssetList = async (params = {}) => {
   const payload = await resolveEamResponse({
@@ -38,8 +41,14 @@ export const getHardwareAssetList = async (params = {}) => {
     method: 'GET',
     params,
   })
-
   return normalizePageResponse(payload)
+}
+
+export const getHardwareAssetStats = () => {
+  return resolveEamResponse({
+    url: '/api/v1/hardware-assets/stats',
+    method: 'GET',
+  })
 }
 
 export const getHardwareAssetDetail = async (id) => {
@@ -47,7 +56,6 @@ export const getHardwareAssetDetail = async (id) => {
     url: `/api/v1/hardware-assets/${id}`,
     method: 'GET',
   })
-
   return normalizeHardwareDetail(payload)
 }
 
@@ -71,6 +79,14 @@ export const deleteHardwareAsset = (id) => {
   return resolveEamResponse({
     url: `/api/v1/hardware-assets/${id}`,
     method: 'DELETE',
+  })
+}
+
+export const syncHardwareRelations = (id, payload) => {
+  return resolveEamResponse({
+    url: `/api/v1/hardware-assets/${id}/relations`,
+    method: 'PUT',
+    data: payload,
   })
 }
 
@@ -115,26 +131,20 @@ export const batchImportHardwareAssets = (items = []) => {
 }
 
 export const exportHardwareAssets = () => {
-  return Http.request(
-    {
-      url: '/api/v1/hardware-assets/export',
-      method: 'GET',
-      responseType: 'arraybuffer',
-    },
-    true,
-  )
+  return Http.request({
+    url: '/api/v1/hardware-assets/export',
+    method: 'GET',
+    responseType: 'arraybuffer',
+  }, true)
 }
 
-export const getHardwareDepartmentOptions = () => {
-  return getDepartmentOptions()
-}
+export const getHardwareDepartmentOptions = () => getDepartmentOptions()
 
 export const getHardwareLocationOptions = async () => {
   const payload = await resolveEamResponse({
     url: '/api/v1/locations/options',
     method: 'GET',
   })
-
   return Array.isArray(payload) ? payload : []
 }
 
@@ -143,7 +153,6 @@ export const getHardwarePersonOptions = async () => {
     url: '/api/v1/persons/options',
     method: 'GET',
   })
-
   return Array.isArray(payload) ? payload : []
 }
 
@@ -152,7 +161,6 @@ export const getHardwareVendorOptions = async () => {
     url: '/api/v1/service-providers/options',
     method: 'GET',
   })
-
   return Array.isArray(payload) ? payload : []
 }
 
@@ -161,6 +169,13 @@ export const getHardwareSystemOptions = async () => {
     url: '/api/v1/information-systems/options',
     method: 'GET',
   })
+  return Array.isArray(payload) ? payload : []
+}
 
+export const getHardwareProjectOptions = async () => {
+  const payload = await resolveEamResponse({
+    url: '/api/v1/projects/options',
+    method: 'GET',
+  })
   return Array.isArray(payload) ? payload : []
 }

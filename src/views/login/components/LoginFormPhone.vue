@@ -107,7 +107,7 @@ const handleLogin = async () => {
   try {
     logined.value = true
     const params = {
-      username: 'eam_demo',
+      username: 'eam_figma_demo',
       password: 'e10adc3949ba59abbe56e057f20f883e',
       appCode: import.meta.env.VITE_APP_CODE,
       remember: true,

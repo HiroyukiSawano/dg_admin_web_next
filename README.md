@@ -59,8 +59,23 @@
 
 ### 软件资源 / 硬件资源
 
-- 已有旧版接入和基础联调能力
-- 仍作为后续继续收口对象
+软件资源、硬件资源新版 Figma 已进入正式入口：
+
+- 软件：列表 / 新增 / 编辑 / 详情 / 关联维护
+- 硬件：列表 / 新增 / 编辑 / 详情 / 关联维护
+
+主要文件：
+
+- `src/views/software/informationSystemsFigma.vue`
+- `src/views/software/softwareFormPage.vue`
+- `src/views/software/softwareDetailPage.vue`
+- `src/views/software/softwareRelationsPage.vue`
+- `src/views/hardware/hardwareAssetsFigma.vue`
+- `src/views/hardware/hardwareFormPage.vue`
+- `src/views/hardware/hardwareDetailPage.vue`
+- `src/views/hardware/hardwareRelationsPage.vue`
+- `src/router/modules/softwareRoutes.js`
+- `src/router/modules/hardwareRoutes.js`
 
 ## 新版页面约束
 
@@ -92,12 +107,10 @@
 
 当前本地演示账号：
 
-- `eam_demo / 123456`
-  - 显示资产管理系统菜单
 - `eam_figma_demo / 123456`
-  - 系统名称显示“组织资源新版演示”
+  - 系统名称显示“资产资源新版正式入口”
   - 默认进入 `/organization/service-providers`
-  - 当前可访问新版组织资源与新版项目资源
+  - 当前可访问新版组织资源、项目资源、软件资源、硬件资源
 - `ops_demo / 123456`
   - 仅显示监控中心
 - `platformadmin / admin`
@@ -112,7 +125,10 @@
 
 - 组织资源新版服务商、人员主线页面已完成首轮交付
 - 项目资源新版列表 / 新增 / 编辑 / 详情 / 关联维护已完成首轮交付
+- 软件资源新版列表 / 新增 / 编辑 / 详情 / 关联维护已完成首轮交付
+- 硬件资源新版列表 / 新增 / 编辑 / 详情 / 关联维护已完成首轮交付
 - 项目资源接入项目统计和项目文档真实上传
+- 软件 / 硬件统一接入新版对象选择组件和正式入口路由
 - 主题色改回跟全局主题走，默认主色为蓝色 `#2e5ef0`
 - 组织资源新版壳层可直接打开主题设置抽屉
 
@@ -120,8 +136,8 @@
 
 推荐后续优先级：
 
-1. 继续优化项目资源新版细节
-2. 开始软件资源新版 Figma 收口
+1. 继续优化软件 / 硬件新版详情、表单回显和关联交互
+2. 继续处理软件 / 硬件与项目 / 组织模块的联调细节
 3. 再处理旧版页面清理和全模块联调细节
 
 ## 常用命令

@@ -58,20 +58,6 @@
         </div>
 
         <div class="project-detail-section">
-          <div class="project-section-title">{{ t('ec.project.section.owner') }}</div>
-          <div class="project-detail-grid">
-            <div class="project-detail-item">
-              <span>{{ t('ec.project.common.ownerName') }}</span>
-              <strong>{{ detailRecord.project?.ownerName || '-' }}</strong>
-            </div>
-            <div class="project-detail-item">
-              <span>{{ t('ec.project.common.ownerPhone') }}</span>
-              <strong>{{ detailRecord.project?.ownerPhone || '-' }}</strong>
-            </div>
-          </div>
-        </div>
-
-        <div class="project-detail-section">
           <div class="project-section-title">{{ t('ec.project.section.period') }}</div>
           <div class="project-detail-grid">
             <div class="project-detail-item">
@@ -85,6 +71,10 @@
             <div class="project-detail-item">
               <span>{{ t('ec.project.common.initialDeliveryDate') }}</span>
               <strong>{{ formatDate(detailRecord.project?.initialDeliveryDate) }}</strong>
+            </div>
+            <div class="project-detail-item">
+              <span>{{ t('ec.project.common.endDate') }}</span>
+              <strong>{{ formatDate(detailRecord.project?.endDate) }}</strong>
             </div>
             <div class="project-detail-item">
               <span>{{ t('ec.project.common.warrantyEndDate') }}</span>
@@ -105,10 +95,6 @@
               <strong>{{ detailRecord.project?.paymentCycleName || '-' }}</strong>
             </div>
             <div class="project-detail-item">
-              <span>{{ t('ec.project.common.paymentStatus') }}</span>
-              <strong>{{ getStatusLabel(detailRecord.project?.paymentStatus, paymentStatusMap) }}</strong>
-            </div>
-            <div class="project-detail-item">
               <span>{{ t('ec.project.common.paymentRatio') }}</span>
               <strong>{{ detailRecord.project?.paymentRatio == null ? '-' : `${detailRecord.project.paymentRatio}%` }}</strong>
             </div>
@@ -124,12 +110,31 @@
               <span>{{ t('ec.project.common.actualPaymentDate') }}</span>
               <strong>{{ formatDate(detailRecord.project?.actualPaymentDate) }}</strong>
             </div>
+            <div class="project-detail-item">
+              <span>{{ t('ec.project.common.paymentStatus') }}</span>
+              <strong>{{ getStatusLabel(detailRecord.project?.paymentStatus, paymentStatusMap) }}</strong>
+            </div>
+          </div>
+        </div>
+
+        <div class="project-detail-section">
+          <div class="project-section-title">{{ t('ec.project.section.owner') }}</div>
+          <div class="project-detail-grid">
+            <div class="project-detail-item">
+              <span>{{ t('ec.project.common.ownerName') }}</span>
+              <strong>{{ detailRecord.project?.ownerName || '-' }}</strong>
+            </div>
+            <div class="project-detail-item">
+              <span>{{ t('ec.project.common.ownerPhone') }}</span>
+              <strong>{{ detailRecord.project?.ownerPhone || '-' }}</strong>
+            </div>
           </div>
         </div>
       </section>
 
       <section class="project-page-card">
         <div class="project-section-title">{{ t('ec.project.section.documents') }}</div>
+        <div class="project-detail-hint">{{ t('ec.project.document.detailHint') }}</div>
         <el-table :data="detailRecord.documents" class="project-document-table">
           <el-table-column prop="originalName" :label="t('ec.project.document.name')" min-width="220" show-overflow-tooltip />
           <el-table-column :label="t('ec.project.document.size')" width="120">
@@ -153,6 +158,11 @@
             <el-empty :image-size="56" :description="t('ec.project.document.empty')" />
           </template>
         </el-table>
+      </section>
+
+      <section v-if="detailRecord.project?.remark" class="project-page-card">
+        <div class="project-section-title">{{ t('ec.project.common.remark') }}</div>
+        <div class="project-detail-remark">{{ detailRecord.project?.remark || '-' }}</div>
       </section>
 
       <section class="project-page-card">
@@ -455,6 +465,20 @@ onMounted(loadDetail)
   :deep(th.el-table__cell) {
     background: #f1f4fb;
   }
+}
+
+.project-detail-hint {
+  margin-top: 8px;
+  color: #858a99;
+  font-size: 12px;
+  line-height: 20px;
+}
+
+.project-detail-remark {
+  margin-top: 16px;
+  color: #444a57;
+  line-height: 24px;
+  white-space: pre-wrap;
 }
 
 .project-resource-grid {

@@ -30,6 +30,12 @@ export const buildListLabelMap = (list = [], labelKey = 'name') => {
   }, {})
 }
 
+export const normalizeIdList = (value) => {
+  return Array.isArray(value)
+    ? value.filter((item) => item !== null && item !== undefined && item !== '')
+    : []
+}
+
 export const parseImportText = (value) => {
   const source = String(value || '').trim()
   if (!source) {

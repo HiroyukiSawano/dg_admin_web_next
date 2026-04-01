@@ -6,6 +6,7 @@ const EMPTY_STATUS_DICTIONARIES = Object.freeze({
   serviceProviderStatus: [],
   informationSystemStatus: [],
   projectStatus: [],
+  paymentStatus: [],
   hardwareStatus: [],
 })
 
