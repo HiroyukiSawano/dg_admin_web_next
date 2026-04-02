@@ -95,19 +95,6 @@
               />
             </el-form-item>
 
-            <el-form-item :label="t('ec.organization.person.relations.relatedServiceProviders')" class="is-span-2">
-              <ec-object-multi-transfer
-                v-model="formData.relatedServiceProviderIds"
-                :placeholder="t('ec.organization.person.relation.relatedServiceProvidersPlaceholder')"
-                :title="`${t('ec.organization.person.relations.relatedServiceProviders')}${t('ec.organization.selector.titleSuffix')}`"
-                :selected-title="t('ec.organization.selector.selected')"
-                :search-placeholder="t('ec.organization.selector.searchPlaceholder')"
-                :options="relatedServiceProviderOptions"
-                label-key="name"
-                value-key="id"
-                subtitle-key="code"
-              />
-            </el-form-item>
           </div>
         </section>
       </el-form>
@@ -116,7 +103,7 @@
 </template>
 
 <script setup>
-import { computed, onMounted, reactive, ref, watch } from 'vue'
+import { computed, onMounted, reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
@@ -156,7 +143,6 @@ const formData = reactive({
   hasOpsAccount: false,
   informationSystemIds: [],
   hardwareAssetIds: [],
-  relatedServiceProviderIds: [],
 })
 
 const isEdit = computed(() => Boolean(route.params.id))
@@ -178,10 +164,6 @@ const personTypeOptions = computed(() => ([
   { value: 'DEV', label: t('ec.organization.person.figma.type.dev') },
   { value: 'OPS', label: t('ec.organization.person.figma.type.ops') },
 ]))
-
-const relatedServiceProviderOptions = computed(() => {
-  return serviceProviderOptions.value.filter((item) => item.id !== formData.serviceProviderId)
-})
 
 const formRules = computed(() => ({
   name: [{ required: true, message: t('ec.organization.person.validation.nameRequired'), trigger: 'blur' }],
@@ -207,7 +189,6 @@ const fillForm = (person = {}, detail = {}) => {
   formData.hasOpsAccount = Boolean(person.hasOpsAccount)
   formData.informationSystemIds = normalizeIds(detail.informationSystemIds)
   formData.hardwareAssetIds = normalizeIds(detail.hardwareAssetIds)
-  formData.relatedServiceProviderIds = normalizeIds(detail.relatedServiceProviderIds)
 }
 
 const loadSupportOptions = async () => {
@@ -246,7 +227,6 @@ const handleSubmit = async () => {
       hasOpsAccount: formData.hasOpsAccount,
       informationSystemIds: formData.informationSystemIds,
       hardwareAssetIds: formData.hardwareAssetIds,
-      relatedServiceProviderIds: formData.relatedServiceProviderIds,
     }
 
     const response = isEdit.value
@@ -273,14 +253,6 @@ onMounted(async () => {
     pageLoading.value = false
   }
 })
-
-watch(
-  () => formData.serviceProviderId,
-  (value) => {
-    if (!value) return
-    formData.relatedServiceProviderIds = formData.relatedServiceProviderIds.filter((item) => item !== value)
-  },
-)
 </script>
 
 <style lang="scss" scoped>

@@ -49,20 +49,6 @@
           />
         </el-form-item>
 
-        <el-form-item :label="t('ec.organization.person.relations.relatedServiceProviders')" class="is-span-2">
-          <ec-object-multi-transfer
-            v-model="relationForm.relatedServiceProviderIds"
-            :placeholder="t('ec.organization.person.relation.relatedServiceProvidersPlaceholder')"
-            :title="`${t('ec.organization.person.relations.relatedServiceProviders')}${t('ec.organization.selector.titleSuffix')}`"
-            :selected-title="t('ec.organization.selector.selected')"
-            :search-placeholder="t('ec.organization.selector.searchPlaceholder')"
-            :options="relatedServiceProviderOptions"
-            label-key="name"
-            value-key="id"
-            subtitle-key="code"
-          />
-        </el-form-item>
-
         <el-form-item :label="t('ec.organization.person.relations.projects')" class="is-span-2">
           <ec-object-multi-transfer
             v-model="relationForm.projectIds"
@@ -82,7 +68,7 @@
 </template>
 
 <script setup>
-import { computed, onMounted, reactive, ref } from 'vue'
+import { onMounted, reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
@@ -90,7 +76,6 @@ import {
   getOrganizationHardwareOptions,
   getOrganizationInformationSystemOptions,
   getOrganizationProjectOptions,
-  getOrganizationServiceProviderOptions,
   getPersonDetail,
   syncPersonRelations,
 } from '@/services/modules/organizationService'
@@ -108,19 +93,12 @@ const submitLoading = ref(false)
 const detailRecord = ref({ person: null })
 const hardwareOptions = ref([])
 const informationSystemOptions = ref([])
-const serviceProviderOptions = ref([])
 const projectOptions = ref([])
 
 const relationForm = reactive({
   hardwareAssetIds: [],
   informationSystemIds: [],
-  relatedServiceProviderIds: [],
   projectIds: [],
-})
-
-const relatedServiceProviderOptions = computed(() => {
-  const primaryId = detailRecord.value.person?.serviceProviderId
-  return serviceProviderOptions.value.filter((item) => item.id !== primaryId)
 })
 
 const normalizeIds = (value) => {
@@ -128,16 +106,14 @@ const normalizeIds = (value) => {
 }
 
 const loadSupportOptions = async () => {
-  const [hardwareAssets, informationSystems, serviceProviders, projects] = await Promise.all([
+  const [hardwareAssets, informationSystems, projects] = await Promise.all([
     getOrganizationHardwareOptions(),
     getOrganizationInformationSystemOptions(),
-    getOrganizationServiceProviderOptions(),
     getOrganizationProjectOptions(),
   ])
 
   hardwareOptions.value = Array.isArray(hardwareAssets) ? hardwareAssets : []
   informationSystemOptions.value = Array.isArray(informationSystems) ? informationSystems : []
-  serviceProviderOptions.value = Array.isArray(serviceProviders) ? serviceProviders : []
   projectOptions.value = Array.isArray(projects) ? projects : []
 }
 
@@ -149,7 +125,6 @@ const loadDetail = async () => {
     detailRecord.value = detail
     relationForm.hardwareAssetIds = normalizeIds(detail.hardwareAssetIds)
     relationForm.informationSystemIds = normalizeIds(detail.informationSystemIds)
-    relationForm.relatedServiceProviderIds = normalizeIds(detail.relatedServiceProviderIds)
     relationForm.projectIds = normalizeIds(detail.projectIds)
   } catch (error) {
     ElMessage.error(error.message || t('ec.organization.person.message.detailFailed'))
@@ -164,7 +139,6 @@ const handleSubmit = async () => {
     await syncPersonRelations(route.params.id, {
       hardwareAssetIds: relationForm.hardwareAssetIds,
       informationSystemIds: relationForm.informationSystemIds,
-      relatedServiceProviderIds: relationForm.relatedServiceProviderIds,
       projectIds: relationForm.projectIds,
     })
     ElMessage.success(t('ec.organization.person.relation.saveSuccess'))
