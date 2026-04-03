@@ -188,7 +188,7 @@ const logoUploading = ref(false)
 const statusDictionaries = ref({})
 const hardwareOptions = ref([])
 const informationSystemOptions = ref([])
-const personOptions = ref([])
+const rawPersonOptions = ref([])
 
 const imageAccept = '.png,.jpg,.jpeg,.webp,.svg'
 
@@ -212,6 +212,7 @@ const formData = reactive({
 })
 
 const isEdit = computed(() => Boolean(route.params.id))
+const currentServiceProviderId = computed(() => route.params.id ?? null)
 
 const pageTitle = computed(() => {
   return isEdit.value ? t('ec.organization.serviceProvider.page.editTitle') : t('ec.organization.serviceProvider.page.createTitle')
@@ -259,6 +260,26 @@ const normalizeIds = (value) => {
   return Array.isArray(value) ? value : []
 }
 
+const isSameId = (left, right) => {
+  if (left == null || right == null) {
+    return false
+  }
+  return String(left) === String(right)
+}
+
+const personOptions = computed(() => {
+  const selectedIds = new Set(normalizeIds(formData.personIds).map((item) => String(item)))
+  return rawPersonOptions.value.filter((item) => {
+    if (item?.serviceProviderId == null) {
+      return true
+    }
+    if (isSameId(item.serviceProviderId, currentServiceProviderId.value)) {
+      return true
+    }
+    return selectedIds.has(String(item?.id))
+  })
+})
+
 const fillForm = (data = {}, detail = {}) => {
   formData.code = data.code || ''
   formData.name = data.name || ''
@@ -303,7 +324,7 @@ const loadSupportOptions = async () => {
     ...item,
     displayLabel: buildDisplayLabel(item.code, item.name),
   }))
-  personOptions.value = persons.map((item) => ({
+  rawPersonOptions.value = persons.map((item) => ({
     ...item,
     displayLabel: buildDisplayLabel(item.name, item.employeeNo),
   }))

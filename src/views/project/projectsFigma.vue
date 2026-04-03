@@ -23,13 +23,13 @@
           />
         </el-select>
         <el-select
-          v-model="queryForm.projectStatus"
+          v-model="queryForm.paymentStatus"
           clearable
           class="project-figma-field"
-          :placeholder="t('ec.project.form.projectStatusPlaceholder')"
+          :placeholder="t('ec.project.form.paymentStatusPlaceholder')"
         >
           <el-option
-            v-for="item in projectStatusOptions"
+            v-for="item in paymentStatusOptions"
             :key="item.value"
             :label="item.displayLabel"
             :value="item.value"
@@ -155,7 +155,7 @@ const statusDictionaries = ref({})
 const queryForm = reactive({
   keyword: '',
   projectType: '',
-  projectStatus: '',
+  paymentStatus: '',
 })
 
 const pagination = reactive({
@@ -197,7 +197,9 @@ const projectStatusMap = computed(() => {
   return buildStatusOptionMap(statusDictionaries.value.projectStatus, locale.value)
 })
 
-const projectStatusOptions = computed(() => Object.values(projectStatusMap.value))
+const paymentStatusOptions = computed(() => {
+  return Object.values(buildStatusOptionMap(statusDictionaries.value.paymentStatus, locale.value))
+})
 
 const paginationLayout = computed(() => {
   return device.value === 'mobile' ? 'prev, pager, next' : 'total, sizes, prev, pager, next, jumper'
@@ -249,7 +251,7 @@ const loadData = async () => {
       pageSize: pagination.pageSize,
       keyword: queryForm.keyword || undefined,
       projectType: queryForm.projectType || undefined,
-      projectStatus: queryForm.projectStatus || undefined,
+      paymentStatus: queryForm.paymentStatus || undefined,
     })
     tableData.value = pageData.records
     pagination.total = pageData.total
@@ -287,7 +289,7 @@ const handleSearch = () => {
 const handleReset = () => {
   queryForm.keyword = ''
   queryForm.projectType = ''
-  queryForm.projectStatus = ''
+  queryForm.paymentStatus = ''
   pagination.currentPage = 1
   loadData()
 }

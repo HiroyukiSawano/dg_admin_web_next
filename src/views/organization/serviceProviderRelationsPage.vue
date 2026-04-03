@@ -75,7 +75,7 @@
 </template>
 
 <script setup>
-import { onMounted, reactive, ref } from 'vue'
+import { computed, onMounted, reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
@@ -101,8 +101,9 @@ const submitLoading = ref(false)
 const detailRecord = ref({ serviceProvider: null })
 const hardwareOptions = ref([])
 const informationSystemOptions = ref([])
-const personOptions = ref([])
+const rawPersonOptions = ref([])
 const projectOptions = ref([])
+const currentServiceProviderId = computed(() => route.params.id ?? null)
 
 const relationForm = reactive({
   hardwareAssetIds: [],
@@ -118,6 +119,26 @@ const buildDisplayLabel = (primary, secondary) => {
 const normalizeIds = (value) => {
   return Array.isArray(value) ? value : []
 }
+
+const isSameId = (left, right) => {
+  if (left == null || right == null) {
+    return false
+  }
+  return String(left) === String(right)
+}
+
+const personOptions = computed(() => {
+  const selectedIds = new Set(normalizeIds(relationForm.personIds).map((item) => String(item)))
+  return rawPersonOptions.value.filter((item) => {
+    if (item?.serviceProviderId == null) {
+      return true
+    }
+    if (isSameId(item.serviceProviderId, currentServiceProviderId.value)) {
+      return true
+    }
+    return selectedIds.has(String(item?.id))
+  })
+})
 
 const loadSupportOptions = async () => {
   const [hardwareAssets, informationSystems, persons, projects] = await Promise.all([
@@ -135,7 +156,7 @@ const loadSupportOptions = async () => {
     ...item,
     displayLabel: buildDisplayLabel(item.code, item.name),
   }))
-  personOptions.value = persons.map((item) => ({
+  rawPersonOptions.value = persons.map((item) => ({
     ...item,
     displayLabel: buildDisplayLabel(item.name, item.employeeNo),
   }))

@@ -23,15 +23,15 @@
           />
         </el-select>
         <el-select
-          v-model="queryForm.status"
+          v-model="queryForm.vendorLevel"
           clearable
           class="organization-figma-field"
-          :placeholder="t('ec.organization.serviceProvider.form.statusPlaceholder')"
+          :placeholder="t('ec.organization.serviceProvider.form.vendorLevelPlaceholder')"
         >
           <el-option
-            v-for="item in serviceProviderStatusOptions"
+            v-for="item in vendorLevelOptions"
             :key="item.value"
-            :label="item.displayLabel"
+            :label="item.label"
             :value="item.value"
           />
         </el-select>
@@ -161,22 +161,19 @@ import { useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { useSystemStore } from '@/stores/modules/systemStore'
-import { getStatusDictionaries } from '@/services/modules/dictionaryService'
-import { buildStatusOptionMap } from '@/utils/statusDictionary'
 import { deleteServiceProvider, getServiceProviderList, getServiceProviderStats } from '@/services/modules/organizationService'
 import FigmaRatingStars from './components/FigmaRatingStars.vue'
 import FigmaResourceShell from './components/FigmaResourceShell.vue'
 
 defineOptions({ name: 'OrganizationServiceProvidersFigma' })
 
-const { t, locale } = useI18n()
+const { t } = useI18n()
 const router = useRouter()
 const { device } = storeToRefs(useSystemStore())
 
 const tableLoading = ref(false)
 const statsLoading = ref(false)
 const tableData = ref([])
-const statusDictionaries = ref({})
 
 const statValues = reactive({
   total: 0,
@@ -189,7 +186,7 @@ const statValues = reactive({
 const queryForm = reactive({
   keyword: '',
   cooperationScope: '',
-  status: '',
+  vendorLevel: '',
 })
 
 const pagination = reactive({
@@ -204,6 +201,12 @@ const cooperationScopeOptions = computed(() => ([
   { value: 'OPERATIONS_SERVICE', label: t('ec.organization.serviceProvider.scope.operationsService') },
   { value: 'HARDWARE_PROCUREMENT', label: t('ec.organization.serviceProvider.scope.hardwareProcurement') },
   { value: 'INTEGRATION', label: t('ec.organization.serviceProvider.scope.integration') },
+]))
+
+const vendorLevelOptions = computed(() => ([
+  { value: 'STRATEGIC_PARTNER', label: t('ec.organization.serviceProvider.vendorLevel.strategicPartner') },
+  { value: 'CORE_SUPPLIER', label: t('ec.organization.serviceProvider.vendorLevel.coreSupplier') },
+  { value: 'GENERAL_SUPPLIER', label: t('ec.organization.serviceProvider.vendorLevel.generalSupplier') },
 ]))
 
 const cooperationScopeVisualMap = computed(() => ({
@@ -227,10 +230,6 @@ const cooperationScopeVisualMap = computed(() => ({
 
 const paginationLayout = computed(() => {
   return device.value === 'mobile' ? 'prev, pager, next' : 'total, sizes, prev, pager, next, jumper'
-})
-
-const serviceProviderStatusOptions = computed(() => {
-  return Object.values(buildStatusOptionMap(statusDictionaries.value.serviceProviderStatus, locale.value))
 })
 
 const serviceProviderStatCards = computed(() => {
@@ -296,10 +295,6 @@ const resetStats = () => {
   statValues.integration = 0
 }
 
-const loadStatusOptions = async () => {
-  statusDictionaries.value = await getStatusDictionaries()
-}
-
 const loadData = async () => {
   tableLoading.value = true
   try {
@@ -308,7 +303,7 @@ const loadData = async () => {
       pageSize: pagination.pageSize,
       keyword: queryForm.keyword || undefined,
       cooperationScope: queryForm.cooperationScope || undefined,
-      status: queryForm.status || undefined,
+      vendorLevel: queryForm.vendorLevel || undefined,
     })
     tableData.value = pageData.records
     pagination.total = pageData.total
@@ -344,7 +339,7 @@ const handleSearch = () => {
 const handleReset = () => {
   queryForm.keyword = ''
   queryForm.cooperationScope = ''
-  queryForm.status = ''
+  queryForm.vendorLevel = ''
   pagination.currentPage = 1
   loadData()
 }
@@ -393,12 +388,6 @@ const handleDelete = async (row) => {
 }
 
 onMounted(async () => {
-  try {
-    await loadStatusOptions()
-  } catch (error) {
-    ElMessage.error(error.message || t('ec.organization.serviceProvider.message.loadFailed'))
-  }
-
   await loadData()
   loadStats()
 })

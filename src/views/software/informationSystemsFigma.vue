@@ -18,17 +18,12 @@
           <el-option v-for="item in systemTypeOptions" :key="item.value" :label="item.label" :value="item.value" />
         </el-select>
         <el-select
-          v-model="queryForm.status"
+          v-model="queryForm.deploymentArchitecture"
           clearable
           class="software-figma-field"
-          :placeholder="t('ec.software.form.statusPlaceholder')"
+          :placeholder="t('ec.software.form.deploymentArchitecturePlaceholder')"
         >
-          <el-option
-            v-for="item in informationSystemStatusOptions"
-            :key="item.value"
-            :label="item.displayLabel"
-            :value="item.value"
-          />
+          <el-option v-for="item in deploymentArchitectureOptions" :key="item.value" :label="item.label" :value="item.value" />
         </el-select>
         <el-button type="primary" @click="handleSearch">
           {{ t('ec.global.button.text.search') }}
@@ -120,31 +115,27 @@ import { useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { useSystemStore } from '@/stores/modules/systemStore'
-import { getStatusDictionaries } from '@/services/modules/dictionaryService'
-import { buildStatusOptionMap } from '@/utils/statusDictionary'
 import {
   deleteInformationSystem,
   getInformationSystemList,
   getInformationSystemStats,
 } from '@/services/modules/softwareService'
-import { getStatusLabel, getStatusTagType } from '@/utils/statusDictionary'
 import FigmaResourceShell from '@/views/organization/components/FigmaResourceShell.vue'
 
 defineOptions({ name: 'SoftwareAssetsFigma' })
 
-const { t, locale } = useI18n()
+const { t } = useI18n()
 const router = useRouter()
 const { device } = storeToRefs(useSystemStore())
 
 const tableLoading = ref(false)
 const statsLoading = ref(false)
 const tableData = ref([])
-const statusDictionaries = ref({})
 
 const queryForm = reactive({
   keyword: '',
   systemType: '',
-  status: '',
+  deploymentArchitecture: '',
 })
 
 const pagination = reactive({
@@ -185,11 +176,11 @@ const deploymentArchitectureMap = computed(() => ({
   CONTAINERIZED: t('ec.software.deployment.containerized'),
 }))
 
-const informationSystemStatusMap = computed(() => {
-  return buildStatusOptionMap(statusDictionaries.value.informationSystemStatus, locale.value)
-})
-
-const informationSystemStatusOptions = computed(() => Object.values(informationSystemStatusMap.value))
+const deploymentArchitectureOptions = computed(() => ([
+  { value: 'SINGLE', label: t('ec.software.deployment.single') },
+  { value: 'CLUSTER', label: t('ec.software.deployment.cluster') },
+  { value: 'CONTAINERIZED', label: t('ec.software.deployment.containerized') },
+]))
 
 const paginationLayout = computed(() => {
   return device.value === 'mobile' ? 'prev, pager, next' : 'total, sizes, prev, pager, next, jumper'
@@ -225,10 +216,6 @@ const resetStats = () => {
   statValues.securitySoftware = 0
 }
 
-const loadStatusOptions = async () => {
-  statusDictionaries.value = await getStatusDictionaries()
-}
-
 const loadData = async () => {
   tableLoading.value = true
   try {
@@ -237,7 +224,7 @@ const loadData = async () => {
       pageSize: pagination.pageSize,
       keyword: queryForm.keyword || undefined,
       systemType: queryForm.systemType || undefined,
-      status: queryForm.status || undefined,
+      deploymentArchitecture: queryForm.deploymentArchitecture || undefined,
     })
     tableData.value = pageData.records
     pagination.total = pageData.total
@@ -274,7 +261,7 @@ const handleSearch = () => {
 const handleReset = () => {
   queryForm.keyword = ''
   queryForm.systemType = ''
-  queryForm.status = ''
+  queryForm.deploymentArchitecture = ''
   pagination.currentPage = 1
   loadData()
 }
@@ -321,7 +308,6 @@ const handleDelete = async (row) => {
 }
 
 onMounted(async () => {
-  await loadStatusOptions()
   await Promise.all([loadData(), loadStats()])
 })
 </script>

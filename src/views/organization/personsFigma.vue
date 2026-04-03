@@ -36,19 +36,16 @@
             :value="item.value"
           />
         </el-select>
-        <el-select
-          v-model="queryForm.status"
+        <el-tree-select
+          v-model="queryForm.departmentId"
           clearable
+          check-strictly
+          node-key="id"
           class="organization-figma-field"
-          :placeholder="t('ec.organization.person.form.statusPlaceholder')"
-        >
-          <el-option
-            v-for="item in personStatusOptions"
-            :key="item.value"
-            :label="item.displayLabel"
-            :value="item.value"
-          />
-        </el-select>
+          :data="departmentOptions"
+          :props="{ label: 'name', children: 'children' }"
+          :placeholder="t('ec.organization.person.form.departmentPlaceholder')"
+        />
         <el-button class="organization-figma-search" type="primary" @click="handleSearch">
           {{ t('ec.global.button.text.search') }}
         </el-button>
@@ -177,10 +174,9 @@ import { useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { useSystemStore } from '@/stores/modules/systemStore'
-import { getStatusDictionaries } from '@/services/modules/dictionaryService'
-import { buildStatusOptionMap } from '@/utils/statusDictionary'
 import {
   deletePerson,
+  getPersonDepartmentOptions,
   getOrganizationServiceProviderOptions,
   getPersonList,
   getPersonStats,
@@ -189,15 +185,15 @@ import FigmaResourceShell from './components/FigmaResourceShell.vue'
 
 defineOptions({ name: 'OrganizationPersonsFigma' })
 
-const { t, locale } = useI18n()
+const { t } = useI18n()
 const router = useRouter()
 const { device } = storeToRefs(useSystemStore())
 
 const tableLoading = ref(false)
 const statsLoading = ref(false)
 const tableData = ref([])
-const statusDictionaries = ref({})
 const serviceProviderOptions = ref([])
+const departmentOptions = ref([])
 
 const personStatValues = reactive({
   total: 0,
@@ -209,8 +205,8 @@ const personStatValues = reactive({
 const queryForm = reactive({
   keyword: '',
   serviceProviderId: null,
+  departmentId: null,
   personType: '',
-  status: '',
 })
 
 const pagination = reactive({
@@ -238,10 +234,6 @@ const personTypeFilterOptions = computed(() => ([
 
 const paginationLayout = computed(() => {
   return device.value === 'mobile' ? 'prev, pager, next' : 'total, sizes, prev, pager, next, jumper'
-})
-
-const personStatusOptions = computed(() => {
-  return Object.values(buildStatusOptionMap(statusDictionaries.value.personStatus, locale.value))
 })
 
 const personStatCards = computed(() => {
@@ -295,16 +287,16 @@ const resetStats = () => {
   personStatValues.hardwareOwners = 0
 }
 
-const loadStatusOptions = async () => {
-  statusDictionaries.value = await getStatusDictionaries()
-}
-
 const loadServiceProviderOptions = async () => {
   const options = await getOrganizationServiceProviderOptions()
   serviceProviderOptions.value = options.map((item) => ({
     ...item,
     displayLabel: [item.name, item.code].filter(Boolean).join(' / ') || '-',
   }))
+}
+
+const loadDepartmentOptions = async () => {
+  departmentOptions.value = await getPersonDepartmentOptions()
 }
 
 const loadData = async () => {
@@ -315,8 +307,8 @@ const loadData = async () => {
       pageSize: pagination.pageSize,
       keyword: queryForm.keyword || undefined,
       serviceProviderId: queryForm.serviceProviderId || undefined,
+      departmentId: queryForm.departmentId || undefined,
       personType: queryForm.personType || undefined,
-      status: queryForm.status || undefined,
     })
     tableData.value = pageData.records
     pagination.total = pageData.total
@@ -351,8 +343,8 @@ const handleSearch = () => {
 const handleReset = () => {
   queryForm.keyword = ''
   queryForm.serviceProviderId = null
+  queryForm.departmentId = null
   queryForm.personType = ''
-  queryForm.status = ''
   pagination.currentPage = 1
   loadData()
 }
@@ -402,7 +394,7 @@ const handleDelete = async (row) => {
 
 onMounted(async () => {
   try {
-    await Promise.all([loadStatusOptions(), loadServiceProviderOptions()])
+    await Promise.all([loadServiceProviderOptions(), loadDepartmentOptions()])
   } catch (error) {
     ElMessage.error(error.message || t('ec.organization.person.message.loadFailed'))
   }
