@@ -177,8 +177,8 @@ const sideMenus = computed(() => {
       key: 'workbench',
       label: 'ec.organization.figma.side.workbench',
       icon: 'ri-home-4-line',
-      path: '/dashboard/dashboardWorkbench',
-      active: route.path.startsWith('/dashboard'),
+      disabled: true,
+      active: false,
     },
     {
       key: 'organization',

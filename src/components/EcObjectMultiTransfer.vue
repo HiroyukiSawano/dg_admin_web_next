@@ -63,7 +63,10 @@
               :key="item[valueKey]"
               class="ec-object-multi-transfer__item"
             >
-              <el-checkbox v-model="leftCheckedValues" :label="item[valueKey]">
+              <el-checkbox
+                :model-value="false"
+                @change="(checked) => handleAvailableChecked(item[valueKey], checked)"
+              >
                 <div class="ec-object-multi-transfer__item-labels">
                   <span class="ec-object-multi-transfer__item-label">{{ item[labelKey] || '-' }}</span>
                   <span v-if="resolveSubtitle(item)" class="ec-object-multi-transfer__item-subtitle">
@@ -81,11 +84,11 @@
           </div>
         </section>
 
-        <div class="ec-object-multi-transfer__actions">
-          <el-button circle :disabled="leftCheckedValues.length === 0" @click="handleMoveRight">
+        <div class="ec-object-multi-transfer__actions" aria-hidden="true">
+          <el-button circle disabled class="ec-object-multi-transfer__action-button">
             <i class="ri-arrow-right-s-line"></i>
           </el-button>
-          <el-button circle :disabled="rightCheckedValues.length === 0" @click="handleMoveLeft">
+          <el-button circle disabled class="ec-object-multi-transfer__action-button">
             <i class="ri-arrow-left-s-line"></i>
           </el-button>
         </div>
@@ -109,7 +112,10 @@
               :key="item[valueKey]"
               class="ec-object-multi-transfer__item is-selected"
             >
-              <el-checkbox v-model="rightCheckedValues" :label="item[valueKey]">
+              <el-checkbox
+                :model-value="true"
+                @change="(checked) => handleSelectedChecked(item[valueKey], checked)"
+              >
                 <div class="ec-object-multi-transfer__item-labels">
                   <span class="ec-object-multi-transfer__item-label">{{ item[labelKey] || '-' }}</span>
                   <span v-if="resolveSubtitle(item)" class="ec-object-multi-transfer__item-subtitle">
@@ -217,8 +223,6 @@ const { t } = useI18n()
 const dialogVisible = ref(false)
 const keyword = ref('')
 const draftSelectedValues = ref([])
-const leftCheckedValues = ref([])
-const rightCheckedValues = ref([])
 
 const normalizedOptions = computed(() => (Array.isArray(props.options) ? props.options : []))
 const optionMap = computed(() => {
@@ -274,8 +278,6 @@ const resolveSubtitle = (item) => {
 
 const syncDraftFromModel = () => {
   draftSelectedValues.value = normalizeIds(props.modelValue)
-  leftCheckedValues.value = []
-  rightCheckedValues.value = []
   keyword.value = ''
 }
 
@@ -285,33 +287,31 @@ const handleOpen = () => {
   dialogVisible.value = true
 }
 
-const handleMoveRight = () => {
-  if (leftCheckedValues.value.length === 0) return
-
-  const appendValues = filteredAvailableOptions.value
-    .map((item) => item?.[props.valueKey])
-    .filter((value) => leftCheckedValues.value.includes(value))
-
-  draftSelectedValues.value = [...draftSelectedValues.value, ...appendValues]
-  leftCheckedValues.value = []
+const appendDraftValue = (value) => {
+  if (draftSelectedValues.value.includes(value)) return
+  draftSelectedValues.value = [...draftSelectedValues.value, value]
 }
 
-const handleMoveLeft = () => {
-  if (rightCheckedValues.value.length === 0) return
+const removeDraftValue = (value) => {
+  draftSelectedValues.value = draftSelectedValues.value.filter((item) => item !== value)
+}
 
-  const removeSet = new Set(rightCheckedValues.value)
-  draftSelectedValues.value = draftSelectedValues.value.filter((value) => !removeSet.has(value))
-  rightCheckedValues.value = []
+const handleAvailableChecked = (value, checked) => {
+  if (!checked) return
+  appendDraftValue(value)
+}
+
+const handleSelectedChecked = (value, checked) => {
+  if (checked) return
+  removeDraftValue(value)
 }
 
 const handleRemoveSingle = (value) => {
-  draftSelectedValues.value = draftSelectedValues.value.filter((item) => item !== value)
-  rightCheckedValues.value = rightCheckedValues.value.filter((item) => item !== value)
+  removeDraftValue(value)
 }
 
 const handleClearDraft = () => {
   draftSelectedValues.value = []
-  rightCheckedValues.value = []
 }
 
 const handleConfirm = () => {
@@ -428,8 +428,8 @@ watch(
 .ec-object-multi-transfer__body {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
-  gap: 16px;
-  align-items: center;
+  gap: 20px;
+  align-items: start;
 }
 
 .ec-object-multi-transfer__panel {
@@ -452,7 +452,7 @@ watch(
 
 .ec-object-multi-transfer__item {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
   padding: 8px 10px;
   border-radius: 10px;
@@ -467,18 +467,26 @@ watch(
 .ec-object-multi-transfer__item :deep(.el-checkbox) {
   flex: 1;
   width: 100%;
+  align-items: flex-start;
+  min-height: 24px;
+}
+
+.ec-object-multi-transfer__item :deep(.el-checkbox__input) {
+  margin-top: 3px;
 }
 
 .ec-object-multi-transfer__item :deep(.el-checkbox__label) {
   display: block;
   width: calc(100% - 20px);
   padding-left: 10px;
+  line-height: 1.5;
 }
 
 .ec-object-multi-transfer__item-labels {
   display: flex;
   flex-direction: column;
   min-width: 0;
+  padding-top: 1px;
 }
 
 .ec-object-multi-transfer__item-label,
@@ -488,10 +496,15 @@ watch(
   text-overflow: ellipsis;
 }
 
+.ec-object-multi-transfer__item-label {
+  line-height: 1.5;
+}
+
 .ec-object-multi-transfer__item-subtitle {
   margin-top: 2px;
   color: #8c93a6;
   font-size: 12px;
+  line-height: 1.5;
 }
 
 .ec-object-multi-transfer__item-remove {
@@ -518,6 +531,13 @@ watch(
   display: flex;
   flex-direction: column;
   gap: 12px;
+  justify-content: center;
+  align-self: stretch;
+  padding-top: 86px;
+}
+
+.ec-object-multi-transfer__action-button {
+  pointer-events: none;
 }
 
 .ec-object-multi-transfer__selected-header {
@@ -543,6 +563,7 @@ watch(
   .ec-object-multi-transfer__actions {
     flex-direction: row;
     justify-content: center;
+    padding-top: 0;
   }
 
   .ec-object-multi-transfer__list {
