@@ -42,8 +42,8 @@ const { proxy } = getCurrentInstance()
 const router = useRouter()
 
 const forms = ref({
-  username: 'platformadmin',
-  password: 'admin',
+  username: 'eam_figma_demo',
+  password: '123456',
   remember: false,
 })
 const rules = ref({

@@ -46,16 +46,18 @@
     >
       <div class="ec-object-multi-transfer__body">
         <section class="ec-object-multi-transfer__panel">
-          <el-input
-            v-model="keyword"
-            clearable
-            class="ec-object-multi-transfer__search"
-            :placeholder="searchPlaceholder || placeholder"
-          >
-            <template #prefix>
-              <i class="ri-search-line"></i>
-            </template>
-          </el-input>
+          <div class="ec-object-multi-transfer__search-wrapper">
+            <el-input
+              v-model="keyword"
+              clearable
+              class="ec-object-multi-transfer__search"
+              :placeholder="searchPlaceholder || placeholder"
+            >
+              <template #suffix>
+                <i class="ri-search-line"></i>
+              </template>
+            </el-input>
+          </div>
 
           <div v-loading="loading" class="ec-object-multi-transfer__list">
             <label
@@ -85,10 +87,10 @@
         </section>
 
         <div class="ec-object-multi-transfer__actions" aria-hidden="true">
-          <el-button circle disabled class="ec-object-multi-transfer__action-button">
+          <el-button circle class="ec-object-multi-transfer__action-button">
             <i class="ri-arrow-right-s-line"></i>
           </el-button>
-          <el-button circle disabled class="ec-object-multi-transfer__action-button">
+          <el-button circle class="ec-object-multi-transfer__action-button">
             <i class="ri-arrow-left-s-line"></i>
           </el-button>
         </div>
@@ -112,17 +114,12 @@
               :key="item[valueKey]"
               class="ec-object-multi-transfer__item is-selected"
             >
-              <el-checkbox
-                :model-value="true"
-                @change="(checked) => handleSelectedChecked(item[valueKey], checked)"
-              >
-                <div class="ec-object-multi-transfer__item-labels">
-                  <span class="ec-object-multi-transfer__item-label">{{ item[labelKey] || '-' }}</span>
-                  <span v-if="resolveSubtitle(item)" class="ec-object-multi-transfer__item-subtitle">
-                    {{ resolveSubtitle(item) }}
-                  </span>
-                </div>
-              </el-checkbox>
+              <div class="ec-object-multi-transfer__item-labels">
+                <span class="ec-object-multi-transfer__item-label">{{ item[labelKey] || '-' }}</span>
+                <span v-if="resolveSubtitle(item)" class="ec-object-multi-transfer__item-subtitle">
+                  {{ resolveSubtitle(item) }}
+                </span>
+              </div>
               <button
                 type="button"
                 class="ec-object-multi-transfer__item-remove"
@@ -143,8 +140,8 @@
 
       <template #footer>
         <div class="ec-object-multi-transfer__footer">
-          <el-button @click="dialogVisible = false">{{ t('ec.global.button.text.cancel') }}</el-button>
-          <el-button type="primary" @click="handleConfirm">{{ t('ec.global.button.text.confirm') }}</el-button>
+          <el-button type="primary" @click="handleConfirm">{{ t('ec.global.button.text.confirm') || '确认' }}</el-button>
+          <el-button class="ec-object-multi-transfer__btn-cancel" @click="dialogVisible = false">{{ t('ec.global.button.text.cancel') || '取消' }}</el-button>
         </div>
       </template>
     </el-dialog>
@@ -172,15 +169,15 @@ const props = defineProps({
   },
   placeholder: {
     type: String,
-    default: '',
+    default: '请输入内容',
   },
   title: {
     type: String,
-    default: '',
+    default: '人员选择',
   },
   selectedTitle: {
     type: String,
-    default: '',
+    default: '已选择',
   },
   labelKey: {
     type: String,
@@ -196,7 +193,7 @@ const props = defineProps({
   },
   searchPlaceholder: {
     type: String,
-    default: '',
+    default: '请输入内容',
   },
   disabled: {
     type: Boolean,
@@ -228,8 +225,8 @@ const normalizedOptions = computed(() => (Array.isArray(props.options) ? props.o
 const optionMap = computed(() => {
   return new Map(normalizedOptions.value.map((item) => [item?.[props.valueKey], item]))
 })
-const emptyText = computed(() => props.emptyText || t('ec.organization.common.empty'))
-const selectedTitle = computed(() => props.selectedTitle || t('ec.organization.selector.selected'))
+const emptyText = computed(() => props.emptyText || t('ec.organization.common.empty') || '暂无数据')
+const selectedTitle = computed(() => props.selectedTitle || t('ec.organization.selector.selected') || '已选择')
 const selectedOptions = computed(() => {
   return normalizeIds(props.modelValue)
     .map((value) => optionMap.value.get(value))
@@ -264,8 +261,7 @@ const dialogWidth = computed(() => {
   if (typeof window !== 'undefined' && window.innerWidth < 768) {
     return '94vw'
   }
-
-  return '760px'
+  return '680px' // 稍微缩窄一点更贴合设计图比例
 })
 
 const normalizeIds = (value) => {
@@ -425,54 +421,65 @@ watch(
   border: none;
 }
 
+/* 弹窗核心区域布局 */
 .ec-object-multi-transfer__body {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
   gap: 20px;
-  align-items: start;
+  align-items: stretch;
 }
 
 .ec-object-multi-transfer__panel {
   min-width: 0;
+  border: 1px solid var(--el-border-color-lighter, #ebeef5);
+  border-radius: 4px;
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  height: 380px; /* 固定高度，确保左右对齐 */
+}
+
+.ec-object-multi-transfer__search-wrapper {
+  padding: 16px 16px 8px 16px;
 }
 
 .ec-object-multi-transfer__search {
-  margin-bottom: 12px;
+  :deep(.el-input__wrapper) {
+    background-color: #f5f7fa;
+    box-shadow: none; /* 去除输入框边框 */
+    border-radius: 6px;
+  }
+  :deep(.el-input__inner) {
+    color: #606266;
+  }
 }
 
 .ec-object-multi-transfer__list {
-  min-height: 320px;
-  max-height: 320px;
-  padding: 8px;
+  flex: 1;
+  padding: 0 8px 8px 8px;
   overflow-y: auto;
-  background: #fff;
-  border: 1px solid #e7eaf3;
-  border-radius: 12px;
 }
 
 .ec-object-multi-transfer__item {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
-  padding: 8px 10px;
-  border-radius: 10px;
+  padding: 8px 12px;
+  border-radius: 4px;
   transition: background-color 0.2s ease;
+  cursor: pointer;
 }
 
 .ec-object-multi-transfer__item:hover,
 .ec-object-multi-transfer__item.is-selected {
-  background: #f6f8fc;
+  background: #f5f7fa;
 }
 
 .ec-object-multi-transfer__item :deep(.el-checkbox) {
   flex: 1;
   width: 100%;
-  align-items: flex-start;
+  align-items: center;
   min-height: 24px;
-}
-
-.ec-object-multi-transfer__item :deep(.el-checkbox__input) {
-  margin-top: 3px;
 }
 
 .ec-object-multi-transfer__item :deep(.el-checkbox__label) {
@@ -480,13 +487,14 @@ watch(
   width: calc(100% - 20px);
   padding-left: 10px;
   line-height: 1.5;
+  color: #303133;
 }
 
 .ec-object-multi-transfer__item-labels {
   display: flex;
   flex-direction: column;
   min-width: 0;
-  padding-top: 1px;
+  flex: 1;
 }
 
 .ec-object-multi-transfer__item-label,
@@ -494,6 +502,7 @@ watch(
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
+  color: #303133;
 }
 
 .ec-object-multi-transfer__item-label {
@@ -515,44 +524,69 @@ watch(
   width: 24px;
   height: 24px;
   margin-left: 8px;
-  color: #8c93a6;
+  color: #909399;
   cursor: pointer;
   background: transparent;
   border: none;
   border-radius: 50%;
+  font-size: 14px;
 }
 
 .ec-object-multi-transfer__item-remove:hover {
-  color: var(--el-color-primary);
-  background: color-mix(in srgb, var(--el-color-primary) 10%, #fff);
+  color: #f56c6c;
 }
 
+/* 中间穿梭操作区 */
 .ec-object-multi-transfer__actions {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  align-items: center; /* 新增：确保内容水平居中 */
+  gap: 16px;
   justify-content: center;
-  align-self: stretch;
-  padding-top: 86px;
+  align-self: center;
 }
-
 .ec-object-multi-transfer__action-button {
-  pointer-events: none;
+  margin: 0 !important; /* 核心修复：强制清除 el-button 默认的相邻左边距 */
+  pointer-events: none; 
+  background-color: #f4f4f5 !important;
+  border: none !important;
+  color: #a8abb2 !important;
 }
 
+/* 右侧表头 */
 .ec-object-multi-transfer__selected-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 12px;
-  color: #151b26;
+  padding: 16px 16px 12px 16px;
+  color: #303133;
   font-weight: 600;
+  font-size: 14px;
 }
 
+.ec-object-multi-transfer__trash {
+  color: #909399;
+}
+.ec-object-multi-transfer__trash:not(:disabled):hover {
+  color: #f56c6c;
+}
+
+/* 底部操作区 */
 .ec-object-multi-transfer__footer {
   display: flex;
   justify-content: flex-end;
   gap: 12px;
+}
+
+.ec-object-multi-transfer__btn-cancel {
+  background-color: #e4e6eb;
+  border-color: transparent;
+  color: #606266;
+}
+
+.ec-object-multi-transfer__btn-cancel:hover {
+  background-color: #dcdfe6;
+  color: #606266;
 }
 
 @media only screen and (max-width: 767px) {
@@ -564,11 +598,6 @@ watch(
     flex-direction: row;
     justify-content: center;
     padding-top: 0;
-  }
-
-  .ec-object-multi-transfer__list {
-    min-height: 240px;
-    max-height: 240px;
   }
 }
 </style>

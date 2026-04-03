@@ -19,7 +19,7 @@ const defaultUser = () => ({
   name: 'ec.user.info.username',
   organName: 'ec.user.info.organName',
   avatar: '',
-  username: 'platformadmin',
+  username: 'eam_figma_demo',
 })
 
 const defaultRoles = () => (AUTH_ENABLED ? [] : ['AUTH_SYSTEM_ADMIN', 'ROLE_SYSTE'])
