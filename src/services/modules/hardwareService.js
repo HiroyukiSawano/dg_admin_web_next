@@ -22,7 +22,6 @@ const normalizePageResponse = (payload) => ({
 const normalizeHardwareDetail = (payload) => ({
   hardwareAsset: payload?.hardwareAsset || null,
   personIds: Array.isArray(payload?.personIds) ? payload.personIds : [],
-  ownerIds: Array.isArray(payload?.ownerIds) ? payload.ownerIds : [],
   informationSystemIds: Array.isArray(payload?.informationSystemIds) ? payload.informationSystemIds : [],
   projectIds: Array.isArray(payload?.projectIds) ? payload.projectIds : [],
   serviceProviderIds: Array.isArray(payload?.serviceProviderIds) ? payload.serviceProviderIds : [],
@@ -93,14 +92,6 @@ export const syncHardwareRelations = (id, payload) => {
 export const syncHardwareSystems = (id, ids = []) => {
   return resolveEamResponse({
     url: `/api/v1/hardware-assets/${id}/systems`,
-    method: 'PUT',
-    data: { ids },
-  })
-}
-
-export const syncHardwareOwners = (id, ids = []) => {
-  return resolveEamResponse({
-    url: `/api/v1/hardware-assets/${id}/owners`,
     method: 'PUT',
     data: { ids },
   })

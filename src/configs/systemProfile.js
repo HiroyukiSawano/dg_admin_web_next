@@ -2,7 +2,7 @@ import { APP_NAME } from '@/configs'
 
 const SYSTEM_PROFILES = [
   {
-    name: '组织资源新版演示',
+    name: '资产管理系统',
     usernames: ['eam_figma_demo'],
     roles: ['ROLE_EAM_FIGMA'],
     allowedPrefixes: ['/organization', '/project', '/software', '/hardware'],

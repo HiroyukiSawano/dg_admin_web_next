@@ -1,0 +1,27 @@
+<svg width="1010" height="120" viewBox="0 0 1010 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="panel" x1="0" y1="0" x2="1010" y2="0" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#6EA1FF" stop-opacity="0.15"/>
+      <stop offset="0.50631" stop-color="#CCE7F5" stop-opacity="0.15"/>
+      <stop offset="0.99921" stop-color="#AE79FF" stop-opacity="0.053"/>
+    </linearGradient>
+    <radialGradient id="glowA" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(261 0) rotate(90) scale(86 201)">
+      <stop stop-color="#86AFFF" stop-opacity="0.52"/>
+      <stop offset="1" stop-color="#86AFFF" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="glowB" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(734 12) rotate(90) scale(78 198)">
+      <stop stop-color="#7EE2FF" stop-opacity="0.48"/>
+      <stop offset="1" stop-color="#7EE2FF" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="blur" x="95" y="-336" width="1184" height="622" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feGaussianBlur stdDeviation="12"/>
+    </filter>
+  </defs>
+  <rect width="1010" height="120" fill="url(#panel)"/>
+  <rect width="1010" height="120" fill="url(#glowA)"/>
+  <rect width="1010" height="120" fill="url(#glowB)"/>
+  <g filter="url(#blur)" opacity="0.58">
+    <path d="M210 -110C287 -165 363 -155 420 -112C476 -69 520 -5 593 -8C664 -11 717 -64 784 -95C860 -130 939 -122 1030 -58V-182H132V-54C157 -64 183 -81 210 -110Z" fill="#8FB0FF"/>
+    <path d="M174 -74C262 -93 332 -56 384 -6C427 35 463 81 523 87C588 95 635 53 689 17C756 -27 831 -48 909 -13V73H132V-37C145 -44 159 -50 174 -54V-74Z" fill="#D8EEFF"/>
+  </g>
+</svg>

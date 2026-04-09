@@ -1,5 +1,5 @@
 <template>
-  <figma-resource-shell active-tab="persons" :stats="personStatCards" :stats-loading="statsLoading">
+  <figma-resource-shell active-tab="persons" frame-variant="platform" :stats="personStatCards" :stats-loading="statsLoading">
     <template #filters>
       <div class="organization-figma-toolbar">
         <el-input

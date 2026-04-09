@@ -206,8 +206,8 @@ export default {
   'ec.hardware.form.networkEnvironmentPlaceholder': '请选择网络环境',
   'ec.hardware.form.operatingSystemPlaceholder': '请输入操作系统',
   'ec.hardware.form.purchaseDatePlaceholder': '请选择采购时间',
-  'ec.hardware.form.ownerPlaceholder': '请选择设备负责人',
-  'ec.hardware.form.ownerSelectTitle': '选择设备负责人',
+  'ec.hardware.form.ownerPlaceholder': '请输入设备负责人姓名',
+  'ec.hardware.form.ownerSelectTitle': '填写设备负责人',
   'ec.hardware.form.contactPhonePlaceholder': '请输入联系电话',
 
   'ec.hardware.validation.assetCodeRequired': '请输入硬件编码',
@@ -220,7 +220,7 @@ export default {
   'ec.hardware.validation.networkEnvironmentRequired': '请选择网络环境',
   'ec.hardware.validation.operatingSystemRequired': '请输入操作系统',
   'ec.hardware.validation.purchaseDateRequired': '请选择采购时间',
-  'ec.hardware.validation.ownerRequired': '请选择设备负责人',
+  'ec.hardware.validation.ownerRequired': '请输入设备负责人姓名',
   'ec.hardware.validation.contactPhoneRequired': '请输入联系电话',
   'ec.hardware.validation.statusRequired': '请选择当前状态',
 

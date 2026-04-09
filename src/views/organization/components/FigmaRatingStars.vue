@@ -1,5 +1,5 @@
 <template>
-  <div v-if="hasNumeric" class="figma-rating" :aria-label="`${normalizedValue}`">
+  <div v-if="hasNumeric" class="figma-rating" :aria-label="`${normalizedValue}`" :style="ratingStyle">
     <div class="figma-rating__base">
       <i v-for="index in max" :key="`base-${index}`" class="ri-star-line"></i>
     </div>
@@ -24,6 +24,22 @@ const props = defineProps({
     type: Number,
     default: 5,
   },
+  size: {
+    type: Number,
+    default: 16,
+  },
+  gap: {
+    type: Number,
+    default: 2,
+  },
+  activeColor: {
+    type: String,
+    default: '#ff9b28',
+  },
+  inactiveColor: {
+    type: String,
+    default: '#d6d9e2',
+  },
 })
 
 const parsedValue = computed(() => Number.parseFloat(props.value))
@@ -37,21 +53,28 @@ const normalizedValue = computed(() => {
 const fallbackText = computed(() => {
   return props.value || '-'
 })
+
+const ratingStyle = computed(() => ({
+  '--figma-rating-size': `${props.size}px`,
+  '--figma-rating-gap': `${props.gap}px`,
+  '--figma-rating-active': props.activeColor,
+  '--figma-rating-inactive': props.inactiveColor,
+}))
 </script>
 
 <style lang="scss" scoped>
 .figma-rating {
   position: relative;
   display: inline-flex;
-  color: #d6d9e2;
-  font-size: 16px;
+  color: var(--figma-rating-inactive);
+  font-size: var(--figma-rating-size);
   line-height: 1;
 }
 
 .figma-rating__base,
 .figma-rating__fill {
   display: inline-flex;
-  gap: 2px;
+  gap: var(--figma-rating-gap);
 }
 
 .figma-rating__fill {
@@ -59,7 +82,7 @@ const fallbackText = computed(() => {
   top: 0;
   left: 0;
   overflow: hidden;
-  color: #ff9b28;
+  color: var(--figma-rating-active);
 }
 
 .figma-rating__text {

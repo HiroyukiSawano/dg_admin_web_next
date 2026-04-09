@@ -1,5 +1,5 @@
 <template>
-  <figma-resource-shell hide-tabs :stats="hardwareStatCards" :stats-loading="statsLoading">
+  <figma-resource-shell hide-tabs frame-variant="platform" :stats="hardwareStatCards" :stats-loading="statsLoading">
     <template #filters>
       <div class="hardware-figma-toolbar">
         <el-input

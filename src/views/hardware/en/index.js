@@ -206,8 +206,8 @@ export default {
   'ec.hardware.form.networkEnvironmentPlaceholder': 'Select network environment',
   'ec.hardware.form.operatingSystemPlaceholder': 'Enter operating system',
   'ec.hardware.form.purchaseDatePlaceholder': 'Select purchase date',
-  'ec.hardware.form.ownerPlaceholder': 'Select device owner',
-  'ec.hardware.form.ownerSelectTitle': 'Select Device Owner',
+  'ec.hardware.form.ownerPlaceholder': 'Enter device owner name',
+  'ec.hardware.form.ownerSelectTitle': 'Enter Device Owner Name',
   'ec.hardware.form.contactPhonePlaceholder': 'Enter contact phone',
 
   'ec.hardware.validation.assetCodeRequired': 'Please enter the hardware code',
@@ -220,7 +220,7 @@ export default {
   'ec.hardware.validation.networkEnvironmentRequired': 'Please select the network environment',
   'ec.hardware.validation.operatingSystemRequired': 'Please enter the operating system',
   'ec.hardware.validation.purchaseDateRequired': 'Please select the purchase date',
-  'ec.hardware.validation.ownerRequired': 'Please select the device owner',
+  'ec.hardware.validation.ownerRequired': 'Please enter the device owner name',
   'ec.hardware.validation.contactPhoneRequired': 'Please enter the contact phone',
   'ec.hardware.validation.statusRequired': 'Please select the current status',
 

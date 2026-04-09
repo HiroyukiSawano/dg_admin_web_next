@@ -40,6 +40,7 @@ export default {
   'ec.organization.figma.top.config': '业务配置',
   'ec.organization.figma.side.workbench': '信息化资产工作台',
   'ec.organization.figma.side.data': '数据资源',
+  'ec.organization.figma.back': '返回',
   'ec.organization.figma.table.index': '#',
   'ec.organization.figma.tab.serviceProviders': '服务商',
   'ec.organization.figma.tab.persons': '人员',

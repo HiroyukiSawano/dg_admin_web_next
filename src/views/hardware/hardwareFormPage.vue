@@ -89,17 +89,11 @@
                 :placeholder="t('ec.hardware.form.purchaseDatePlaceholder')"
               />
             </el-form-item>
-            <el-form-item :label="t('ec.hardware.common.owner')" prop="ownerPersonId">
-              <ec-object-single-select
-                v-model="formData.ownerPersonId"
+            <el-form-item :label="t('ec.hardware.common.owner')" prop="ownerName">
+              <el-input
+                v-model="formData.ownerName"
+                clearable
                 :placeholder="t('ec.hardware.form.ownerPlaceholder')"
-                :title="t('ec.hardware.form.ownerSelectTitle')"
-                :search-placeholder="t('ec.organization.selector.searchPlaceholder')"
-                :options="personOptions"
-                label-key="name"
-                value-key="id"
-                subtitle-key="employeeNo"
-                @change="handleOwnerChange"
               />
             </el-form-item>
             <el-form-item :label="t('ec.hardware.common.contactPhone')" prop="contactPhone" class="is-span-2">
@@ -189,7 +183,6 @@ import {
   syncHardwareRelations,
   updateHardwareAsset,
 } from '@/services/modules/hardwareService'
-import EcObjectSingleSelect from '@/components/EcObjectSingleSelect.vue'
 import EcObjectMultiTransfer from '@/components/EcObjectMultiTransfer.vue'
 import { normalizeIdList } from './helpers'
 import FigmaResourcePage from '@/views/organization/components/FigmaResourcePage.vue'
@@ -220,7 +213,7 @@ const formData = reactive({
   operatingSystem: '',
   hardwareStatus: 'RUNNING',
   purchaseDate: '',
-  ownerPersonId: null,
+  ownerName: '',
   contactPhone: '',
   remark: '',
   personIds: [],
@@ -253,10 +246,6 @@ const networkEnvironmentOptions = computed(() => ([
   { value: 'EXTRANET_INTRANET', label: t('ec.hardware.networkEnvironment.extranetIntranet') },
 ]))
 
-const personMap = computed(() => {
-  return new Map((Array.isArray(personOptions.value) ? personOptions.value : []).map((item) => [item.id, item]))
-})
-
 const formRules = computed(() => ({
   assetCode: [{ required: true, message: t('ec.hardware.validation.assetCodeRequired'), trigger: 'blur' }],
   hardwareIp: [{ required: true, message: t('ec.hardware.validation.hardwareIpRequired'), trigger: 'blur' }],
@@ -269,7 +258,7 @@ const formRules = computed(() => ({
   operatingSystem: [{ required: true, message: t('ec.hardware.validation.operatingSystemRequired'), trigger: 'blur' }],
   hardwareStatus: [{ required: true, message: t('ec.hardware.validation.statusRequired'), trigger: 'change' }],
   purchaseDate: [{ required: true, message: t('ec.hardware.validation.purchaseDateRequired'), trigger: 'change' }],
-  ownerPersonId: [{ required: true, message: t('ec.hardware.validation.ownerRequired'), trigger: 'change' }],
+  ownerName: [{ required: true, message: t('ec.hardware.validation.ownerRequired'), trigger: 'blur' }],
   contactPhone: [{ required: true, message: t('ec.hardware.validation.contactPhoneRequired'), trigger: 'blur' }],
 }))
 
@@ -300,7 +289,7 @@ const fillForm = (detail) => {
   formData.operatingSystem = hardwareAsset.operatingSystem || ''
   formData.hardwareStatus = hardwareAsset.hardwareStatus || 'RUNNING'
   formData.purchaseDate = hardwareAsset.purchaseDate || ''
-  formData.ownerPersonId = hardwareAsset.ownerPersonId ?? null
+  formData.ownerName = hardwareAsset.ownerName || ''
   formData.contactPhone = hardwareAsset.contactPhone || ''
   formData.remark = hardwareAsset.remark || ''
   formData.personIds = normalizeIdList(detail?.personIds)
@@ -321,19 +310,10 @@ const buildPayload = () => ({
   operatingSystem: formData.operatingSystem,
   hardwareStatus: formData.hardwareStatus,
   purchaseDate: formData.purchaseDate,
-  ownerPersonId: formData.ownerPersonId,
+  ownerName: formData.ownerName,
   contactPhone: formData.contactPhone,
   remark: formData.remark,
 })
-
-const handleOwnerChange = (value) => {
-  const owner = personMap.value.get(value)
-  if (owner) {
-    formData.contactPhone = owner.mobile || ''
-    return
-  }
-  formData.contactPhone = ''
-}
 
 const loadDetail = async () => {
   if (!isEdit.value) return

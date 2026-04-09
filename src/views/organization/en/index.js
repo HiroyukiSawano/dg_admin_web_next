@@ -40,6 +40,7 @@ export default {
   'ec.organization.figma.top.config': 'Business Config',
   'ec.organization.figma.side.workbench': 'Asset Workbench',
   'ec.organization.figma.side.data': 'Data Assets',
+  'ec.organization.figma.back': 'Back',
   'ec.organization.figma.table.index': '#',
   'ec.organization.figma.tab.serviceProviders': 'Service Providers',
   'ec.organization.figma.tab.persons': 'Persons',
