@@ -1,5 +1,13 @@
 <template>
-  <figma-resource-shell hide-tabs frame-variant="platform" :stats="projectStatCards" :stats-loading="statsLoading">
+  <figma-resource-shell
+    hide-tabs
+    frame-variant="platform"
+    variant="project-list"
+    :stats="projectStatCards"
+    :stats-decoration="statsDecoration"
+    :stats-decoration-image="statsDecorationImage"
+    :stats-loading="statsLoading"
+  >
     <template #filters>
       <div class="project-figma-toolbar">
         <el-input
@@ -35,56 +43,89 @@
             :value="item.value"
           />
         </el-select>
-        <el-button type="primary" @click="handleSearch">
+        <el-button class="project-figma-search" type="primary" @click="handleSearch">
           {{ t('ec.global.button.text.search') }}
         </el-button>
-        <el-button @click="handleReset">
+        <el-button class="project-figma-reset" @click="handleReset">
           {{ t('ec.global.button.text.reset') }}
         </el-button>
       </div>
     </template>
 
     <template #actions>
-      <el-button type="primary" @click="router.push('/project/projects/create')">
-        {{ t('ec.project.common.create') }}
-      </el-button>
+      <div class="project-figma-toolbar-actions">
+        <el-button class="project-figma-primary" type="primary" @click="router.push('/project/projects/create')">
+          {{ isZhLocale ? '新增项目' : t('ec.project.common.create') }}
+        </el-button>
+        <div class="project-figma-view-switch" aria-hidden="true">
+          <button class="project-figma-view-switch__button is-active" type="button" tabindex="-1">
+            <i class="ri-list-check-2"></i>
+          </button>
+          <button class="project-figma-view-switch__button" type="button" tabindex="-1">
+            <i class="ri-layout-grid-line"></i>
+          </button>
+        </div>
+      </div>
     </template>
 
-    <el-table v-loading="tableLoading" :data="tableData" row-key="id" class="project-figma-table">
+    <el-table
+      v-loading="tableLoading"
+      :data="tableData"
+      height="100%"
+      row-key="id"
+      class="project-figma-table"
+    >
       <el-table-column
         type="index"
-        width="64"
+        width="48"
         :label="t('ec.organization.figma.table.index')"
         :index="indexMethod"
       />
-      <el-table-column prop="code" :label="t('ec.project.common.code')" min-width="150" show-overflow-tooltip />
-      <el-table-column prop="name" :label="t('ec.project.common.name')" min-width="180" show-overflow-tooltip />
-      <el-table-column prop="approvalBatchNo" :label="t('ec.project.common.approvalBatchNo')" min-width="160" show-overflow-tooltip />
-      <el-table-column :label="t('ec.project.common.projectBudget')" min-width="140">
+      <el-table-column
+        prop="code"
+        :label="t('ec.project.common.code')"
+        min-width="110"
+        show-overflow-tooltip
+      />
+      <el-table-column
+        prop="name"
+        :label="t('ec.project.common.name')"
+        min-width="110"
+        show-overflow-tooltip
+      />
+      <el-table-column
+        prop="approvalBatchNo"
+        :label="t('ec.project.common.approvalBatchNo')"
+        min-width="110"
+        show-overflow-tooltip
+      />
+      <el-table-column :label="budgetColumnLabel" min-width="157">
         <template #default="{ row }">
           {{ formatAmount(row.projectBudget) }}
         </template>
       </el-table-column>
-      <el-table-column :label="t('ec.project.common.contractAmount')" min-width="160">
+      <el-table-column :label="contractAmountColumnLabel" min-width="176">
         <template #default="{ row }">
           {{ formatAmount(row.contractAmount) }}
         </template>
       </el-table-column>
-      <el-table-column :label="t('ec.project.common.projectType')" min-width="140">
+      <el-table-column :label="typeColumnLabel" min-width="92">
         <template #default="{ row }">
-          <span class="project-figma-tag" :class="`is-${getProjectTypeVisual(row.projectType).tone}`">
+          <span class="project-figma-tag">
             {{ getProjectTypeVisual(row.projectType).label }}
           </span>
         </template>
       </el-table-column>
-      <el-table-column :label="t('ec.project.common.projectStatus')" min-width="130">
+      <el-table-column :label="statusColumnLabel" min-width="91">
         <template #default="{ row }">
-          <el-tag :type="getStatusTagType(row.projectStatus, projectStatusMap)">
-            {{ getStatusLabel(row.projectStatus, projectStatusMap) }}
-          </el-tag>
+          <span class="project-figma-status">{{ getProjectStatusText(row.projectStatus) }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="t('ec.project.common.actions')" fixed="right" width="160">
+      <el-table-column
+        :label="t('ec.project.common.actions')"
+        fixed="right"
+        width="116"
+      >
         <template #default="{ row }">
           <div class="project-figma-actions">
             <button class="project-figma-icon-button" type="button" @click="router.push(`/project/projects/${row.id}/edit`)">
@@ -113,17 +154,20 @@
     </el-table>
 
     <template #pagination>
-      <el-pagination
-        v-model:current-page="pagination.currentPage"
-        background
-        class="project-figma-pagination"
-        :layout="paginationLayout"
-        :total="pagination.total"
-        :page-size="pagination.pageSize"
-        :page-sizes="pagination.pageSizes"
-        @current-change="handlePageChange"
-        @update:page-size="handlePageSizeChange"
-      />
+      <div class="project-figma-pagination">
+        <div class="project-figma-pagination__summary">{{ pageSummaryText }}</div>
+        <el-pagination
+          v-model:current-page="pagination.currentPage"
+          v-model:page-size="pagination.pageSize"
+          background
+          class="project-figma-pagination__controls"
+          :layout="paginationLayout"
+          :total="pagination.total"
+          :page-sizes="pagination.pageSizes"
+          @current-change="handlePageChange"
+          @size-change="handlePageSizeChange"
+        />
+      </div>
     </template>
   </figma-resource-shell>
 </template>
@@ -138,12 +182,21 @@ import { useSystemStore } from '@/stores/modules/systemStore'
 import { getStatusDictionaries } from '@/services/modules/dictionaryService'
 import { buildStatusOptionMap } from '@/utils/statusDictionary'
 import { deleteProject, getProjectList, getProjectStats } from '@/services/modules/projectService'
-import { getStatusLabel, getStatusTagType } from './helpers'
+import { formatAmount, getStatusLabel } from './helpers'
+import statsDecoration from '@/assets/images/organization/project-stats-mask.svg'
+import statsDecorationImage from '@/assets/images/organization/project-stats-image.png'
+import totalIcon from '@/assets/images/organization/project-stat-total.svg'
+import newBuildIcon from '@/assets/images/organization/project-stat-new-build.svg'
+import softwareUpgradeIcon from '@/assets/images/organization/project-stat-software-upgrade.svg'
+import opsProjectIcon from '@/assets/images/organization/project-stat-ops-project.svg'
+import servicePurchaseIcon from '@/assets/images/organization/project-stat-service-purchase.svg'
+import hardwarePurchaseIcon from '@/assets/images/organization/project-stat-hardware-purchase.svg'
+import integrationProjectIcon from '@/assets/images/organization/project-stat-integration-project.svg'
 import FigmaResourceShell from '@/views/organization/components/FigmaResourceShell.vue'
 
 defineOptions({ name: 'ProjectAssetsFigma' })
 
-const { t, locale } = useI18n()
+const { locale, t } = useI18n()
 const router = useRouter()
 const { device } = storeToRefs(useSystemStore())
 
@@ -160,8 +213,8 @@ const queryForm = reactive({
 
 const pagination = reactive({
   currentPage: 1,
-  pageSize: 10,
-  pageSizes: [10, 20, 50, 100],
+  pageSize: 8,
+  pageSizes: [8, 10, 20, 50, 100],
   total: 0,
 })
 
@@ -175,23 +228,53 @@ const statValues = reactive({
   integrationProject: 0,
 })
 
-const projectTypeOptions = computed(() => ([
-  { value: 'NEW_BUILD', label: t('ec.project.type.newBuild') },
-  { value: 'SOFTWARE_UPGRADE', label: t('ec.project.type.softwareUpgrade') },
-  { value: 'OPS_PROJECT', label: t('ec.project.type.opsProject') },
-  { value: 'SERVICE_PURCHASE', label: t('ec.project.type.servicePurchase') },
-  { value: 'HARDWARE_PURCHASE', label: t('ec.project.type.hardwarePurchase') },
-  { value: 'INTEGRATION_PROJECT', label: t('ec.project.type.integrationProject') },
-]))
+const isZhLocale = computed(() => String(locale.value || '').startsWith('zh'))
+
+const budgetColumnLabel = computed(() => {
+  return isZhLocale.value ? '项目预算（万元）' : 'Project Budget (10k CNY)'
+})
+
+const contractAmountColumnLabel = computed(() => {
+  return isZhLocale.value ? '项目合同金额（万元）' : 'Contract Amount (10k CNY)'
+})
+
+const typeColumnLabel = computed(() => {
+  return isZhLocale.value ? '类型' : t('ec.project.common.projectType')
+})
+
+const statusColumnLabel = computed(() => {
+  return isZhLocale.value ? '状态' : t('ec.project.common.projectStatus')
+})
 
 const projectTypeVisualMap = computed(() => ({
-  NEW_BUILD: { label: t('ec.project.type.newBuild'), tone: 'blue' },
-  SOFTWARE_UPGRADE: { label: t('ec.project.type.softwareUpgrade'), tone: 'violet' },
-  OPS_PROJECT: { label: t('ec.project.type.opsProject'), tone: 'green' },
-  SERVICE_PURCHASE: { label: t('ec.project.type.servicePurchase'), tone: 'orange' },
-  HARDWARE_PURCHASE: { label: t('ec.project.type.hardwarePurchase'), tone: 'gold' },
-  INTEGRATION_PROJECT: { label: t('ec.project.type.integrationProject'), tone: 'cyan' },
+  NEW_BUILD: {
+    label: isZhLocale.value ? '新建' : 'New Build',
+  },
+  SOFTWARE_UPGRADE: {
+    label: isZhLocale.value ? '软件升级' : 'Software Upgrade',
+  },
+  OPS_PROJECT: {
+    label: isZhLocale.value ? '运维' : 'Operations',
+  },
+  SERVICE_PURCHASE: {
+    label: isZhLocale.value ? '购买服务' : 'Service Purchase',
+  },
+  HARDWARE_PURCHASE: {
+    label: isZhLocale.value ? '硬件采购' : 'Hardware Purchase',
+  },
+  INTEGRATION_PROJECT: {
+    label: isZhLocale.value ? '集成项目' : 'Integration Project',
+  },
 }))
+
+const projectTypeOptions = computed(() => ([
+  { value: 'NEW_BUILD', label: isZhLocale.value ? '新建' : 'New Build' },
+  { value: 'SOFTWARE_UPGRADE', label: isZhLocale.value ? '软件升级' : 'Software Upgrade' },
+  { value: 'OPS_PROJECT', label: isZhLocale.value ? '运维项目' : 'Operations Project' },
+  { value: 'SERVICE_PURCHASE', label: isZhLocale.value ? '购买服务' : 'Service Purchase' },
+  { value: 'HARDWARE_PURCHASE', label: isZhLocale.value ? '硬件采购' : 'Hardware Purchase' },
+  { value: 'INTEGRATION_PROJECT', label: isZhLocale.value ? '集成项目' : 'Integration Project' },
+]))
 
 const projectStatusMap = computed(() => {
   return buildStatusOptionMap(statusDictionaries.value.projectStatus, locale.value)
@@ -202,17 +285,69 @@ const paymentStatusOptions = computed(() => {
 })
 
 const paginationLayout = computed(() => {
-  return device.value === 'mobile' ? 'prev, pager, next' : 'total, sizes, prev, pager, next, jumper'
+  return device.value === 'mobile' ? 'prev, pager, next' : 'sizes, prev, pager, next, jumper'
+})
+
+const pageCount = computed(() => {
+  const total = Number(pagination.total || 0)
+  const pageSize = Number(pagination.pageSize || 8)
+  return Math.max(1, Math.ceil(total / pageSize))
+})
+
+const pageSummaryText = computed(() => {
+  return isZhLocale.value ? `共${pageCount.value}页` : `${pageCount.value} pages`
 })
 
 const projectStatCards = computed(() => ([
-  { key: 'total', label: t('ec.project.stats.total'), value: statValues.total, icon: 'ri-folders-fill', tone: 'primary' },
-  { key: 'newBuild', label: t('ec.project.stats.newBuild'), value: statValues.newBuild, icon: 'ri-add-box-fill', tone: 'primary' },
-  { key: 'softwareUpgrade', label: t('ec.project.stats.softwareUpgrade'), value: statValues.softwareUpgrade, icon: 'ri-code-box-fill', tone: 'primary' },
-  { key: 'opsProject', label: t('ec.project.stats.opsProject'), value: statValues.opsProject, icon: 'ri-settings-3-fill', tone: 'primary' },
-  { key: 'servicePurchase', label: t('ec.project.stats.servicePurchase'), value: statValues.servicePurchase, icon: 'ri-service-fill', tone: 'primary' },
-  { key: 'hardwarePurchase', label: t('ec.project.stats.hardwarePurchase'), value: statValues.hardwarePurchase, icon: 'ri-hard-drive-3-fill', tone: 'primary' },
-  { key: 'integrationProject', label: t('ec.project.stats.integrationProject'), value: statValues.integrationProject, icon: 'ri-links-fill', tone: 'primary' },
+  {
+    key: 'total',
+    label: isZhLocale.value ? '项目总数' : 'Total Projects',
+    value: statValues.total,
+    iconUrl: totalIcon,
+    tone: 'primary',
+  },
+  {
+    key: 'new-build',
+    label: isZhLocale.value ? '新建项目' : 'New Projects',
+    value: statValues.newBuild,
+    iconUrl: newBuildIcon,
+    tone: 'primary',
+  },
+  {
+    key: 'software-upgrade',
+    label: isZhLocale.value ? '软件升级' : 'Software Upgrade',
+    value: statValues.softwareUpgrade,
+    iconUrl: softwareUpgradeIcon,
+    tone: 'primary',
+  },
+  {
+    key: 'ops-project',
+    label: isZhLocale.value ? '运维项目' : 'Operations Projects',
+    value: statValues.opsProject,
+    iconUrl: opsProjectIcon,
+    tone: 'primary',
+  },
+  {
+    key: 'service-purchase',
+    label: isZhLocale.value ? '购买服务' : 'Service Purchase',
+    value: statValues.servicePurchase,
+    iconUrl: servicePurchaseIcon,
+    tone: 'primary',
+  },
+  {
+    key: 'hardware-purchase',
+    label: isZhLocale.value ? '硬件采购' : 'Hardware Purchase',
+    value: statValues.hardwarePurchase,
+    iconUrl: hardwarePurchaseIcon,
+    tone: 'primary',
+  },
+  {
+    key: 'integration-project',
+    label: isZhLocale.value ? '集成项目' : 'Integration Project',
+    value: statValues.integrationProject,
+    iconUrl: integrationProjectIcon,
+    tone: 'primary',
+  },
 ]))
 
 const indexMethod = (index) => {
@@ -220,13 +355,13 @@ const indexMethod = (index) => {
 }
 
 const getProjectTypeVisual = (value) => {
-  return projectTypeVisualMap.value[value] || { label: value || '-', tone: 'blue' }
+  return projectTypeVisualMap.value[value] || {
+    label: value || '-',
+  }
 }
 
-const formatAmount = (value) => {
-  if (value == null || value === '') return '-'
-  const numeric = Number(value)
-  return Number.isNaN(numeric) ? value : numeric.toFixed(2)
+const getProjectStatusText = (value) => {
+  return getStatusLabel(value, projectStatusMap.value) || '-'
 }
 
 const resetStats = () => {
@@ -253,8 +388,8 @@ const loadData = async () => {
       projectType: queryForm.projectType || undefined,
       paymentStatus: queryForm.paymentStatus || undefined,
     })
-    tableData.value = pageData.records
-    pagination.total = pageData.total
+    tableData.value = Array.isArray(pageData.records) ? pageData.records : []
+    pagination.total = Number(pageData.total || 0)
   } catch (error) {
     ElMessage.error(error.message || t('ec.project.message.loadFailed'))
   } finally {
@@ -299,8 +434,8 @@ const handlePageChange = (page) => {
   loadData()
 }
 
-const handlePageSizeChange = (size) => {
-  pagination.pageSize = size
+const handlePageSizeChange = (pageSize) => {
+  pagination.pageSize = pageSize
   pagination.currentPage = 1
   loadData()
 }
@@ -345,27 +480,139 @@ onMounted(async () => {
 .project-figma-toolbar {
   display: flex;
   flex-wrap: wrap;
-  gap: 12px;
+  gap: 8px;
   width: 100%;
 }
 
 .project-figma-field {
-  width: 220px;
+  width: 200px;
 }
 
 .project-figma-field--keyword {
-  width: 300px;
+  width: 200px;
+}
+
+.project-figma-search {
+  min-width: 52px;
+  height: 32px;
+  padding-inline: 12px;
+  border: 0;
+  border-radius: 4px;
+  background: #2e5ef0;
+  box-shadow: none;
+  font-size: 14px;
+}
+
+.project-figma-reset {
+  min-width: 68px;
+  height: 32px;
+  padding-inline: 12px;
+  border: 0;
+  border-radius: 4px;
+  background: #f5f6f9;
+  box-shadow: none;
+  color: #444a57;
+  font-size: 14px;
+}
+
+.project-figma-toolbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.project-figma-primary {
+  min-width: 80px;
+  height: 32px;
+  padding-inline: 12px;
+  border: 0;
+  border-radius: 4px;
+  background: #2e5ef0;
+  box-shadow: none;
+  font-size: 14px;
+}
+
+.project-figma-view-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  color: #7c8393;
+}
+
+.project-figma-view-switch__button {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+
+  &.is-active {
+    color: #2e5ef0;
+  }
+
+  i {
+    font-size: 18px;
+    line-height: 1;
+  }
+
+  &:first-child::after {
+    content: '';
+    position: absolute;
+    top: 3px;
+    right: -6px;
+    width: 1px;
+    height: 12px;
+    background: #e6e8ed;
+  }
 }
 
 .project-figma-table {
-  :deep(.el-table__cell) {
-    height: 56px;
+  flex: 1;
+  min-height: 0;
+
+  :deep(.el-table) {
+    --el-table-border-color: #edeef3;
+    --el-table-header-bg-color: #f5f6f9;
+    --el-table-row-hover-bg-color: #f8faff;
+    height: 100%;
+  }
+
+  :deep(.el-table__inner-wrapper) {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+
+  :deep(.el-table__inner-wrapper::before) {
+    display: none;
+  }
+
+  :deep(.el-table__body-wrapper) {
+    flex: 1;
+    min-height: 0;
   }
 
   :deep(th.el-table__cell) {
+    height: 46px;
+    padding: 0;
+    background: #f5f6f9;
     color: #151b26;
-    font-weight: 700;
-    background: #f6f8fd;
+    font-weight: 600;
+  }
+
+  :deep(td.el-table__cell) {
+    height: 46px;
+    padding: 0;
+    color: #444a57;
+  }
+
+  :deep(.cell) {
+    line-height: 22px;
   }
 }
 
@@ -373,81 +620,160 @@ onMounted(async () => {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 70px;
-  padding: 2px 10px;
-  border-radius: 999px;
+  min-width: 40px;
+  padding: 2px 8px;
+  border-radius: 2px;
+  background: #ebf0ff;
+  color: #2e5ef0;
   font-size: 12px;
   line-height: 20px;
+  white-space: nowrap;
+}
 
-  &.is-blue {
-    color: #2e5ef0;
-    background: #ebf0ff;
-  }
-
-  &.is-violet {
-    color: #7a45ff;
-    background: #f1eaff;
-  }
-
-  &.is-green {
-    color: #1f9d55;
-    background: #dff6e2;
-  }
-
-  &.is-orange {
-    color: #ff8a00;
-    background: #fff1df;
-  }
-
-  &.is-gold {
-    color: #b7791f;
-    background: #fff8df;
-  }
-
-  &.is-cyan {
-    color: #1c96d6;
-    background: #e4f5ff;
-  }
+.project-figma-status {
+  color: #444a57;
+  font-size: 14px;
+  line-height: 22px;
 }
 
 .project-figma-actions {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 24px;
 }
 
 .project-figma-icon-button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
+  width: 16px;
+  height: 16px;
+  padding: 0;
   border: 0;
-  border-radius: 10px;
-  background: #f5f7fb;
-  color: #4f566b;
+  background: transparent;
+  color: #6d7485;
   cursor: pointer;
-  transition: background 0.2s ease, color 0.2s ease;
+  transition: color 0.2s ease;
 
   &:hover {
-    color: var(--el-color-primary);
-    background: #edf2ff;
+    color: #2e5ef0;
   }
 
   &.is-danger:hover {
-    color: #d14343;
-    background: #fff1f1;
+    color: #f56c6c;
+  }
+
+  i {
+    font-size: 16px;
+    line-height: 1;
   }
 }
 
 .project-figma-pagination {
-  justify-content: flex-end;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  width: 100%;
+}
+
+.project-figma-pagination__summary {
+  flex-shrink: 0;
+  color: #444a57;
+  font-size: 14px;
+  line-height: 22px;
+}
+
+.project-figma-pagination__controls {
+  min-width: 0;
+
+  :deep(.el-pagination) {
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    row-gap: 12px;
+  }
+
+  :deep(.btn-prev),
+  :deep(.btn-next),
+  :deep(.el-pager li),
+  :deep(.el-pagination__sizes .el-select .el-input__wrapper),
+  :deep(.el-pagination__jump .el-input__wrapper) {
+    min-width: 28px;
+    height: 28px;
+    border-radius: 4px;
+    box-shadow: none;
+  }
+
+  :deep(.btn-prev),
+  :deep(.btn-next),
+  :deep(.el-pager li) {
+    background: #f5f6f9;
+    color: #444a57;
+  }
+
+  :deep(.el-pager li.is-active) {
+    background: #2e5ef0;
+    color: #ffffff;
+  }
+
+  :deep(.el-pagination__sizes) {
+    margin-left: auto;
+  }
+}
+
+.project-figma-field {
+  :deep(.el-input__wrapper),
+  :deep(.el-select__wrapper) {
+    display: flex;
+    align-items: center;
+    height: 32px;
+    min-height: 32px;
+    padding: 5px 12px;
+    background: #f5f6f9;
+    border-radius: 4px;
+    box-shadow: none;
+  }
+
+  :deep(.el-input__inner),
+  :deep(.el-select__placeholder),
+  :deep(.el-select__selected-item) {
+    font-size: 14px;
+    line-height: 22px;
+  }
+
+  :deep(.el-input__inner) {
+    height: 22px;
+  }
+
+  :deep(.el-input__inner::placeholder) {
+    color: #858a99;
+  }
 }
 
 @media only screen and (max-width: 991px) {
-  .project-figma-field,
-  .project-figma-field--keyword {
+  .project-figma-toolbar-actions {
+    justify-content: space-between;
     width: 100%;
+  }
+
+  .project-figma-field,
+  .project-figma-field--keyword,
+  .project-figma-search,
+  .project-figma-reset {
+    width: 100%;
+  }
+
+  .project-figma-pagination {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .project-figma-pagination__controls {
+    width: 100%;
+  }
+
+  .project-figma-pagination__controls :deep(.el-pagination__sizes) {
+    margin-left: 0;
   }
 }
 </style>

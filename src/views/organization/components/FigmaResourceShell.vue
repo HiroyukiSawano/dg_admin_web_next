@@ -330,6 +330,17 @@ const currentSubTabs = computed(() => {
 
 const isPlatformFrameVariant = computed(() => props.frameVariant === 'platform')
 const isServiceProviderListVariant = computed(() => props.variant === 'service-provider-list')
+const isPersonListVariant = computed(() => props.variant === 'person-list')
+const isProjectListVariant = computed(() => props.variant === 'project-list')
+const isSoftwareListVariant = computed(() => props.variant === 'software-list')
+const isHardwareListVariant = computed(() => props.variant === 'hardware-list')
+const isResourceListVariant = computed(() => {
+  return isServiceProviderListVariant.value
+    || isPersonListVariant.value
+    || isProjectListVariant.value
+    || isSoftwareListVariant.value
+    || isHardwareListVariant.value
+})
 const isAsideCollapsed = computed(() => device.value === 'desktop' && collapse.value)
 
 const hasPanelHeader = computed(() => Boolean(slots['panel-header']))
@@ -343,6 +354,10 @@ const panelClass = computed(() => ({
 const shellClass = computed(() => ({
   'figma-shell--platform': isPlatformFrameVariant.value,
   'figma-shell--service-provider-list': isServiceProviderListVariant.value,
+  'figma-shell--person-list': isPersonListVariant.value,
+  'figma-shell--project-list': isProjectListVariant.value,
+  'figma-shell--software-list': isSoftwareListVariant.value,
+  'figma-shell--hardware-list': isHardwareListVariant.value,
   'figma-shell--aside-collapsed': isAsideCollapsed.value,
 }))
 
@@ -368,19 +383,39 @@ const tabsClass = computed(() => ({
 }))
 
 const statsClass = computed(() => ({
+  'figma-shell__stats--resource-list': isResourceListVariant.value,
   'figma-shell__stats--service-provider-list': isServiceProviderListVariant.value,
+  'figma-shell__stats--person-list': isPersonListVariant.value,
+  'figma-shell__stats--project-list': isProjectListVariant.value,
+  'figma-shell__stats--software-list': isSoftwareListVariant.value,
+  'figma-shell__stats--hardware-list': isHardwareListVariant.value,
 }))
 
 const contentClass = computed(() => ({
+  'figma-shell__content--resource-list': isResourceListVariant.value,
   'figma-shell__content--service-provider-list': isServiceProviderListVariant.value,
+  'figma-shell__content--person-list': isPersonListVariant.value,
+  'figma-shell__content--project-list': isProjectListVariant.value,
+  'figma-shell__content--software-list': isSoftwareListVariant.value,
+  'figma-shell__content--hardware-list': isHardwareListVariant.value,
 }))
 
 const toolbarClass = computed(() => ({
+  'figma-shell__toolbar--resource-list': isResourceListVariant.value,
   'figma-shell__toolbar--service-provider-list': isServiceProviderListVariant.value,
+  'figma-shell__toolbar--person-list': isPersonListVariant.value,
+  'figma-shell__toolbar--project-list': isProjectListVariant.value,
+  'figma-shell__toolbar--software-list': isSoftwareListVariant.value,
+  'figma-shell__toolbar--hardware-list': isHardwareListVariant.value,
 }))
 
 const paginationClass = computed(() => ({
+  'figma-shell__pagination--resource-list': isResourceListVariant.value,
   'figma-shell__pagination--service-provider-list': isServiceProviderListVariant.value,
+  'figma-shell__pagination--person-list': isPersonListVariant.value,
+  'figma-shell__pagination--project-list': isProjectListVariant.value,
+  'figma-shell__pagination--software-list': isSoftwareListVariant.value,
+  'figma-shell__pagination--hardware-list': isHardwareListVariant.value,
 }))
 
 const toolsClass = computed(() => ({
@@ -815,7 +850,7 @@ const toggleSidebar = () => {
   z-index: 1;
 }
 
-.figma-shell__stats--service-provider-list {
+.figma-shell__stats--resource-list {
   grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 16px;
   width: 100%;
@@ -827,7 +862,7 @@ const toggleSidebar = () => {
   background: linear-gradient(86.78deg, rgba(110, 161, 255, 0.15) 0%, rgba(204, 231, 245, 0.15) 50.63%, rgba(174, 121, 255, 0.053) 99.92%);
 }
 
-.figma-shell__stats--service-provider-list::before {
+.figma-shell__stats--resource-list::before {
   background-image: var(--figma-shell-stats-decoration-image, none);
   opacity: 0.3;
   filter: blur(1px);
@@ -844,8 +879,28 @@ const toggleSidebar = () => {
   mask-size: 1010px 120px;
 }
 
-.figma-shell__stats--service-provider-list::after {
+.figma-shell__stats--resource-list::after {
   display: none;
+}
+
+.figma-shell__stats--service-provider-list {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+.figma-shell__stats--person-list {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.figma-shell__stats--project-list {
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+}
+
+.figma-shell__stats--software-list {
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+}
+
+.figma-shell__stats--hardware-list {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
 }
 
 .figma-shell__stat-card {
@@ -890,7 +945,7 @@ const toggleSidebar = () => {
   bottom: -1px;
 }
 
-.figma-shell__stats--service-provider-list .figma-shell__stat-card {
+.figma-shell__stats--resource-list .figma-shell__stat-card {
   min-height: 88px;
   padding: 16px 17px 10px;
   background: rgba(255, 255, 255, 0.7);
@@ -899,7 +954,7 @@ const toggleSidebar = () => {
   box-shadow: none;
 }
 
-.figma-shell__stats--service-provider-list .figma-shell__stat-card::before {
+.figma-shell__stats--resource-list .figma-shell__stat-card::before {
   display: none;
 }
 
@@ -946,7 +1001,7 @@ const toggleSidebar = () => {
   }
 }
 
-.figma-shell__stats--service-provider-list .figma-shell__stat-icon {
+.figma-shell__stats--resource-list .figma-shell__stat-icon {
   top: 15px;
   right: 18px;
   width: 20px;
@@ -963,7 +1018,7 @@ const toggleSidebar = () => {
   height: 100%;
 }
 
-.figma-shell__stats--service-provider-list .figma-shell__stat-icon-image {
+.figma-shell__stats--resource-list .figma-shell__stat-icon-image {
   position: absolute;
   max-width: none;
   max-height: none;
@@ -1004,6 +1059,130 @@ const toggleSidebar = () => {
   height: 20px;
 }
 
+.figma-shell__stats--person-list .figma-shell__stat-card.is-total .figma-shell__stat-icon {
+  top: 14px;
+  right: 24px;
+  width: 22.61px;
+  height: 20px;
+}
+
+.figma-shell__stats--person-list .figma-shell__stat-card.is-development .figma-shell__stat-icon {
+  top: 15px;
+  right: 24px;
+  width: 22.35px;
+  height: 20px;
+}
+
+.figma-shell__stats--person-list .figma-shell__stat-card.is-ops .figma-shell__stat-icon,
+.figma-shell__stats--person-list .figma-shell__stat-card.is-hardware-owner .figma-shell__stat-icon {
+  top: 15px;
+  right: 24px;
+  width: 20px;
+  height: 20px;
+}
+
+.figma-shell__stats--project-list .figma-shell__stat-card.is-total .figma-shell__stat-icon {
+  top: 16.63px;
+  right: 16.3px;
+  width: 18.35px;
+  height: 16.23px;
+}
+
+.figma-shell__stats--project-list .figma-shell__stat-card.is-new-build .figma-shell__stat-icon {
+  top: 17.78px;
+  right: 15.97px;
+  width: 18.35px;
+  height: 16.42px;
+}
+
+.figma-shell__stats--project-list .figma-shell__stat-card.is-software-upgrade .figma-shell__stat-icon {
+  top: 15px;
+  right: 13.82px;
+  width: 16.84px;
+  height: 20px;
+}
+
+.figma-shell__stats--project-list .figma-shell__stat-card.is-ops-project .figma-shell__stat-icon,
+.figma-shell__stats--project-list .figma-shell__stat-card.is-service-purchase .figma-shell__stat-icon,
+.figma-shell__stats--project-list .figma-shell__stat-card.is-hardware-purchase .figma-shell__stat-icon,
+.figma-shell__stats--project-list .figma-shell__stat-card.is-integration-project .figma-shell__stat-icon {
+  top: 15px;
+  right: 15.12px;
+  width: 16.84px;
+  height: 20px;
+}
+
+.figma-shell__stats--software-list .figma-shell__stat-card.is-total .figma-shell__stat-icon {
+  top: 15px;
+  right: 24px;
+  width: 22.61px;
+  height: 20px;
+}
+
+.figma-shell__stats--software-list .figma-shell__stat-card.is-external-service .figma-shell__stat-icon {
+  top: 15px;
+  right: 24px;
+  width: 22.35px;
+  height: 20px;
+}
+
+.figma-shell__stats--software-list .figma-shell__stat-card.is-internal-office .figma-shell__stat-icon {
+  top: 15px;
+  right: 24px;
+  width: 20px;
+  height: 20px;
+}
+
+.figma-shell__stats--software-list .figma-shell__stat-card.is-database-software .figma-shell__stat-icon {
+  top: 15px;
+  right: 18px;
+  width: 20px;
+  height: 20px;
+}
+
+.figma-shell__stats--software-list .figma-shell__stat-card.is-basic-support .figma-shell__stat-icon,
+.figma-shell__stats--software-list .figma-shell__stat-card.is-security-software .figma-shell__stat-icon {
+  top: 15px;
+  right: 19px;
+  width: 20px;
+  height: 20px;
+}
+
+.figma-shell__stats--hardware-list .figma-shell__stat-card.is-total .figma-shell__stat-icon {
+  top: 15px;
+  right: 24px;
+  width: 22.63px;
+  height: 20.02px;
+}
+
+.figma-shell__stats--hardware-list .figma-shell__stat-card.is-server .figma-shell__stat-icon {
+  top: 16px;
+  right: 24px;
+  width: 22.38px;
+  height: 20.02px;
+}
+
+.figma-shell__stats--hardware-list .figma-shell__stat-card.is-network-device .figma-shell__stat-icon {
+  top: 15px;
+  right: 24px;
+  width: 20.04px;
+  height: 20px;
+}
+
+.figma-shell__stats--hardware-list .figma-shell__stat-card.is-terminal-device .figma-shell__stat-icon {
+  top: 15px;
+  right: 16px;
+  width: 20.04px;
+  height: 20px;
+}
+
+.figma-shell__stats--hardware-list .figma-shell__stat-card.is-peripheral .figma-shell__stat-icon {
+  top: 15px;
+  right: 18px;
+  width: 20px;
+  height: 20px;
+}
+
 .figma-shell__stats--service-provider-list .figma-shell__stat-card.is-total .figma-shell__stat-icon-image {
   top: -19.98%;
   left: -35.35%;
@@ -1033,13 +1212,113 @@ const toggleSidebar = () => {
   height: 180%;
 }
 
+.figma-shell__stats--person-list .figma-shell__stat-card.is-total .figma-shell__stat-icon-image {
+  top: -20%;
+  left: -35.38%;
+  width: 170.76%;
+  height: 180%;
+}
+
+.figma-shell__stats--person-list .figma-shell__stat-card.is-development .figma-shell__stat-icon-image {
+  top: -20%;
+  left: -35.79%;
+  width: 171.58%;
+  height: 180%;
+}
+
+.figma-shell__stats--person-list .figma-shell__stat-card.is-ops .figma-shell__stat-icon-image,
+.figma-shell__stats--person-list .figma-shell__stat-card.is-hardware-owner .figma-shell__stat-icon-image {
+  top: -20%;
+  left: -40%;
+  width: 180%;
+  height: 180%;
+}
+
+.figma-shell__stats--project-list .figma-shell__stat-card.is-total .figma-shell__stat-icon-image {
+  top: -24.64%;
+  left: -43.59%;
+  width: 187.18%;
+  height: 198.56%;
+}
+
+.figma-shell__stats--project-list .figma-shell__stat-card.is-new-build .figma-shell__stat-icon-image {
+  top: -24.36%;
+  left: -43.59%;
+  width: 187.18%;
+  height: 197.44%;
+}
+
+.figma-shell__stats--project-list .figma-shell__stat-card.is-software-upgrade .figma-shell__stat-icon-image,
+.figma-shell__stats--project-list .figma-shell__stat-card.is-ops-project .figma-shell__stat-icon-image,
+.figma-shell__stats--project-list .figma-shell__stat-card.is-service-purchase .figma-shell__stat-icon-image,
+.figma-shell__stats--project-list .figma-shell__stat-card.is-hardware-purchase .figma-shell__stat-icon-image,
+.figma-shell__stats--project-list .figma-shell__stat-card.is-integration-project .figma-shell__stat-icon-image {
+  top: -20%;
+  left: -47.51%;
+  width: 195.02%;
+  height: 180%;
+}
+
+.figma-shell__stats--software-list .figma-shell__stat-card.is-total .figma-shell__stat-icon-image {
+  top: -20%;
+  left: -35.38%;
+  width: 170.76%;
+  height: 180%;
+}
+
+.figma-shell__stats--software-list .figma-shell__stat-card.is-external-service .figma-shell__stat-icon-image {
+  top: -20%;
+  left: -35.79%;
+  width: 171.58%;
+  height: 180%;
+}
+
+.figma-shell__stats--software-list .figma-shell__stat-card.is-internal-office .figma-shell__stat-icon-image,
+.figma-shell__stats--software-list .figma-shell__stat-card.is-database-software .figma-shell__stat-icon-image,
+.figma-shell__stats--software-list .figma-shell__stat-card.is-basic-support .figma-shell__stat-icon-image,
+.figma-shell__stats--software-list .figma-shell__stat-card.is-security-software .figma-shell__stat-icon-image {
+  top: -20%;
+  left: -40%;
+  width: 180%;
+  height: 180%;
+}
+
+.figma-shell__stats--hardware-list .figma-shell__stat-card.is-total .figma-shell__stat-icon-image {
+  top: -19.98%;
+  left: -35.35%;
+  width: 170.7%;
+  height: 179.93%;
+}
+
+.figma-shell__stats--hardware-list .figma-shell__stat-card.is-server .figma-shell__stat-icon-image {
+  top: -19.98%;
+  left: -35.75%;
+  width: 171.5%;
+  height: 179.94%;
+}
+
+.figma-shell__stats--hardware-list .figma-shell__stat-card.is-network-device .figma-shell__stat-icon-image,
+.figma-shell__stats--hardware-list .figma-shell__stat-card.is-terminal-device .figma-shell__stat-icon-image {
+  top: -20%;
+  left: -39.91%;
+  width: 179.82%;
+  height: 180%;
+}
+
+.figma-shell__stats--hardware-list .figma-shell__stat-card.is-peripheral .figma-shell__stat-icon-image {
+  top: -20%;
+  left: -40%;
+  width: 180%;
+  height: 180%;
+}
+
 .figma-shell__stat-label {
   color: #858a99;
   font-size: 13px;
   line-height: 20px;
 }
 
-.figma-shell__stats--service-provider-list .figma-shell__stat-label {
+.figma-shell__stats--resource-list .figma-shell__stat-label {
   font-size: 14px;
   font-weight: 400;
   line-height: 22px;
@@ -1053,7 +1332,7 @@ const toggleSidebar = () => {
   line-height: 1.1;
 }
 
-.figma-shell__stats--service-provider-list .figma-shell__stat-value {
+.figma-shell__stats--resource-list .figma-shell__stat-value {
   margin-top: 0;
   font-family: 'DIN Alternate', 'Arial Narrow', sans-serif;
   font-size: 22px;
@@ -1071,7 +1350,7 @@ const toggleSidebar = () => {
   border-radius: 14px;
 }
 
-.figma-shell__content--service-provider-list {
+.figma-shell__content--resource-list {
   width: 100%;
   min-height: clamp(300px, calc(100vh - 660px), 360px);
   padding: 0;
@@ -1087,7 +1366,7 @@ const toggleSidebar = () => {
   padding: 12px 0;
 }
 
-.figma-shell__toolbar--service-provider-list {
+.figma-shell__toolbar--resource-list {
   width: 100%;
   padding: 16px 0;
   align-items: center;
@@ -1115,12 +1394,12 @@ const toggleSidebar = () => {
   min-height: 0;
 }
 
-.figma-shell__content--service-provider-list .figma-shell__table,
-.figma-shell__content--service-provider-list .figma-shell__pagination {
+.figma-shell__content--resource-list .figma-shell__table,
+.figma-shell__content--resource-list .figma-shell__pagination {
   width: 100%;
 }
 
-.figma-shell__content--service-provider-list .figma-shell__table {
+.figma-shell__content--resource-list .figma-shell__table {
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
@@ -1131,7 +1410,7 @@ const toggleSidebar = () => {
   padding-top: 12px;
 }
 
-.figma-shell__pagination--service-provider-list {
+.figma-shell__pagination--resource-list {
   padding-top: 14px;
 }
 
@@ -1195,7 +1474,7 @@ const toggleSidebar = () => {
     padding-inline: 0;
   }
 
-  .figma-shell__stats--service-provider-list {
+  .figma-shell__stats--resource-list {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     width: 100%;
     margin-top: 8px;
@@ -1207,7 +1486,7 @@ const toggleSidebar = () => {
     background: transparent;
   }
 
-  .figma-shell__content--service-provider-list {
+  .figma-shell__content--resource-list {
     width: auto;
     min-height: auto;
     padding: 0;

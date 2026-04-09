@@ -1,5 +1,13 @@
 <template>
-  <figma-resource-shell hide-tabs frame-variant="platform" :stats="softwareStatCards" :stats-loading="statsLoading">
+  <figma-resource-shell
+    hide-tabs
+    frame-variant="platform"
+    variant="software-list"
+    :stats="softwareStatCards"
+    :stats-decoration="statsDecoration"
+    :stats-decoration-image="statsDecorationImage"
+    :stats-loading="statsLoading"
+  >
     <template #filters>
       <div class="software-figma-toolbar">
         <el-input
@@ -15,7 +23,12 @@
           class="software-figma-field"
           :placeholder="t('ec.software.form.systemTypePlaceholder')"
         >
-          <el-option v-for="item in systemTypeOptions" :key="item.value" :label="item.label" :value="item.value" />
+          <el-option
+            v-for="item in systemTypeOptions"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value"
+          />
         </el-select>
         <el-select
           v-model="queryForm.deploymentArchitecture"
@@ -23,48 +36,104 @@
           class="software-figma-field"
           :placeholder="t('ec.software.form.deploymentArchitecturePlaceholder')"
         >
-          <el-option v-for="item in deploymentArchitectureOptions" :key="item.value" :label="item.label" :value="item.value" />
+          <el-option
+            v-for="item in deploymentArchitectureOptions"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value"
+          />
         </el-select>
-        <el-button type="primary" @click="handleSearch">
+        <el-button class="software-figma-search" type="primary" @click="handleSearch">
           {{ t('ec.global.button.text.search') }}
         </el-button>
-        <el-button @click="handleReset">
+        <el-button class="software-figma-reset" @click="handleReset">
           {{ t('ec.global.button.text.reset') }}
         </el-button>
       </div>
     </template>
 
     <template #actions>
-      <el-button type="primary" @click="router.push('/software/informationSystems/create')">
-        {{ t('ec.software.common.create') }}
-      </el-button>
+      <div class="software-figma-toolbar-actions">
+        <el-button class="software-figma-primary" type="primary" @click="router.push('/software/informationSystems/create')">
+          {{ isZhLocale ? '新增软件' : t('ec.software.common.create') }}
+        </el-button>
+        <div class="software-figma-view-switch" aria-hidden="true">
+          <button class="software-figma-view-switch__button is-active" type="button" tabindex="-1">
+            <i class="ri-list-check-2"></i>
+          </button>
+          <button class="software-figma-view-switch__button" type="button" tabindex="-1">
+            <i class="ri-layout-grid-line"></i>
+          </button>
+        </div>
+      </div>
     </template>
 
-    <el-table v-loading="tableLoading" :data="tableData" row-key="id" class="software-figma-table">
+    <el-table
+      v-loading="tableLoading"
+      :data="tableData"
+      height="100%"
+      row-key="id"
+      class="software-figma-table"
+    >
       <el-table-column
         type="index"
-        width="64"
+        width="48"
         :label="t('ec.organization.figma.table.index')"
         :index="indexMethod"
       />
-      <el-table-column prop="code" :label="t('ec.software.common.code')" min-width="150" show-overflow-tooltip />
-      <el-table-column prop="name" :label="t('ec.software.common.name')" min-width="180" show-overflow-tooltip />
-      <el-table-column prop="versionNo" :label="t('ec.software.common.versionNo')" min-width="140" show-overflow-tooltip />
-      <el-table-column :label="t('ec.software.common.deploymentArchitecture')" min-width="140">
+      <el-table-column
+        prop="code"
+        :label="t('ec.software.common.code')"
+        min-width="146"
+        show-overflow-tooltip
+      />
+      <el-table-column
+        prop="name"
+        :label="t('ec.software.common.name')"
+        min-width="109"
+        show-overflow-tooltip
+      />
+      <el-table-column
+        prop="versionNo"
+        :label="t('ec.software.common.versionNo')"
+        min-width="109"
+        show-overflow-tooltip
+      />
+      <el-table-column
+        :label="deploymentArchitectureColumnLabel"
+        min-width="109"
+      >
         <template #default="{ row }">
           {{ getDeploymentArchitectureLabel(row.deploymentArchitecture) }}
         </template>
       </el-table-column>
-      <el-table-column prop="ownerName" :label="t('ec.software.common.owner')" min-width="130" show-overflow-tooltip />
-      <el-table-column prop="contactPhone" :label="t('ec.software.common.contactPhone')" min-width="150" show-overflow-tooltip />
-      <el-table-column :label="t('ec.software.common.systemType')" min-width="140">
+      <el-table-column
+        prop="ownerName"
+        :label="t('ec.software.common.owner')"
+        min-width="109"
+        show-overflow-tooltip
+      />
+      <el-table-column
+        prop="contactPhone"
+        :label="t('ec.software.common.contactPhone')"
+        min-width="129"
+        show-overflow-tooltip
+      />
+      <el-table-column
+        :label="systemTypeColumnLabel"
+        min-width="138"
+      >
         <template #default="{ row }">
           <span class="software-figma-tag" :class="`is-${getSystemTypeVisual(row.systemType).tone}`">
             {{ getSystemTypeVisual(row.systemType).label }}
           </span>
         </template>
       </el-table-column>
-      <el-table-column :label="t('ec.software.common.actions')" fixed="right" width="160">
+      <el-table-column
+        :label="t('ec.software.common.actions')"
+        fixed="right"
+        width="116"
+      >
         <template #default="{ row }">
           <div class="software-figma-actions">
             <button class="software-figma-icon-button" type="button" @click="router.push(`/software/informationSystems/${row.id}/edit`)">
@@ -93,17 +162,20 @@
     </el-table>
 
     <template #pagination>
-      <el-pagination
-        v-model:current-page="pagination.currentPage"
-        background
-        class="software-figma-pagination"
-        :layout="paginationLayout"
-        :total="pagination.total"
-        :page-size="pagination.pageSize"
-        :page-sizes="pagination.pageSizes"
-        @current-change="handlePageChange"
-        @update:page-size="handlePageSizeChange"
-      />
+      <div class="software-figma-pagination">
+        <div class="software-figma-pagination__summary">{{ pageSummaryText }}</div>
+        <el-pagination
+          v-model:current-page="pagination.currentPage"
+          v-model:page-size="pagination.pageSize"
+          background
+          class="software-figma-pagination__controls"
+          :layout="paginationLayout"
+          :total="pagination.total"
+          :page-sizes="pagination.pageSizes"
+          @current-change="handlePageChange"
+          @size-change="handlePageSizeChange"
+        />
+      </div>
     </template>
   </figma-resource-shell>
 </template>
@@ -120,11 +192,19 @@ import {
   getInformationSystemList,
   getInformationSystemStats,
 } from '@/services/modules/softwareService'
+import statsDecoration from '@/assets/images/organization/software-stats-mask.svg'
+import statsDecorationImage from '@/assets/images/organization/software-stats-image.png'
+import totalIcon from '@/assets/images/organization/software-stat-total.svg'
+import externalServiceIcon from '@/assets/images/organization/software-stat-external-service.svg'
+import internalOfficeIcon from '@/assets/images/organization/software-stat-internal-office.svg'
+import databaseSoftwareIcon from '@/assets/images/organization/software-stat-database-software.svg'
+import basicSupportIcon from '@/assets/images/organization/software-stat-basic-support.svg'
+import securitySoftwareIcon from '@/assets/images/organization/software-stat-security-software.svg'
 import FigmaResourceShell from '@/views/organization/components/FigmaResourceShell.vue'
 
 defineOptions({ name: 'SoftwareAssetsFigma' })
 
-const { t } = useI18n()
+const { locale, t } = useI18n()
 const router = useRouter()
 const { device } = storeToRefs(useSystemStore())
 
@@ -140,8 +220,8 @@ const queryForm = reactive({
 
 const pagination = reactive({
   currentPage: 1,
-  pageSize: 10,
-  pageSizes: [10, 20, 50, 100],
+  pageSize: 8,
+  pageSizes: [8, 10, 20, 50, 100],
   total: 0,
 })
 
@@ -154,6 +234,16 @@ const statValues = reactive({
   securitySoftware: 0,
 })
 
+const isZhLocale = computed(() => String(locale.value || '').startsWith('zh'))
+
+const systemTypeColumnLabel = computed(() => {
+  return isZhLocale.value ? '软件类型' : t('ec.software.common.systemType')
+})
+
+const deploymentArchitectureColumnLabel = computed(() => {
+  return isZhLocale.value ? '部署架构' : t('ec.software.common.deploymentArchitecture')
+})
+
 const systemTypeOptions = computed(() => ([
   { value: 'EXTERNAL_SERVICE', label: t('ec.software.type.externalService') },
   { value: 'INTERNAL_OFFICE', label: t('ec.software.type.internalOffice') },
@@ -164,9 +254,9 @@ const systemTypeOptions = computed(() => ([
 
 const systemTypeVisualMap = computed(() => ({
   EXTERNAL_SERVICE: { label: t('ec.software.type.externalService'), tone: 'blue' },
-  INTERNAL_OFFICE: { label: t('ec.software.type.internalOffice'), tone: 'green' },
+  INTERNAL_OFFICE: { label: t('ec.software.type.internalOffice'), tone: 'orange' },
   DATABASE_SOFTWARE: { label: t('ec.software.type.databaseSoftware'), tone: 'violet' },
-  BASIC_SUPPORT: { label: t('ec.software.type.basicSupport'), tone: 'cyan' },
+  BASIC_SUPPORT: { label: isZhLocale.value ? '支撑系统' : t('ec.software.type.basicSupport'), tone: 'green' },
   SECURITY_SOFTWARE: { label: t('ec.software.type.securitySoftware'), tone: 'orange' },
 }))
 
@@ -183,16 +273,62 @@ const deploymentArchitectureOptions = computed(() => ([
 ]))
 
 const paginationLayout = computed(() => {
-  return device.value === 'mobile' ? 'prev, pager, next' : 'total, sizes, prev, pager, next, jumper'
+  return device.value === 'mobile' ? 'prev, pager, next' : 'sizes, prev, pager, next, jumper'
+})
+
+const pageCount = computed(() => {
+  const total = Number(pagination.total || 0)
+  const pageSize = Number(pagination.pageSize || 8)
+  return Math.max(1, Math.ceil(total / pageSize))
+})
+
+const pageSummaryText = computed(() => {
+  return isZhLocale.value ? `共${pageCount.value}页` : `${pageCount.value} pages`
 })
 
 const softwareStatCards = computed(() => ([
-  { key: 'total', label: t('ec.software.stats.total'), value: statValues.total, icon: 'ri-apps-fill', tone: 'primary' },
-  { key: 'externalService', label: t('ec.software.stats.externalService'), value: statValues.externalService, icon: 'ri-global-fill', tone: 'primary' },
-  { key: 'internalOffice', label: t('ec.software.stats.internalOffice'), value: statValues.internalOffice, icon: 'ri-briefcase-4-fill', tone: 'primary' },
-  { key: 'databaseSoftware', label: t('ec.software.stats.databaseSoftware'), value: statValues.databaseSoftware, icon: 'ri-database-2-fill', tone: 'primary' },
-  { key: 'basicSupport', label: t('ec.software.stats.basicSupport'), value: statValues.basicSupport, icon: 'ri-tools-fill', tone: 'primary' },
-  { key: 'securitySoftware', label: t('ec.software.stats.securitySoftware'), value: statValues.securitySoftware, icon: 'ri-shield-check-fill', tone: 'primary' },
+  {
+    key: 'total',
+    label: isZhLocale.value ? '软件总数' : 'Total Software',
+    value: statValues.total,
+    iconUrl: totalIcon,
+    tone: 'primary',
+  },
+  {
+    key: 'external-service',
+    label: isZhLocale.value ? '对外服务' : 'External Service',
+    value: statValues.externalService,
+    iconUrl: externalServiceIcon,
+    tone: 'primary',
+  },
+  {
+    key: 'internal-office',
+    label: isZhLocale.value ? '内部办公' : 'Internal Office',
+    value: statValues.internalOffice,
+    iconUrl: internalOfficeIcon,
+    tone: 'primary',
+  },
+  {
+    key: 'database-software',
+    label: isZhLocale.value ? '数据库软件' : 'Database Software',
+    value: statValues.databaseSoftware,
+    iconUrl: databaseSoftwareIcon,
+    tone: 'primary',
+  },
+  {
+    key: 'basic-support',
+    label: isZhLocale.value ? '基础支撑' : 'Basic Support',
+    value: statValues.basicSupport,
+    iconUrl: basicSupportIcon,
+    tone: 'primary',
+  },
+  {
+    key: 'security-software',
+    label: isZhLocale.value ? '安全软件' : 'Security Software',
+    value: statValues.securitySoftware,
+    iconUrl: securitySoftwareIcon,
+    tone: 'primary',
+  },
 ]))
 
 const indexMethod = (index) => {
@@ -226,8 +362,8 @@ const loadData = async () => {
       systemType: queryForm.systemType || undefined,
       deploymentArchitecture: queryForm.deploymentArchitecture || undefined,
     })
-    tableData.value = pageData.records
-    pagination.total = pageData.total
+    tableData.value = Array.isArray(pageData.records) ? pageData.records : []
+    pagination.total = Number(pageData.total || 0)
   } catch (error) {
     ElMessage.error(error.message || t('ec.software.message.loadFailed'))
   } finally {
@@ -316,27 +452,139 @@ onMounted(async () => {
 .software-figma-toolbar {
   display: flex;
   flex-wrap: wrap;
-  gap: 12px;
+  gap: 8px;
   width: 100%;
 }
 
 .software-figma-field {
-  width: 220px;
+  width: 200px;
 }
 
 .software-figma-field--keyword {
-  width: 300px;
+  width: 200px;
+}
+
+.software-figma-search {
+  min-width: 52px;
+  height: 32px;
+  padding-inline: 12px;
+  border: 0;
+  border-radius: 4px;
+  background: #2e5ef0;
+  box-shadow: none;
+  font-size: 14px;
+}
+
+.software-figma-reset {
+  min-width: 68px;
+  height: 32px;
+  padding-inline: 12px;
+  border: 0;
+  border-radius: 4px;
+  background: #f5f6f9;
+  box-shadow: none;
+  color: #444a57;
+  font-size: 14px;
+}
+
+.software-figma-toolbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.software-figma-primary {
+  min-width: 96px;
+  height: 32px;
+  padding-inline: 12px;
+  border: 0;
+  border-radius: 4px;
+  background: #2e5ef0;
+  box-shadow: none;
+  font-size: 14px;
+}
+
+.software-figma-view-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  color: #7c8393;
+}
+
+.software-figma-view-switch__button {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+
+  &.is-active {
+    color: #2e5ef0;
+  }
+
+  i {
+    font-size: 18px;
+    line-height: 1;
+  }
+
+  &:first-child::after {
+    content: '';
+    position: absolute;
+    top: 3px;
+    right: -6px;
+    width: 1px;
+    height: 12px;
+    background: #e6e8ed;
+  }
 }
 
 .software-figma-table {
-  :deep(.el-table__cell) {
-    height: 56px;
+  flex: 1;
+  min-height: 0;
+
+  :deep(.el-table) {
+    --el-table-border-color: #edeef3;
+    --el-table-header-bg-color: #f5f6f9;
+    --el-table-row-hover-bg-color: #f8faff;
+    height: 100%;
+  }
+
+  :deep(.el-table__inner-wrapper) {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+
+  :deep(.el-table__inner-wrapper::before) {
+    display: none;
+  }
+
+  :deep(.el-table__body-wrapper) {
+    flex: 1;
+    min-height: 0;
   }
 
   :deep(th.el-table__cell) {
+    height: 46px;
+    padding: 0;
+    background: #f5f6f9;
     color: #151b26;
-    font-weight: 700;
-    background: #f6f8fd;
+    font-weight: 600;
+  }
+
+  :deep(td.el-table__cell) {
+    height: 46px;
+    padding: 0;
+    color: #444a57;
+  }
+
+  :deep(.cell) {
+    line-height: 22px;
   }
 }
 
@@ -344,76 +592,172 @@ onMounted(async () => {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 70px;
-  padding: 2px 10px;
-  border-radius: 999px;
+  min-width: 68px;
+  padding: 2px 8px;
+  border-radius: 2px;
   font-size: 12px;
   line-height: 20px;
+  white-space: nowrap;
 
   &.is-blue {
-    color: #2e5ef0;
     background: #ebf0ff;
-  }
-
-  &.is-green {
-    color: #1f9d55;
-    background: #dff6e2;
-  }
-
-  &.is-violet {
-    color: #7a45ff;
-    background: #f1eaff;
-  }
-
-  &.is-cyan {
-    color: #1c96d6;
-    background: #e4f5ff;
+    color: #2e5ef0;
   }
 
   &.is-orange {
-    color: #ff8a00;
     background: #fff1df;
+    color: #ff8a00;
+  }
+
+  &.is-violet {
+    background: #f1eaff;
+    color: #7a45ff;
+  }
+
+  &.is-green {
+    background: #d5f7d7;
+    color: #36b23e;
   }
 }
 
 .software-figma-actions {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 24px;
 }
 
 .software-figma-icon-button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
+  width: 16px;
+  height: 16px;
+  padding: 0;
   border: 0;
-  border-radius: 10px;
-  background: #f5f7fb;
-  color: #4f566b;
+  background: transparent;
+  color: #6d7485;
   cursor: pointer;
-  transition: background 0.2s ease, color 0.2s ease;
+  transition: color 0.2s ease;
 
   &:hover {
-    color: var(--el-color-primary);
-    background: #edf2ff;
+    color: #2e5ef0;
   }
 
   &.is-danger:hover {
-    color: #d14343;
-    background: #fff1f1;
+    color: #f56c6c;
+  }
+
+  i {
+    font-size: 16px;
+    line-height: 1;
   }
 }
 
 .software-figma-pagination {
-  justify-content: flex-end;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  width: 100%;
+}
+
+.software-figma-pagination__summary {
+  flex-shrink: 0;
+  color: #444a57;
+  font-size: 14px;
+  line-height: 22px;
+}
+
+.software-figma-pagination__controls {
+  min-width: 0;
+
+  :deep(.el-pagination) {
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    row-gap: 12px;
+  }
+
+  :deep(.btn-prev),
+  :deep(.btn-next),
+  :deep(.el-pager li),
+  :deep(.el-pagination__sizes .el-select .el-input__wrapper),
+  :deep(.el-pagination__jump .el-input__wrapper) {
+    min-width: 28px;
+    height: 28px;
+    border-radius: 4px;
+    box-shadow: none;
+  }
+
+  :deep(.btn-prev),
+  :deep(.btn-next),
+  :deep(.el-pager li) {
+    background: #f5f6f9;
+    color: #444a57;
+  }
+
+  :deep(.el-pager li.is-active) {
+    background: #2e5ef0;
+    color: #ffffff;
+  }
+
+  :deep(.el-pagination__sizes) {
+    margin-left: auto;
+  }
+}
+
+.software-figma-field {
+  :deep(.el-input__wrapper),
+  :deep(.el-select__wrapper) {
+    display: flex;
+    align-items: center;
+    height: 32px;
+    min-height: 32px;
+    padding: 5px 12px;
+    background: #f5f6f9;
+    border-radius: 4px;
+    box-shadow: none;
+  }
+
+  :deep(.el-input__inner),
+  :deep(.el-select__placeholder),
+  :deep(.el-select__selected-item) {
+    font-size: 14px;
+    line-height: 22px;
+  }
+
+  :deep(.el-input__inner) {
+    height: 22px;
+  }
+
+  :deep(.el-input__inner::placeholder) {
+    color: #858a99;
+  }
 }
 
 @media only screen and (max-width: 991px) {
-  .software-figma-field,
-  .software-figma-field--keyword {
+  .software-figma-toolbar-actions {
+    justify-content: space-between;
     width: 100%;
+  }
+
+  .software-figma-field,
+  .software-figma-field--keyword,
+  .software-figma-search,
+  .software-figma-reset {
+    width: 100%;
+  }
+
+  .software-figma-pagination {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .software-figma-pagination__controls {
+    width: 100%;
+  }
+
+  .software-figma-pagination__controls :deep(.el-pagination__sizes) {
+    margin-left: 0;
   }
 }
 </style>

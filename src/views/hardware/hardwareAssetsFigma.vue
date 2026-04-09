@@ -1,5 +1,13 @@
 <template>
-  <figma-resource-shell hide-tabs frame-variant="platform" :stats="hardwareStatCards" :stats-loading="statsLoading">
+  <figma-resource-shell
+    hide-tabs
+    frame-variant="platform"
+    variant="hardware-list"
+    :stats="hardwareStatCards"
+    :stats-decoration="statsDecoration"
+    :stats-decoration-image="statsDecorationImage"
+    :stats-loading="statsLoading"
+  >
     <template #filters>
       <div class="hardware-figma-toolbar">
         <el-input
@@ -15,7 +23,12 @@
           class="hardware-figma-field"
           :placeholder="t('ec.hardware.form.hardwareTypePlaceholder')"
         >
-          <el-option v-for="item in hardwareTypeOptions" :key="item.value" :label="item.label" :value="item.value" />
+          <el-option
+            v-for="item in hardwareTypeOptions"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value"
+          />
         </el-select>
         <el-select
           v-model="queryForm.hardwareStatus"
@@ -23,43 +36,96 @@
           class="hardware-figma-field"
           :placeholder="t('ec.hardware.form.statusPlaceholder')"
         >
-          <el-option v-for="item in hardwareStatusOptions" :key="item.value" :label="item.label" :value="item.value" />
+          <el-option
+            v-for="item in hardwareStatusOptions"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value"
+          />
         </el-select>
-        <el-button type="primary" @click="handleSearch">
+        <el-button class="hardware-figma-search" type="primary" @click="handleSearch">
           {{ t('ec.global.button.text.search') }}
         </el-button>
-        <el-button @click="handleReset">
+        <el-button class="hardware-figma-reset" @click="handleReset">
           {{ t('ec.global.button.text.reset') }}
         </el-button>
       </div>
     </template>
 
     <template #actions>
-      <el-button type="primary" @click="router.push('/hardware/hardwareAssets/create')">
-        {{ t('ec.hardware.common.create') }}
-      </el-button>
+      <div class="hardware-figma-toolbar-actions">
+        <el-button class="hardware-figma-primary" type="primary" @click="router.push('/hardware/hardwareAssets/create')">
+          {{ isZhLocale ? '新增硬件' : t('ec.hardware.common.create') }}
+        </el-button>
+        <div class="hardware-figma-view-switch" aria-hidden="true">
+          <button class="hardware-figma-view-switch__button is-active" type="button" tabindex="-1">
+            <i class="ri-list-check-2"></i>
+          </button>
+          <button class="hardware-figma-view-switch__button" type="button" tabindex="-1">
+            <i class="ri-layout-grid-line"></i>
+          </button>
+        </div>
+      </div>
     </template>
 
-    <el-table v-loading="tableLoading" :data="tableData" row-key="id" class="hardware-figma-table">
+    <el-table
+      v-loading="tableLoading"
+      :data="tableData"
+      height="100%"
+      row-key="id"
+      class="hardware-figma-table"
+    >
       <el-table-column
         type="index"
-        width="64"
+        width="48"
         :label="t('ec.organization.figma.table.index')"
         :index="indexMethod"
       />
-      <el-table-column prop="assetCode" :label="t('ec.hardware.common.assetCode')" min-width="160" show-overflow-tooltip />
-      <el-table-column prop="hardwareIp" :label="t('ec.hardware.common.hardwareIp')" min-width="150" show-overflow-tooltip />
-      <el-table-column prop="assetName" :label="t('ec.hardware.common.assetName')" min-width="170" show-overflow-tooltip />
-      <el-table-column prop="hardwareBrand" :label="t('ec.hardware.common.hardwareBrand')" min-width="150" show-overflow-tooltip />
-      <el-table-column :label="t('ec.hardware.common.hardwareType')" min-width="140">
+      <el-table-column
+        prop="assetCode"
+        :label="assetCodeColumnLabel"
+        min-width="146"
+        show-overflow-tooltip
+      />
+      <el-table-column
+        prop="hardwareIp"
+        :label="ipColumnLabel"
+        min-width="140"
+        show-overflow-tooltip
+      />
+      <el-table-column
+        prop="assetName"
+        :label="assetNameColumnLabel"
+        min-width="140"
+        show-overflow-tooltip
+      />
+      <el-table-column
+        prop="hardwareBrand"
+        :label="brandColumnLabel"
+        min-width="140"
+        show-overflow-tooltip
+      />
+      <el-table-column
+        :label="hardwareTypeColumnLabel"
+        min-width="140"
+      >
         <template #default="{ row }">
           <span class="hardware-figma-tag" :class="`is-${getHardwareTypeVisual(row.hardwareType).tone}`">
             {{ getHardwareTypeVisual(row.hardwareType).label }}
           </span>
         </template>
       </el-table-column>
-      <el-table-column prop="ownerName" :label="t('ec.hardware.common.owner')" min-width="130" show-overflow-tooltip />
-      <el-table-column :label="t('ec.hardware.common.actions')" fixed="right" width="160">
+      <el-table-column
+        prop="ownerName"
+        :label="t('ec.hardware.common.owner')"
+        min-width="140"
+        show-overflow-tooltip
+      />
+      <el-table-column
+        :label="t('ec.hardware.common.actions')"
+        fixed="right"
+        width="116"
+      >
         <template #default="{ row }">
           <div class="hardware-figma-actions">
             <button class="hardware-figma-icon-button" type="button" @click="router.push(`/hardware/hardwareAssets/${row.id}/edit`)">
@@ -88,17 +154,20 @@
     </el-table>
 
     <template #pagination>
-      <el-pagination
-        v-model:current-page="pagination.currentPage"
-        background
-        class="hardware-figma-pagination"
-        :layout="paginationLayout"
-        :total="pagination.total"
-        :page-size="pagination.pageSize"
-        :page-sizes="pagination.pageSizes"
-        @current-change="handlePageChange"
-        @update:page-size="handlePageSizeChange"
-      />
+      <div class="hardware-figma-pagination">
+        <div class="hardware-figma-pagination__summary">{{ pageSummaryText }}</div>
+        <el-pagination
+          v-model:current-page="pagination.currentPage"
+          v-model:page-size="pagination.pageSize"
+          background
+          class="hardware-figma-pagination__controls"
+          :layout="paginationLayout"
+          :total="pagination.total"
+          :page-sizes="pagination.pageSizes"
+          @current-change="handlePageChange"
+          @size-change="handlePageSizeChange"
+        />
+      </div>
     </template>
   </figma-resource-shell>
 </template>
@@ -115,11 +184,18 @@ import {
   getHardwareAssetList,
   getHardwareAssetStats,
 } from '@/services/modules/hardwareService'
+import statsDecoration from '@/assets/images/organization/hardware-stats-mask.svg'
+import statsDecorationImage from '@/assets/images/organization/hardware-stats-image.png'
+import totalIcon from '@/assets/images/organization/hardware-stat-total.svg'
+import serverIcon from '@/assets/images/organization/hardware-stat-server.svg'
+import networkDeviceIcon from '@/assets/images/organization/hardware-stat-network-device.svg'
+import terminalDeviceIcon from '@/assets/images/organization/hardware-stat-terminal-device.svg'
+import peripheralIcon from '@/assets/images/organization/hardware-stat-peripheral.svg'
 import FigmaResourceShell from '@/views/organization/components/FigmaResourceShell.vue'
 
 defineOptions({ name: 'HardwareAssetsFigma' })
 
-const { t } = useI18n()
+const { locale, t } = useI18n()
 const router = useRouter()
 const { device } = storeToRefs(useSystemStore())
 
@@ -135,8 +211,8 @@ const queryForm = reactive({
 
 const pagination = reactive({
   currentPage: 1,
-  pageSize: 10,
-  pageSizes: [10, 20, 50, 100],
+  pageSize: 8,
+  pageSizes: [8, 10, 20, 50, 100],
   total: 0,
 })
 
@@ -146,6 +222,28 @@ const statValues = reactive({
   networkDevice: 0,
   terminalDevice: 0,
   peripheral: 0,
+})
+
+const isZhLocale = computed(() => String(locale.value || '').startsWith('zh'))
+
+const assetCodeColumnLabel = computed(() => {
+  return isZhLocale.value ? '硬件编码' : t('ec.hardware.common.assetCode')
+})
+
+const ipColumnLabel = computed(() => {
+  return isZhLocale.value ? 'IP地址' : t('ec.hardware.common.hardwareIp')
+})
+
+const assetNameColumnLabel = computed(() => {
+  return isZhLocale.value ? '硬件名称' : t('ec.hardware.common.assetName')
+})
+
+const brandColumnLabel = computed(() => {
+  return isZhLocale.value ? '硬件品牌' : t('ec.hardware.common.hardwareBrand')
+})
+
+const hardwareTypeColumnLabel = computed(() => {
+  return isZhLocale.value ? '硬件类型' : t('ec.hardware.common.hardwareType')
 })
 
 const hardwareTypeVisualMap = computed(() => ({
@@ -169,17 +267,57 @@ const hardwareTypeOptions = computed(() => ([
   { value: 'PERIPHERAL', label: t('ec.hardware.type.peripheral') },
 ]))
 
-const hardwareStatCards = computed(() => ([
-  { key: 'total', label: t('ec.hardware.stats.total'), value: statValues.total, icon: 'ri-hard-drive-3-fill', tone: 'primary' },
-  { key: 'server', label: t('ec.hardware.stats.server'), value: statValues.server, icon: 'ri-server-fill', tone: 'primary' },
-  { key: 'networkDevice', label: t('ec.hardware.stats.networkDevice'), value: statValues.networkDevice, icon: 'ri-router-fill', tone: 'primary' },
-  { key: 'terminalDevice', label: t('ec.hardware.stats.terminalDevice'), value: statValues.terminalDevice, icon: 'ri-computer-fill', tone: 'primary' },
-  { key: 'peripheral', label: t('ec.hardware.stats.peripheral'), value: statValues.peripheral, icon: 'ri-printer-fill', tone: 'primary' },
-]))
-
 const paginationLayout = computed(() => {
-  return device.value === 'mobile' ? 'prev, pager, next' : 'total, sizes, prev, pager, next, jumper'
+  return device.value === 'mobile' ? 'prev, pager, next' : 'sizes, prev, pager, next, jumper'
 })
+
+const pageCount = computed(() => {
+  const total = Number(pagination.total || 0)
+  const pageSize = Number(pagination.pageSize || 8)
+  return Math.max(1, Math.ceil(total / pageSize))
+})
+
+const pageSummaryText = computed(() => {
+  return isZhLocale.value ? `共${pageCount.value}页` : `${pageCount.value} pages`
+})
+
+const hardwareStatCards = computed(() => ([
+  {
+    key: 'total',
+    label: isZhLocale.value ? '硬件总数' : 'Total Hardware',
+    value: statValues.total,
+    iconUrl: totalIcon,
+    tone: 'primary',
+  },
+  {
+    key: 'server',
+    label: isZhLocale.value ? '服务器' : t('ec.hardware.stats.server'),
+    value: statValues.server,
+    iconUrl: serverIcon,
+    tone: 'primary',
+  },
+  {
+    key: 'network-device',
+    label: isZhLocale.value ? '网络设备' : t('ec.hardware.stats.networkDevice'),
+    value: statValues.networkDevice,
+    iconUrl: networkDeviceIcon,
+    tone: 'primary',
+  },
+  {
+    key: 'terminal-device',
+    label: isZhLocale.value ? '终端设备' : t('ec.hardware.stats.terminalDevice'),
+    value: statValues.terminalDevice,
+    iconUrl: terminalDeviceIcon,
+    tone: 'primary',
+  },
+  {
+    key: 'peripheral',
+    label: isZhLocale.value ? '外设' : t('ec.hardware.stats.peripheral'),
+    value: statValues.peripheral,
+    iconUrl: peripheralIcon,
+    tone: 'primary',
+  },
+]))
 
 const indexMethod = (index) => {
   return (pagination.currentPage - 1) * pagination.pageSize + index + 1
@@ -207,8 +345,8 @@ const loadData = async () => {
       hardwareType: queryForm.hardwareType || undefined,
       hardwareStatus: queryForm.hardwareStatus || undefined,
     })
-    tableData.value = pageData.records
-    pagination.total = pageData.total
+    tableData.value = Array.isArray(pageData.records) ? pageData.records : []
+    pagination.total = Number(pageData.total || 0)
   } catch (error) {
     ElMessage.error(error.message || t('ec.hardware.load.failed'))
   } finally {
@@ -296,27 +434,139 @@ onMounted(async () => {
 .hardware-figma-toolbar {
   display: flex;
   flex-wrap: wrap;
-  gap: 12px;
+  gap: 8px;
   width: 100%;
 }
 
 .hardware-figma-field {
-  width: 220px;
+  width: 200px;
 }
 
 .hardware-figma-field--keyword {
-  width: 300px;
+  width: 200px;
+}
+
+.hardware-figma-search {
+  min-width: 52px;
+  height: 32px;
+  padding-inline: 12px;
+  border: 0;
+  border-radius: 4px;
+  background: #2e5ef0;
+  box-shadow: none;
+  font-size: 14px;
+}
+
+.hardware-figma-reset {
+  min-width: 68px;
+  height: 32px;
+  padding-inline: 12px;
+  border: 0;
+  border-radius: 4px;
+  background: #f5f6f9;
+  box-shadow: none;
+  color: #444a57;
+  font-size: 14px;
+}
+
+.hardware-figma-toolbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.hardware-figma-primary {
+  min-width: 96px;
+  height: 32px;
+  padding-inline: 12px;
+  border: 0;
+  border-radius: 4px;
+  background: #2e5ef0;
+  box-shadow: none;
+  font-size: 14px;
+}
+
+.hardware-figma-view-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  color: #7c8393;
+}
+
+.hardware-figma-view-switch__button {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+
+  &.is-active {
+    color: #2e5ef0;
+  }
+
+  i {
+    font-size: 18px;
+    line-height: 1;
+  }
+
+  &:first-child::after {
+    content: '';
+    position: absolute;
+    top: 3px;
+    right: -6px;
+    width: 1px;
+    height: 12px;
+    background: #e6e8ed;
+  }
 }
 
 .hardware-figma-table {
-  :deep(.el-table__cell) {
-    height: 56px;
+  flex: 1;
+  min-height: 0;
+
+  :deep(.el-table) {
+    --el-table-border-color: #edeef3;
+    --el-table-header-bg-color: #f5f6f9;
+    --el-table-row-hover-bg-color: #f8faff;
+    height: 100%;
+  }
+
+  :deep(.el-table__inner-wrapper) {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+
+  :deep(.el-table__inner-wrapper::before) {
+    display: none;
+  }
+
+  :deep(.el-table__body-wrapper) {
+    flex: 1;
+    min-height: 0;
   }
 
   :deep(th.el-table__cell) {
+    height: 46px;
+    padding: 0;
+    background: #f5f6f9;
     color: #151b26;
-    font-weight: 700;
-    background: #f6f8fd;
+    font-weight: 600;
+  }
+
+  :deep(td.el-table__cell) {
+    height: 46px;
+    padding: 0;
+    color: #444a57;
+  }
+
+  :deep(.cell) {
+    line-height: 22px;
   }
 }
 
@@ -324,11 +574,12 @@ onMounted(async () => {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 70px;
-  padding: 2px 10px;
-  border-radius: 999px;
+  min-width: 56px;
+  padding: 2px 8px;
+  border-radius: 2px;
   font-size: 12px;
   line-height: 20px;
+  white-space: nowrap;
 
   &.is-blue {
     color: #2e5ef0;
@@ -341,8 +592,8 @@ onMounted(async () => {
   }
 
   &.is-green {
-    color: #1f9d55;
-    background: #dff6e2;
+    color: #36b23e;
+    background: #d5f7d7;
   }
 
   &.is-orange {
@@ -354,41 +605,141 @@ onMounted(async () => {
 .hardware-figma-actions {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 24px;
 }
 
 .hardware-figma-icon-button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
+  width: 16px;
+  height: 16px;
+  padding: 0;
   border: 0;
-  border-radius: 10px;
-  background: #f5f7fb;
-  color: #4f566b;
+  background: transparent;
+  color: #6d7485;
   cursor: pointer;
-  transition: background 0.2s ease, color 0.2s ease;
+  transition: color 0.2s ease;
 
   &:hover {
-    color: var(--el-color-primary);
-    background: #edf2ff;
+    color: #2e5ef0;
   }
 
   &.is-danger:hover {
-    color: #d14343;
-    background: #fff1f1;
+    color: #f56c6c;
+  }
+
+  i {
+    font-size: 16px;
+    line-height: 1;
   }
 }
 
 .hardware-figma-pagination {
-  justify-content: flex-end;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  width: 100%;
+}
+
+.hardware-figma-pagination__summary {
+  flex-shrink: 0;
+  color: #444a57;
+  font-size: 14px;
+  line-height: 22px;
+}
+
+.hardware-figma-pagination__controls {
+  min-width: 0;
+
+  :deep(.el-pagination) {
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    row-gap: 12px;
+  }
+
+  :deep(.btn-prev),
+  :deep(.btn-next),
+  :deep(.el-pager li),
+  :deep(.el-pagination__sizes .el-select .el-input__wrapper),
+  :deep(.el-pagination__jump .el-input__wrapper) {
+    min-width: 28px;
+    height: 28px;
+    border-radius: 4px;
+    box-shadow: none;
+  }
+
+  :deep(.btn-prev),
+  :deep(.btn-next),
+  :deep(.el-pager li) {
+    background: #f5f6f9;
+    color: #444a57;
+  }
+
+  :deep(.el-pager li.is-active) {
+    background: #2e5ef0;
+    color: #ffffff;
+  }
+
+  :deep(.el-pagination__sizes) {
+    margin-left: auto;
+  }
+}
+
+.hardware-figma-field {
+  :deep(.el-input__wrapper),
+  :deep(.el-select__wrapper) {
+    display: flex;
+    align-items: center;
+    height: 32px;
+    min-height: 32px;
+    padding: 5px 12px;
+    background: #f5f6f9;
+    border-radius: 4px;
+    box-shadow: none;
+  }
+
+  :deep(.el-input__inner),
+  :deep(.el-select__placeholder),
+  :deep(.el-select__selected-item) {
+    font-size: 14px;
+    line-height: 22px;
+  }
+
+  :deep(.el-input__inner) {
+    height: 22px;
+  }
+
+  :deep(.el-input__inner::placeholder) {
+    color: #858a99;
+  }
 }
 
 @media only screen and (max-width: 991px) {
-  .hardware-figma-field,
-  .hardware-figma-field--keyword {
+  .hardware-figma-toolbar-actions {
+    justify-content: space-between;
     width: 100%;
+  }
+
+  .hardware-figma-field,
+  .hardware-figma-field--keyword,
+  .hardware-figma-search,
+  .hardware-figma-reset {
+    width: 100%;
+  }
+
+  .hardware-figma-pagination {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .hardware-figma-pagination__controls {
+    width: 100%;
+  }
+
+  .hardware-figma-pagination__controls :deep(.el-pagination__sizes) {
+    margin-left: 0;
   }
 }
 </style>
