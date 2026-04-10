@@ -1,41 +1,73 @@
 <template>
   <figma-resource-page
-    hide-tabs
-    :title="pageTitle"
-    :description="pageDescription"
+    active-tab="informationSystems"
+    :breadcrumbs="pageBreadcrumbs"
+    back-text="返回"
     back-path="/software/informationSystems"
   >
-    <template #actions>
-      <el-button @click="router.push('/software/informationSystems')">
-        {{ t('ec.global.button.text.cancel') }}
-      </el-button>
-      <el-button type="primary" :loading="submitLoading" @click="handleSubmit">
-        {{ t('ec.global.button.text.submit') }}
-      </el-button>
-    </template>
-
     <div v-loading="pageLoading" class="software-page-card">
-      <el-form ref="formRef" :model="formData" :rules="formRules" label-position="top">
+      <el-form
+        ref="formRef"
+        :model="formData"
+        :rules="formRules"
+        label-position="top"
+        class="software-form"
+      >
         <section class="software-form-section">
           <div class="software-section-title">{{ t('ec.software.section.basic') }}</div>
           <div class="software-form-grid">
-            <el-form-item :label="t('ec.software.common.code')" prop="code">
+            <el-form-item prop="code">
+              <template #label>
+                <span class="software-form-label">
+                  {{ t('ec.software.common.code') }}
+                  <span class="software-form-label__required">*</span>
+                </span>
+              </template>
               <el-input v-model="formData.code" clearable :placeholder="t('ec.software.form.codePlaceholder')" />
             </el-form-item>
-            <el-form-item :label="t('ec.software.common.name')" prop="name">
+            
+            <el-form-item prop="name">
+              <template #label>
+                <span class="software-form-label">
+                  {{ t('ec.software.common.name') }}
+                  <span class="software-form-label__required">*</span>
+                </span>
+              </template>
               <el-input v-model="formData.name" clearable :placeholder="t('ec.software.form.namePlaceholder')" />
             </el-form-item>
-            <el-form-item :label="t('ec.software.common.systemType')" prop="systemType">
-              <el-select v-model="formData.systemType" :placeholder="t('ec.software.form.systemTypePlaceholder')">
+            
+            <el-form-item prop="systemType">
+              <template #label>
+                <span class="software-form-label">
+                  {{ t('ec.software.common.systemType') }}
+                  <span class="software-form-label__required">*</span>
+                </span>
+              </template>
+              <el-select v-model="formData.systemType" clearable :placeholder="t('ec.software.form.systemTypePlaceholder')">
                 <el-option v-for="item in systemTypeOptions" :key="item.value" :label="item.label" :value="item.value" />
               </el-select>
             </el-form-item>
-            <el-form-item :label="t('ec.software.common.versionNo')">
+            
+            <el-form-item prop="versionNo">
+              <template #label>
+                <span class="software-form-label">
+                  {{ t('ec.software.common.versionNo') }}
+                  <span class="software-form-label__required">*</span>
+                </span>
+              </template>
               <el-input v-model="formData.versionNo" clearable :placeholder="t('ec.software.form.versionNoPlaceholder')" />
             </el-form-item>
-            <el-form-item :label="t('ec.software.common.deploymentArchitecture')" prop="deploymentArchitecture">
+            
+            <el-form-item prop="deploymentArchitecture">
+              <template #label>
+                <span class="software-form-label">
+                  {{ t('ec.software.common.deploymentArchitecture') }}
+                  <span class="software-form-label__required">*</span>
+                </span>
+              </template>
               <el-select
                 v-model="formData.deploymentArchitecture"
+                clearable
                 :placeholder="t('ec.software.form.deploymentArchitecturePlaceholder')"
               >
                 <el-option
@@ -46,7 +78,14 @@
                 />
               </el-select>
             </el-form-item>
-            <el-form-item :label="t('ec.software.common.owner')">
+            
+            <el-form-item prop="ownerPersonId">
+              <template #label>
+                <span class="software-form-label">
+                  {{ t('ec.software.common.owner') }}
+                  <span class="software-form-label__required">*</span>
+                </span>
+              </template>
               <ec-object-single-select
                 v-model="formData.ownerPersonId"
                 :placeholder="t('ec.software.form.ownerPlaceholder')"
@@ -59,7 +98,14 @@
                 @change="handleOwnerChange"
               />
             </el-form-item>
-            <el-form-item :label="t('ec.software.common.contactPhone')">
+            
+            <el-form-item prop="contactPhone">
+              <template #label>
+                <span class="software-form-label">
+                  {{ t('ec.software.common.contactPhone') }}
+                  <span class="software-form-label__required">*</span>
+                </span>
+              </template>
               <el-input
                 v-model="formData.contactPhone"
                 clearable
@@ -71,8 +117,13 @@
 
         <section class="software-form-section">
           <div class="software-section-title">{{ t('ec.software.section.relations') }}</div>
-          <div class="software-form-grid">
-            <el-form-item :label="t('ec.software.detail.persons')">
+          <div class="software-form-grid software-form-grid--relation">
+            <el-form-item class="software-form-item--transfer">
+              <template #label>
+                <span class="software-form-label">
+                  {{ t('ec.software.detail.persons') }}
+                </span>
+              </template>
               <ec-object-multi-transfer
                 v-model="formData.personIds"
                 :placeholder="t('ec.software.relation.personsPlaceholder')"
@@ -85,7 +136,13 @@
                 subtitle-key="employeeNo"
               />
             </el-form-item>
-            <el-form-item :label="t('ec.software.detail.serviceProviders')">
+            
+            <el-form-item class="software-form-item--transfer">
+              <template #label>
+                <span class="software-form-label">
+                  {{ t('ec.software.detail.serviceProviders') }}
+                </span>
+              </template>
               <ec-object-multi-transfer
                 v-model="formData.serviceProviderIds"
                 :placeholder="t('ec.software.relation.serviceProvidersPlaceholder')"
@@ -98,7 +155,13 @@
                 subtitle-key="code"
               />
             </el-form-item>
-            <el-form-item :label="t('ec.software.detail.hardwareAssets')" class="is-span-2">
+            
+            <el-form-item class="software-form-item--transfer">
+              <template #label>
+                <span class="software-form-label">
+                  {{ t('ec.software.detail.hardwareAssets') }}
+                </span>
+              </template>
               <ec-object-multi-transfer
                 v-model="formData.hardwareAssetIds"
                 :placeholder="t('ec.software.relation.hardwareAssetsPlaceholder')"
@@ -113,6 +176,15 @@
             </el-form-item>
           </div>
         </section>
+        
+        <div class="software-form-actions">
+          <el-button type="primary" :loading="submitLoading" class="software-form-actions__submit" @click="handleSubmit">
+            {{ t('ec.global.button.text.confirm') }}
+          </el-button>
+          <el-button class="software-form-actions__cancel" @click="router.push('/software/informationSystems')">
+            {{ t('ec.global.button.text.cancel') }}
+          </el-button>
+        </div>
       </el-form>
     </div>
   </figma-resource-page>
@@ -165,8 +237,10 @@ const formData = reactive({
 })
 
 const isEdit = computed(() => Boolean(route.params.id))
-const pageTitle = computed(() => (isEdit.value ? t('ec.software.page.editTitle') : t('ec.software.page.createTitle')))
-const pageDescription = computed(() => (isEdit.value ? t('ec.software.page.editDescription') : t('ec.software.page.createDescription')))
+const pageBreadcrumbs = computed(() => ([
+  { label: 'ec.menu.name.software' },
+  { label: isEdit.value ? 'ec.software.page.editTitle' : 'ec.software.page.createTitle' },
+]))
 
 const systemTypeOptions = computed(() => ([
   { value: 'EXTERNAL_SERVICE', label: t('ec.software.type.externalService') },
@@ -190,7 +264,10 @@ const formRules = computed(() => ({
   code: [{ required: true, message: t('ec.software.validation.codeRequired'), trigger: 'blur' }],
   name: [{ required: true, message: t('ec.software.validation.nameRequired'), trigger: 'blur' }],
   systemType: [{ required: true, message: t('ec.software.validation.systemTypeRequired'), trigger: 'change' }],
+  versionNo: [{ required: true, message: t('ec.software.validation.versionNoRequired'), trigger: 'blur' }],
   deploymentArchitecture: [{ required: true, message: t('ec.software.validation.deploymentArchitectureRequired'), trigger: 'change' }],
+  ownerPersonId: [{ required: true, message: t('ec.software.validation.ownerRequired'), trigger: 'change' }],
+  contactPhone: [{ required: true, message: t('ec.software.validation.contactPhoneRequired'), trigger: 'blur' }],
 }))
 
 const loadSupportData = async () => {
@@ -288,31 +365,31 @@ onMounted(async () => {
 
 <style lang="scss" scoped>
 .software-page-card {
-  padding: 24px;
-  background: rgba(255, 255, 255, 0.96);
-  border: 1px solid #edf0f6;
-  border-radius: 16px;
-  box-shadow: 0 12px 40px rgba(28, 53, 91, 0.05);
+  padding: 0 4px 0 0;
+  background: transparent;
 }
 
-.software-form-section + .software-form-section {
-  margin-top: 28px;
-}
-
-.software-section-title {
-  color: #151b26;
-  font-size: 16px;
-  font-weight: 700;
-}
-
-.software-form-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 18px 20px;
-  margin-top: 20px;
-
+.software-form {
   :deep(.el-form-item) {
     margin-bottom: 0;
+  }
+
+  :deep(.el-form-item__label) {
+    display: inline-flex;
+    align-items: center;
+    padding-bottom: 8px;
+    color: #444a57;
+    font-size: 14px;
+    line-height: 22px;
+  }
+
+  :deep(.el-form-item__label-wrap) {
+    margin: 0;
+  }
+
+  :deep(.el-form-item.is-required:not(.is-no-asterisk) > .el-form-item__label:before),
+  :deep(.el-form-item.is-required:not(.is-no-asterisk) .el-form-item__label:before) {
+    display: none;
   }
 
   :deep(.el-form-item__content),
@@ -320,6 +397,163 @@ onMounted(async () => {
   :deep(.el-input) {
     width: 100%;
   }
+
+  :deep(.el-input__wrapper),
+  :deep(.el-select__wrapper) {
+    min-height: 40px;
+    padding: 0 14px;
+    background: #f5f6f9;
+    box-shadow: none;
+    border-radius: 4px;
+  }
+
+  :deep(.el-input__wrapper.is-focus),
+  :deep(.el-select__wrapper.is-focused) {
+    background: #fff;
+    box-shadow: 0 0 0 1px #2e5ef0 inset;
+  }
+
+  :deep(.el-input__inner),
+  :deep(.el-select__placeholder),
+  :deep(.el-select__selected-item) {
+    color: #444a57;
+    font-size: 14px;
+    line-height: 22px;
+  }
+
+  :deep(.el-input__inner::placeholder) {
+    color: #b4b9c3;
+  }
+
+  :deep(.el-select__placeholder.is-transparent) {
+    color: #b4b9c3;
+  }
+
+  :deep(.el-form-item.is-error .el-input__wrapper),
+  :deep(.el-form-item.is-error .el-select__wrapper),
+  :deep(.el-form-item.is-error .ec-object-multi-transfer__trigger),
+  :deep(.el-form-item.is-error .ec-object-single-select) {
+    box-shadow: 0 0 0 1px #db4942 inset;
+  }
+
+  :deep(.el-form-item__error) {
+    padding-top: 6px;
+  }
+}
+
+.software-form-section + .software-form-section {
+  margin-top: 44px;
+}
+
+.software-section-title {
+  margin-bottom: 18px;
+  color: #151b26;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 26px;
+}
+
+.software-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px 24px;
+}
+
+.software-form-grid--relation {
+  gap: 24px 24px;
+}
+
+.software-form-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 32px;
+}
+
+.software-form-actions__submit,
+.software-form-actions__cancel {
+  min-width: 68px;
+  height: 32px;
+  padding: 0 16px;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.software-form-actions__submit {
+  border-color: #2e5ef0;
+  background: #2e5ef0;
+}
+
+.software-form-actions__cancel {
+  color: #555d6d;
+  background: #f0f2f5;
+  border-color: #f0f2f5;
+}
+
+.software-form-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.software-form-label__required {
+  color: #db4942;
+  line-height: 1;
+}
+
+.software-form-item--transfer {
+  :deep(.ec-object-multi-transfer__trigger) {
+    min-height: 40px;
+    padding: 6px 14px;
+    background: #f5f6f9;
+    border: 1px solid transparent;
+    border-radius: 4px;
+  }
+
+  :deep(.ec-object-multi-transfer__tag) {
+    height: 28px;
+    padding: 0 10px;
+    color: #555d6d;
+    background: #fff;
+    border: 1px solid #e6e8ed;
+    border-radius: 4px;
+    line-height: 26px;
+  }
+
+  :deep(.ec-object-multi-transfer__placeholder),
+  :deep(.ec-object-multi-transfer__suffix) {
+    color: #b4b9c3;
+    font-size: 14px;
+  }
+
+  :deep(.ec-object-multi-transfer__trigger.is-active) {
+    background: #fff;
+  }
+}
+
+:deep(.ec-object-single-select) {
+  min-height: 40px;
+  padding: 0 14px;
+  background: #f5f6f9;
+  border: 1px solid transparent;
+  border-radius: 4px;
+}
+
+:deep(.ec-object-single-select:hover),
+:deep(.ec-object-single-select.is-active) {
+  background: #fff;
+  border-color: transparent;
+  box-shadow: 0 0 0 1px #2e5ef0 inset;
+}
+
+:deep(.ec-object-single-select__text),
+:deep(.ec-object-single-select__suffix) {
+  font-size: 14px;
+}
+
+:deep(.ec-object-single-select.is-empty .ec-object-single-select__text),
+:deep(.ec-object-single-select__suffix) {
+  color: #b4b9c3;
 }
 
 .is-span-2 {
@@ -327,10 +561,6 @@ onMounted(async () => {
 }
 
 @media only screen and (max-width: 991px) {
-  .software-page-card {
-    padding: 16px;
-  }
-
   .software-form-grid {
     grid-template-columns: 1fr;
   }
@@ -340,3 +570,4 @@ onMounted(async () => {
   }
 }
 </style>
+

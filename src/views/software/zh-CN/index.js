@@ -30,8 +30,8 @@ export default {
   'ec.software.common.deleteFailed': '软件删除失败',
   'ec.software.common.deleteConfirm': '确定删除“{name}”吗？',
 
-  'ec.software.section.basic': '软件基本信息',
-  'ec.software.section.relations': '软件关联信息',
+  'ec.software.section.basic': '基本信息',
+  'ec.software.section.relations': '关联信息',
 
   'ec.software.page.createTitle': '新增软件',
   'ec.software.page.createDescription': '按新版正式入口录入软件基础信息，并同步维护关联人员、服务商和硬件。',
@@ -76,7 +76,10 @@ export default {
   'ec.software.validation.codeRequired': '请输入软件编码',
   'ec.software.validation.nameRequired': '请输入软件名称',
   'ec.software.validation.systemTypeRequired': '请选择软件类型',
+  'ec.software.validation.versionNoRequired': '请输入版本号',
   'ec.software.validation.deploymentArchitectureRequired': '请选择部署架构',
+  'ec.software.validation.ownerRequired': '请选择负责人',
+  'ec.software.validation.contactPhoneRequired': '请输入联系电话',
   'ec.software.validation.statusRequired': '请选择软件状态',
 
   'ec.software.detail.title': '软件详情',

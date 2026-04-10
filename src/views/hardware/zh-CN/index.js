@@ -1,6 +1,6 @@
 export default {
   'ec.menu.name.hardware': '硬件资源',
-  'ec.menu.name.hardwareAssets': '硬件台账',
+  'ec.menu.name.hardwareAssets': '硬件资源',
 
   'ec.hardware.common.code': '资产编码',
   'ec.hardware.common.name': '资产名称',
@@ -225,7 +225,7 @@ export default {
   'ec.hardware.validation.statusRequired': '请选择当前状态',
 
   'ec.hardware.detail.persons': '关联人员',
-  'ec.hardware.detail.softwareAssets': '关联软件',
+  'ec.hardware.detail.softwareAssets': '软件',
   'ec.hardware.detail.projects': '关联项目',
   'ec.hardware.detail.serviceProviders': '关联服务商',
 

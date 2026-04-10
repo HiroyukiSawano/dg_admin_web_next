@@ -1,60 +1,126 @@
 <template>
   <figma-resource-page
-    hide-tabs
-    :title="pageTitle"
-    :description="pageDescription"
+    active-tab="hardwareAssets"
+    :breadcrumbs="pageBreadcrumbs"
+    back-text="返回"
     back-path="/hardware/hardwareAssets"
   >
-    <template #actions>
-      <el-button @click="router.push('/hardware/hardwareAssets')">
-        {{ t('ec.global.button.text.cancel') }}
-      </el-button>
-      <el-button type="primary" :loading="submitLoading" @click="handleSubmit">
-        {{ t('ec.global.button.text.submit') }}
-      </el-button>
-    </template>
-
     <div v-loading="pageLoading" class="hardware-page-card">
-      <el-form ref="formRef" :model="formData" :rules="formRules" label-position="top">
+      <el-form
+        ref="formRef"
+        :model="formData"
+        :rules="formRules"
+        label-position="top"
+        class="hardware-form"
+      >
         <section class="hardware-form-section">
           <div class="hardware-section-title">{{ t('ec.hardware.section.basic') }}</div>
           <div class="hardware-form-grid">
-            <el-form-item :label="t('ec.hardware.common.assetCode')" prop="assetCode">
+            <el-form-item prop="assetCode">
+              <template #label>
+                <span class="hardware-form-label">
+                  {{ t('ec.hardware.common.assetCode') }}
+                  <span class="hardware-form-label__required">*</span>
+                </span>
+              </template>
               <el-input v-model="formData.assetCode" clearable :placeholder="t('ec.hardware.form.assetCodePlaceholder')" />
             </el-form-item>
-            <el-form-item :label="t('ec.hardware.common.hardwareIp')" prop="hardwareIp">
+            
+            <el-form-item prop="hardwareIp">
+              <template #label>
+                <span class="hardware-form-label">
+                  {{ t('ec.hardware.common.hardwareIp') }}
+                  <span class="hardware-form-label__required">*</span>
+                </span>
+              </template>
               <el-input v-model="formData.hardwareIp" clearable :placeholder="t('ec.hardware.form.hardwareIpPlaceholder')" />
             </el-form-item>
-            <el-form-item :label="t('ec.hardware.common.assetName')" prop="assetName">
+            
+            <el-form-item prop="assetName">
+              <template #label>
+                <span class="hardware-form-label">
+                  {{ t('ec.hardware.common.assetName') }}
+                  <span class="hardware-form-label__required">*</span>
+                </span>
+              </template>
               <el-input v-model="formData.assetName" clearable :placeholder="t('ec.hardware.form.assetNamePlaceholder')" />
             </el-form-item>
-            <el-form-item :label="t('ec.hardware.common.hardwareModel')" prop="hardwareModel">
-              <el-input
-                v-model="formData.hardwareModel"
-                clearable
-                :placeholder="t('ec.hardware.form.hardwareModelPlaceholder')"
-              />
-            </el-form-item>
-            <el-form-item :label="t('ec.hardware.common.hardwareBrand')" prop="hardwareBrand">
+            
+            <el-form-item prop="hardwareBrand">
+              <template #label>
+                <span class="hardware-form-label">
+                  {{ t('ec.hardware.common.hardwareBrand') }}
+                  <span class="hardware-form-label__required">*</span>
+                </span>
+              </template>
               <el-input
                 v-model="formData.hardwareBrand"
                 clearable
                 :placeholder="t('ec.hardware.form.hardwareBrandPlaceholder')"
               />
             </el-form-item>
-            <el-form-item :label="t('ec.hardware.common.hardwareType')" prop="hardwareType">
-              <el-select v-model="formData.hardwareType" :placeholder="t('ec.hardware.form.hardwareTypePlaceholder')">
-                <el-option v-for="item in hardwareTypeOptions" :key="item.value" :label="item.label" :value="item.value" />
-              </el-select>
+            
+            <el-form-item prop="hardwareModel">
+              <template #label>
+                <span class="hardware-form-label">
+                  {{ t('ec.hardware.common.hardwareModel') }}
+                  <span class="hardware-form-label__required">*</span>
+                </span>
+              </template>
+              <el-input
+                v-model="formData.hardwareModel"
+                clearable
+                :placeholder="t('ec.hardware.form.hardwareModelPlaceholder')"
+              />
             </el-form-item>
-            <el-form-item :label="t('ec.hardware.common.physicalLocation')" prop="physicalLocation">
+            
+            <el-form-item prop="physicalLocation">
+              <template #label>
+                <span class="hardware-form-label">
+                  {{ t('ec.hardware.common.physicalLocation') }}
+                  <span class="hardware-form-label__required">*</span>
+                </span>
+              </template>
               <el-input
                 v-model="formData.physicalLocation"
                 clearable
                 :placeholder="t('ec.hardware.form.physicalLocationPlaceholder')"
               />
             </el-form-item>
-            <el-form-item :label="t('ec.hardware.common.networkEnvironment')" prop="networkEnvironment">
+
+            <el-form-item prop="hardwareType">
+              <template #label>
+                <span class="hardware-form-label">
+                  {{ t('ec.hardware.common.hardwareType') }}
+                  <span class="hardware-form-label__required">*</span>
+                </span>
+              </template>
+              <el-select v-model="formData.hardwareType" clearable :placeholder="t('ec.hardware.form.hardwareTypePlaceholder')">
+                <el-option v-for="item in hardwareTypeOptions" :key="item.value" :label="item.label" :value="item.value" />
+              </el-select>
+            </el-form-item>
+            
+            <el-form-item prop="operatingSystem">
+              <template #label>
+                <span class="hardware-form-label">
+                  {{ t('ec.hardware.common.operatingSystem') }}
+                  <span class="hardware-form-label__required">*</span>
+                </span>
+              </template>
+              <el-input
+                v-model="formData.operatingSystem"
+                clearable
+                :placeholder="t('ec.hardware.form.operatingSystemPlaceholder')"
+              />
+            </el-form-item>
+            
+            <el-form-item prop="networkEnvironment">
+              <template #label>
+                <span class="hardware-form-label">
+                  {{ t('ec.hardware.common.networkEnvironment') }}
+                  <span class="hardware-form-label__required">*</span>
+                </span>
+              </template>
               <el-select
                 v-model="formData.networkEnvironment"
                 clearable
@@ -68,39 +134,61 @@
                 />
               </el-select>
             </el-form-item>
-            <el-form-item :label="t('ec.hardware.common.operatingSystem')" prop="operatingSystem">
-              <el-input
-                v-model="formData.operatingSystem"
-                clearable
-                :placeholder="t('ec.hardware.form.operatingSystemPlaceholder')"
-              />
-            </el-form-item>
-            <el-form-item :label="t('ec.hardware.common.status')" prop="hardwareStatus">
-              <el-select v-model="formData.hardwareStatus" :placeholder="t('ec.hardware.form.statusPlaceholder')">
-                <el-option v-for="item in hardwareStatusOptions" :key="item.value" :label="item.label" :value="item.value" />
-              </el-select>
-            </el-form-item>
-            <el-form-item :label="t('ec.hardware.common.purchaseDate')" prop="purchaseDate">
+            
+            <el-form-item prop="purchaseDate">
+              <template #label>
+                <span class="hardware-form-label">
+                  {{ t('ec.hardware.common.purchaseDate') }}
+                  <span class="hardware-form-label__required">*</span>
+                </span>
+              </template>
               <el-date-picker
                 v-model="formData.purchaseDate"
                 type="date"
                 value-format="YYYY-MM-DD"
                 class="hardware-date-picker"
+                clearable
                 :placeholder="t('ec.hardware.form.purchaseDatePlaceholder')"
               />
             </el-form-item>
-            <el-form-item :label="t('ec.hardware.common.owner')" prop="ownerName">
-              <el-input
-                v-model="formData.ownerName"
-                clearable
-                :placeholder="t('ec.hardware.form.ownerPlaceholder')"
-              />
+            
+            <el-form-item prop="hardwareStatus">
+              <template #label>
+                <span class="hardware-form-label">
+                  {{ t('ec.hardware.common.status') }}
+                  <span class="hardware-form-label__required">*</span>
+                </span>
+              </template>
+              <el-select v-model="formData.hardwareStatus" clearable :placeholder="t('ec.hardware.form.statusPlaceholder')">
+                <el-option v-for="item in hardwareStatusOptions" :key="item.value" :label="item.label" :value="item.value" />
+              </el-select>
             </el-form-item>
-            <el-form-item :label="t('ec.hardware.common.contactPhone')" prop="contactPhone" class="is-span-2">
+            
+            <el-form-item prop="contactPhone">
+              <template #label>
+                <span class="hardware-form-label">
+                  {{ t('ec.hardware.common.contactPhone') }}
+                  <span class="hardware-form-label__required">*</span>
+                </span>
+              </template>
               <el-input
                 v-model="formData.contactPhone"
                 clearable
                 :placeholder="t('ec.hardware.form.contactPhonePlaceholder')"
+              />
+            </el-form-item>
+            
+            <el-form-item prop="ownerName">
+              <template #label>
+                <span class="hardware-form-label">
+                  {{ t('ec.hardware.common.owner') }}
+                  <span class="hardware-form-label__required">*</span>
+                </span>
+              </template>
+              <el-input
+                v-model="formData.ownerName"
+                clearable
+                :placeholder="t('ec.hardware.form.ownerPlaceholder')"
               />
             </el-form-item>
           </div>
@@ -108,8 +196,13 @@
 
         <section class="hardware-form-section">
           <div class="hardware-section-title">{{ t('ec.hardware.section.relations') }}</div>
-          <div class="hardware-form-grid">
-            <el-form-item :label="t('ec.hardware.detail.persons')" class="is-span-2">
+          <div class="hardware-form-grid hardware-form-grid--relation">
+            <el-form-item class="hardware-form-item--transfer is-span-2">
+              <template #label>
+                <span class="hardware-form-label">
+                  {{ t('ec.hardware.detail.persons') }}
+                </span>
+              </template>
               <ec-object-multi-transfer
                 v-model="formData.personIds"
                 :placeholder="t('ec.hardware.relation.personsPlaceholder')"
@@ -122,7 +215,13 @@
                 subtitle-key="employeeNo"
               />
             </el-form-item>
-            <el-form-item :label="t('ec.hardware.detail.serviceProviders')">
+            
+            <el-form-item class="hardware-form-item--transfer">
+              <template #label>
+                <span class="hardware-form-label">
+                  {{ t('ec.hardware.detail.serviceProviders') }}
+                </span>
+              </template>
               <ec-object-multi-transfer
                 v-model="formData.serviceProviderIds"
                 :placeholder="t('ec.hardware.relation.serviceProvidersPlaceholder')"
@@ -135,7 +234,13 @@
                 subtitle-key="code"
               />
             </el-form-item>
-            <el-form-item :label="t('ec.hardware.detail.softwareAssets')">
+            
+            <el-form-item class="hardware-form-item--transfer">
+              <template #label>
+                <span class="hardware-form-label">
+                  {{ t('ec.hardware.detail.softwareAssets') }}
+                </span>
+              </template>
               <ec-object-multi-transfer
                 v-model="formData.informationSystemIds"
                 :placeholder="t('ec.hardware.relation.softwareAssetsPlaceholder')"
@@ -148,21 +253,17 @@
                 subtitle-key="code"
               />
             </el-form-item>
-            <el-form-item :label="t('ec.hardware.detail.projects')" class="is-span-2">
-              <ec-object-multi-transfer
-                v-model="formData.projectIds"
-                :placeholder="t('ec.hardware.relation.projectsPlaceholder')"
-                :title="`${t('ec.hardware.detail.projects')}${t('ec.organization.selector.titleSuffix')}`"
-                :selected-title="t('ec.organization.selector.selected')"
-                :search-placeholder="t('ec.organization.selector.searchPlaceholder')"
-                :options="projectOptions"
-                label-key="name"
-                value-key="id"
-                subtitle-key="code"
-              />
-            </el-form-item>
           </div>
         </section>
+        
+        <div class="hardware-form-actions">
+          <el-button type="primary" :loading="submitLoading" class="hardware-form-actions__submit" @click="handleSubmit">
+            确认
+          </el-button>
+          <el-button class="hardware-form-actions__cancel" @click="router.push('/hardware/hardwareAssets')">
+            取消
+          </el-button>
+        </div>
       </el-form>
     </div>
   </figma-resource-page>
@@ -223,8 +324,10 @@ const formData = reactive({
 })
 
 const isEdit = computed(() => Boolean(route.params.id))
-const pageTitle = computed(() => (isEdit.value ? t('ec.hardware.page.editTitle') : t('ec.hardware.page.createTitle')))
-const pageDescription = computed(() => (isEdit.value ? t('ec.hardware.page.editDescription') : t('ec.hardware.page.createDescription')))
+const pageBreadcrumbs = computed(() => ([
+  { label: 'ec.menu.name.hardwareAssets' },
+  { label: isEdit.value ? 'ec.hardware.page.editTitle' : 'ec.hardware.page.createTitle' },
+]))
 
 const hardwareTypeOptions = computed(() => ([
   { value: 'SERVER', label: t('ec.hardware.type.server') },
@@ -338,7 +441,7 @@ const handleSubmit = async () => {
       personIds: formData.personIds,
       serviceProviderIds: formData.serviceProviderIds,
       informationSystemIds: formData.informationSystemIds,
-      projectIds: formData.projectIds,
+      projectIds: formData.projectIds, // Keeps projects when relations sync runs
     })
 
     ElMessage.success(t('ec.hardware.common.saveSuccess'))
@@ -365,31 +468,31 @@ onMounted(async () => {
 
 <style lang="scss" scoped>
 .hardware-page-card {
-  padding: 24px;
-  background: rgba(255, 255, 255, 0.96);
-  border: 1px solid #edf0f6;
-  border-radius: 16px;
-  box-shadow: 0 12px 40px rgba(28, 53, 91, 0.05);
+  padding: 0 4px 0 0;
+  background: transparent;
 }
 
-.hardware-form-section + .hardware-form-section {
-  margin-top: 28px;
-}
-
-.hardware-section-title {
-  color: #151b26;
-  font-size: 16px;
-  font-weight: 700;
-}
-
-.hardware-form-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 18px 20px;
-  margin-top: 20px;
-
+.hardware-form {
   :deep(.el-form-item) {
     margin-bottom: 0;
+  }
+
+  :deep(.el-form-item__label) {
+    display: inline-flex;
+    align-items: center;
+    padding-bottom: 8px;
+    color: #444a57;
+    font-size: 14px;
+    line-height: 22px;
+  }
+
+  :deep(.el-form-item__label-wrap) {
+    margin: 0;
+  }
+
+  :deep(.el-form-item.is-required:not(.is-no-asterisk) > .el-form-item__label:before),
+  :deep(.el-form-item.is-required:not(.is-no-asterisk) .el-form-item__label:before) {
+    display: none;
   }
 
   :deep(.el-form-item__content),
@@ -398,17 +501,144 @@ onMounted(async () => {
   :deep(.hardware-date-picker) {
     width: 100%;
   }
+
+  :deep(.el-input__wrapper),
+  :deep(.el-select__wrapper) {
+    min-height: 40px;
+    padding: 0 14px;
+    background: #f5f6f9;
+    box-shadow: none;
+    border-radius: 4px;
+  }
+
+  :deep(.el-input__wrapper.is-focus),
+  :deep(.el-select__wrapper.is-focused) {
+    background: #fff;
+    box-shadow: 0 0 0 1px #2e5ef0 inset;
+  }
+
+  :deep(.el-input__inner),
+  :deep(.el-select__placeholder),
+  :deep(.el-select__selected-item) {
+    color: #444a57;
+    font-size: 14px;
+    line-height: 22px;
+  }
+
+  :deep(.el-input__inner::placeholder) {
+    color: #b4b9c3;
+  }
+
+  :deep(.el-select__placeholder.is-transparent) {
+    color: #b4b9c3;
+  }
+
+  :deep(.el-form-item.is-error .el-input__wrapper),
+  :deep(.el-form-item.is-error .el-select__wrapper),
+  :deep(.el-form-item.is-error .ec-object-multi-transfer__trigger) {
+    box-shadow: 0 0 0 1px #db4942 inset;
+  }
+
+  :deep(.el-form-item__error) {
+    padding-top: 6px;
+  }
+}
+
+.hardware-form-section + .hardware-form-section {
+  margin-top: 44px;
+}
+
+.hardware-section-title {
+  margin-bottom: 18px;
+  color: #151b26;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 26px;
+}
+
+.hardware-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px 24px;
+}
+
+.hardware-form-grid--relation {
+  gap: 24px 24px;
+}
+
+.hardware-form-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 32px;
+}
+
+.hardware-form-actions__submit,
+.hardware-form-actions__cancel {
+  min-width: 68px;
+  height: 32px;
+  padding: 0 16px;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.hardware-form-actions__submit {
+  border-color: #2e5ef0;
+  background: #2e5ef0;
+}
+
+.hardware-form-actions__cancel {
+  color: #555d6d;
+  background: #f0f2f5;
+  border-color: #f0f2f5;
+}
+
+.hardware-form-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.hardware-form-label__required {
+  color: #db4942;
+  line-height: 1;
 }
 
 .is-span-2 {
   grid-column: 1 / -1;
 }
 
-@media only screen and (max-width: 991px) {
-  .hardware-page-card {
-    padding: 16px;
+.hardware-form-item--transfer {
+  :deep(.ec-object-multi-transfer__trigger) {
+    min-height: 40px;
+    padding: 6px 14px;
+    background: #f5f6f9;
+    border: 1px solid transparent;
+    border-radius: 4px;
   }
 
+  :deep(.ec-object-multi-transfer__tag) {
+    height: 28px;
+    padding: 0 10px;
+    color: #555d6d;
+    background: #fff;
+    border: 1px solid #e6e8ed;
+    border-radius: 4px;
+    line-height: 26px;
+  }
+
+  :deep(.ec-object-multi-transfer__placeholder),
+  :deep(.ec-object-multi-transfer__suffix) {
+    color: #b4b9c3;
+    font-size: 14px;
+  }
+
+  :deep(.ec-object-multi-transfer__trigger.is-active) {
+    background: #fff;
+  }
+}
+
+@media only screen and (max-width: 991px) {
   .hardware-form-grid {
     grid-template-columns: 1fr;
   }
