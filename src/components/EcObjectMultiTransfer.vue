@@ -10,14 +10,19 @@
     >
       <div v-if="selectedOptions.length > 0" class="ec-object-multi-transfer__summary">
         <span
-          v-for="item in summaryOptions"
+          v-for="item in selectedOptions"
           :key="item[valueKey]"
           class="ec-object-multi-transfer__tag"
         >
           {{ item[labelKey] || '-' }}
-        </span>
-        <span v-if="selectedOptions.length > summaryLimit" class="ec-object-multi-transfer__summary-text">
-          +{{ selectedOptions.length - summaryLimit }}
+          <button
+            v-if="!disabled"
+            type="button"
+            class="ec-object-multi-transfer__tag-remove"
+            @click.stop="handleRemoveSelected(item[valueKey])"
+          >
+            <i class="ri-close-line"></i>
+          </button>
         </span>
       </div>
       <span v-else class="ec-object-multi-transfer__placeholder">{{ placeholder }}</span>
@@ -203,10 +208,6 @@ const props = defineProps({
     type: Boolean,
     default: true,
   },
-  summaryLimit: {
-    type: Number,
-    default: 2,
-  },
   emptyText: {
     type: String,
     default: '',
@@ -232,7 +233,6 @@ const selectedOptions = computed(() => {
     .map((value) => optionMap.value.get(value))
     .filter(Boolean)
 })
-const summaryOptions = computed(() => selectedOptions.value.slice(0, props.summaryLimit))
 const availableOptions = computed(() => {
   const selectedSet = new Set(draftSelectedValues.value)
   return normalizedOptions.value.filter((item) => !selectedSet.has(item?.[props.valueKey]))
@@ -322,6 +322,12 @@ const handleClear = () => {
   emit('change', [])
 }
 
+const handleRemoveSelected = (value) => {
+  const nextValue = normalizeIds(props.modelValue).filter((item) => item !== value)
+  emit('update:modelValue', nextValue)
+  emit('change', nextValue)
+}
+
 const resetDraftState = () => {
   syncDraftFromModel()
 }
@@ -344,7 +350,7 @@ watch(
 
 .ec-object-multi-transfer__trigger {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   width: 100%;
   min-height: 40px;
   padding: 6px 12px;
@@ -376,20 +382,22 @@ watch(
   flex-wrap: wrap;
   gap: 6px;
   min-width: 0;
+  padding: 1px 0;
 }
 
-.ec-object-multi-transfer__tag,
-.ec-object-multi-transfer__summary-text {
+.ec-object-multi-transfer__tag {
   display: inline-flex;
   align-items: center;
+  gap: 6px;
   max-width: 100%;
   padding: 4px 8px;
   overflow: hidden;
   color: #4a5365;
   white-space: nowrap;
   text-overflow: ellipsis;
-  background: #f3f5fb;
-  border-radius: 8px;
+  background: #fff;
+  border: 1px solid #e6e8ed;
+  border-radius: 4px;
 }
 
 .ec-object-multi-transfer__placeholder {
@@ -398,6 +406,7 @@ watch(
   color: var(--el-text-color-placeholder);
   white-space: nowrap;
   text-overflow: ellipsis;
+  line-height: 28px;
 }
 
 .ec-object-multi-transfer__suffix {
@@ -406,7 +415,27 @@ watch(
   gap: 6px;
   align-items: center;
   margin-left: 12px;
+  min-height: 28px;
   color: var(--el-text-color-placeholder);
+}
+
+.ec-object-multi-transfer__tag-remove {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  height: 14px;
+  padding: 0;
+  color: #8c93a6;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 12px;
+  line-height: 1;
+}
+
+.ec-object-multi-transfer__tag-remove:hover {
+  color: #606266;
 }
 
 .ec-object-multi-transfer__clear,

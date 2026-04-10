@@ -1,74 +1,143 @@
 <template>
   <figma-resource-page
     active-tab="serviceProviders"
-    :title="pageTitle"
-    :description="pageDescription"
+    :breadcrumbs="pageBreadcrumbs"
+    back-text="返回"
     back-path="/organization/service-providers"
   >
-    <template #actions>
-      <el-button @click="router.push('/organization/service-providers')">
-        {{ t('ec.global.button.text.cancel') }}
-      </el-button>
-      <el-button type="primary" :loading="submitLoading" @click="handleSubmit">
-        {{ t('ec.global.button.text.submit') }}
-      </el-button>
-    </template>
-
     <div v-loading="pageLoading" class="organization-page-card">
-      <el-form ref="formRef" :model="formData" :rules="formRules" label-position="top">
+      <el-form
+        ref="formRef"
+        :model="formData"
+        :rules="formRules"
+        label-position="top"
+        class="organization-provider-form"
+      >
         <section class="organization-form-section">
           <div class="organization-section-title">{{ t('ec.organization.serviceProvider.section.basicInfo') }}</div>
-          <div class="organization-form-grid">
-            <el-form-item :label="t('ec.organization.common.code')" prop="code">
+
+          <div class="organization-form-grid organization-form-grid--basic">
+            <el-form-item prop="code">
+              <template #label>
+                <span class="organization-form-label">
+                  {{ t('ec.organization.serviceProvider.form.codeLabel') }}
+                  <span class="organization-form-label__required">*</span>
+                </span>
+              </template>
               <el-input v-model="formData.code" clearable :placeholder="t('ec.organization.serviceProvider.form.codePlaceholder')" />
             </el-form-item>
-            <el-form-item :label="t('ec.organization.common.name')" prop="name">
+            <el-form-item prop="name">
+              <template #label>
+                <span class="organization-form-label">
+                  {{ t('ec.organization.serviceProvider.form.nameLabel') }}
+                  <span class="organization-form-label__required">*</span>
+                </span>
+              </template>
               <el-input v-model="formData.name" clearable :placeholder="t('ec.organization.serviceProvider.form.namePlaceholder')" />
             </el-form-item>
 
-            <el-form-item :label="t('ec.organization.serviceProvider.table.unifiedSocialCreditCode')">
+            <el-form-item prop="unifiedSocialCreditCode">
+              <template #label>
+                <span class="organization-form-label">
+                  {{ t('ec.organization.serviceProvider.form.unifiedSocialCreditCode') }}
+                  <span class="organization-form-label__required">*</span>
+                </span>
+              </template>
               <el-input
                 v-model="formData.unifiedSocialCreditCode"
                 clearable
                 :placeholder="t('ec.organization.serviceProvider.form.unifiedSocialCreditCodePlaceholder')"
               />
             </el-form-item>
-            <el-form-item :label="t('ec.organization.serviceProvider.form.shortName')">
+            <el-form-item prop="shortName">
+              <template #label>
+                <span class="organization-form-label">
+                  {{ t('ec.organization.serviceProvider.form.shortName') }}
+                  <span class="organization-form-label__required">*</span>
+                </span>
+              </template>
               <el-input v-model="formData.shortName" clearable :placeholder="t('ec.organization.serviceProvider.form.shortNamePlaceholder')" />
             </el-form-item>
 
-            <el-form-item :label="t('ec.organization.serviceProvider.form.enterpriseNature')">
+            <el-form-item prop="enterpriseNature">
+              <template #label>
+                <span class="organization-form-label">
+                  {{ t('ec.organization.serviceProvider.form.enterpriseNature') }}
+                  <span class="organization-form-label__required">*</span>
+                </span>
+              </template>
               <el-select v-model="formData.enterpriseNature" clearable :placeholder="t('ec.organization.serviceProvider.form.enterpriseNaturePlaceholder')">
                 <el-option v-for="item in enterpriseNatureOptions" :key="item.value" :label="item.label" :value="item.value" />
               </el-select>
             </el-form-item>
-            <el-form-item :label="t('ec.organization.serviceProvider.table.cooperationScopes')" prop="cooperationScopes">
-              <el-select
+            <el-form-item prop="cooperationScopes" class="organization-form-item--transfer">
+              <template #label>
+                <span class="organization-form-label">
+                  {{ t('ec.organization.serviceProvider.table.cooperationScopes') }}
+                  <span class="organization-form-label__required">*</span>
+                </span>
+              </template>
+              <ec-object-multi-transfer
                 v-model="formData.cooperationScopes"
-                multiple
-                filterable
-                collapse-tags
-                collapse-tags-tooltip
                 :placeholder="t('ec.organization.serviceProvider.form.cooperationScopePlaceholder')"
-              >
-                <el-option v-for="item in cooperationScopeOptions" :key="item.value" :label="item.label" :value="item.value" />
-              </el-select>
+                :title="`${t('ec.organization.serviceProvider.table.cooperationScopes')}${t('ec.organization.selector.titleSuffix')}`"
+                :selected-title="t('ec.organization.selector.selected')"
+                :search-placeholder="t('ec.organization.selector.searchPlaceholder')"
+                :options="cooperationScopeOptions"
+                label-key="label"
+                value-key="value"
+              />
             </el-form-item>
 
-            <el-form-item :label="t('ec.organization.serviceProvider.form.vendorLevel')">
+            <el-form-item prop="vendorLevel">
+              <template #label>
+                <span class="organization-form-label">
+                  {{ t('ec.organization.serviceProvider.form.vendorLevel') }}
+                  <span class="organization-form-label__required">*</span>
+                </span>
+              </template>
               <el-select v-model="formData.vendorLevel" clearable :placeholder="t('ec.organization.serviceProvider.form.vendorLevelPlaceholder')">
                 <el-option v-for="item in vendorLevelOptions" :key="item.value" :label="item.label" :value="item.value" />
               </el-select>
             </el-form-item>
-            <el-form-item :label="t('ec.organization.serviceProvider.form.businessContact')">
+            <el-form-item prop="businessContact">
+              <template #label>
+                <span class="organization-form-label">
+                  {{ t('ec.organization.serviceProvider.form.businessContact') }}
+                  <span class="organization-form-label__required">*</span>
+                </span>
+              </template>
               <el-input v-model="formData.businessContact" clearable :placeholder="t('ec.organization.serviceProvider.form.businessContactPlaceholder')" />
             </el-form-item>
 
-            <el-form-item :label="t('ec.organization.serviceProvider.form.businessPhone')" class="is-span-2">
+            <el-form-item prop="businessPhone">
+              <template #label>
+                <span class="organization-form-label">
+                  {{ t('ec.organization.serviceProvider.form.businessPhone') }}
+                  <span class="organization-form-label__required">*</span>
+                </span>
+              </template>
               <el-input v-model="formData.businessPhone" clearable :placeholder="t('ec.organization.serviceProvider.form.businessPhonePlaceholder')" />
             </el-form-item>
+            <el-form-item :label="t('ec.organization.serviceProvider.form.score')">
+              <div class="organization-score-field" role="radiogroup" :aria-label="t('ec.organization.serviceProvider.form.score')">
+                <button
+                  v-for="index in 5"
+                  :key="index"
+                  type="button"
+                  class="organization-score-field__star"
+                  :class="{ 'is-active': index <= formData.score }"
+                  :aria-checked="index === formData.score"
+                  @click="setScore(index)"
+                >
+                  <i :class="index <= formData.score ? 'ri-star-fill' : 'ri-star-line'"></i>
+                </button>
+              </div>
+            </el-form-item>
+          </div>
 
-            <el-form-item :label="t('ec.organization.serviceProvider.form.logoUrl')" class="is-span-2">
+          <div class="organization-form-grid organization-form-grid--support">
+            <el-form-item :label="t('ec.organization.serviceProvider.form.logoUrl')" class="organization-form-item--logo">
               <div class="organization-logo-field">
                 <el-upload
                   class="organization-logo-upload__control"
@@ -98,20 +167,14 @@
                 </el-button>
               </div>
             </el-form-item>
-
-            <el-form-item :label="t('ec.organization.serviceProvider.table.score')" class="is-span-2">
-              <div class="organization-score-field">
-                <el-rate v-model="formData.score" :max="5" />
-                <span class="organization-score-field__value">{{ formData.score || 0 }}</span>
-              </div>
-            </el-form-item>
+            <div class="organization-form-placeholder" aria-hidden="true"></div>
           </div>
         </section>
 
         <section class="organization-form-section">
           <div class="organization-section-title">{{ t('ec.organization.serviceProvider.section.relationInfo') }}</div>
-          <div class="organization-form-grid">
-            <el-form-item :label="t('ec.organization.serviceProvider.relations.persons')" class="is-span-2">
+          <div class="organization-form-grid organization-form-grid--relation">
+            <el-form-item :label="t('ec.organization.serviceProvider.relations.persons')" class="is-span-2 organization-form-item--transfer">
               <ec-object-multi-transfer
                 v-model="formData.personIds"
                 :placeholder="t('ec.organization.serviceProvider.relation.personsPlaceholder')"
@@ -119,12 +182,13 @@
                 :selected-title="t('ec.organization.selector.selected')"
                 :search-placeholder="t('ec.organization.selector.searchPlaceholder')"
                 :options="personOptions"
-                label-key="displayLabel"
+                label-key="summaryLabel"
                 value-key="id"
+                subtitle-key="subtitle"
               />
             </el-form-item>
 
-            <el-form-item :label="t('ec.organization.serviceProvider.relations.softwareAssets')">
+            <el-form-item :label="t('ec.organization.serviceProvider.relations.softwareAssets')" class="organization-form-item--transfer">
               <ec-object-multi-transfer
                 v-model="formData.informationSystemIds"
                 :placeholder="t('ec.organization.serviceProvider.relation.informationSystemsPlaceholder')"
@@ -132,12 +196,13 @@
                 :selected-title="t('ec.organization.selector.selected')"
                 :search-placeholder="t('ec.organization.selector.searchPlaceholder')"
                 :options="informationSystemOptions"
-                label-key="displayLabel"
+                label-key="summaryLabel"
                 value-key="id"
+                subtitle-key="subtitle"
               />
             </el-form-item>
 
-            <el-form-item :label="t('ec.organization.serviceProvider.relations.hardwareAssets')">
+            <el-form-item :label="t('ec.organization.serviceProvider.relations.hardwareAssets')" class="organization-form-item--transfer">
               <ec-object-multi-transfer
                 v-model="formData.hardwareAssetIds"
                 :placeholder="t('ec.organization.serviceProvider.relation.hardwareAssetsPlaceholder')"
@@ -145,12 +210,22 @@
                 :selected-title="t('ec.organization.selector.selected')"
                 :search-placeholder="t('ec.organization.selector.searchPlaceholder')"
                 :options="hardwareOptions"
-                label-key="displayLabel"
+                label-key="summaryLabel"
                 value-key="id"
+                subtitle-key="subtitle"
               />
             </el-form-item>
           </div>
         </section>
+
+        <div class="organization-form-actions">
+          <el-button type="primary" :loading="submitLoading" class="organization-form-actions__submit" @click="handleSubmit">
+            {{ t('ec.global.button.text.confirm') }}
+          </el-button>
+          <el-button class="organization-form-actions__cancel" @click="router.push('/organization/service-providers')">
+            {{ t('ec.global.button.text.cancel') }}
+          </el-button>
+        </div>
       </el-form>
     </div>
   </figma-resource-page>
@@ -201,7 +276,7 @@ const formData = reactive({
   enterpriseNature: '',
   cooperationScopes: [],
   vendorLevel: '',
-  score: 0,
+  score: 3,
   businessContact: '',
   businessPhone: '',
   status: '',
@@ -213,14 +288,10 @@ const formData = reactive({
 
 const isEdit = computed(() => Boolean(route.params.id))
 const currentServiceProviderId = computed(() => route.params.id ?? null)
-
-const pageTitle = computed(() => {
-  return isEdit.value ? t('ec.organization.serviceProvider.page.editTitle') : t('ec.organization.serviceProvider.page.createTitle')
-})
-
-const pageDescription = computed(() => {
-  return isEdit.value ? t('ec.organization.serviceProvider.page.editDescription') : t('ec.organization.serviceProvider.page.createDescription')
-})
+const pageBreadcrumbs = computed(() => ([
+  { label: 'ec.organization.figma.tab.serviceProviders' },
+  { label: isEdit.value ? 'ec.organization.serviceProvider.page.editTitle' : 'ec.organization.serviceProvider.page.createTitle' },
+]))
 
 const enterpriseNatureOptions = computed(() => ([
   { value: 'CENTRAL_STATE_OWNED', label: t('ec.organization.serviceProvider.enterpriseNature.centralStateOwned') },
@@ -249,12 +320,14 @@ const serviceProviderStatusOptions = computed(() => {
 const formRules = computed(() => ({
   code: [{ required: true, message: t('ec.organization.serviceProvider.validation.codeRequired'), trigger: 'blur' }],
   name: [{ required: true, message: t('ec.organization.serviceProvider.validation.nameRequired'), trigger: 'blur' }],
+  unifiedSocialCreditCode: [{ required: true, message: t('ec.organization.serviceProvider.validation.unifiedSocialCreditCodeRequired'), trigger: 'blur' }],
+  shortName: [{ required: true, message: t('ec.organization.serviceProvider.validation.shortNameRequired'), trigger: 'blur' }],
+  enterpriseNature: [{ required: true, message: t('ec.organization.serviceProvider.validation.enterpriseNatureRequired'), trigger: 'change' }],
   cooperationScopes: [{ required: true, message: t('ec.organization.serviceProvider.validation.cooperationScopesRequired'), trigger: 'change' }],
+  vendorLevel: [{ required: true, message: t('ec.organization.serviceProvider.validation.vendorLevelRequired'), trigger: 'change' }],
+  businessContact: [{ required: true, message: t('ec.organization.serviceProvider.validation.businessContactRequired'), trigger: 'blur' }],
+  businessPhone: [{ required: true, message: t('ec.organization.serviceProvider.validation.businessPhoneRequired'), trigger: 'blur' }],
 }))
-
-const buildDisplayLabel = (primary, secondary) => {
-  return [primary, secondary].filter(Boolean).join(' / ') || '-'
-}
 
 const normalizeIds = (value) => {
   return Array.isArray(value) ? value : []
@@ -289,7 +362,7 @@ const fillForm = (data = {}, detail = {}) => {
   formData.enterpriseNature = data.enterpriseNature || ''
   formData.cooperationScopes = Array.isArray(data.cooperationScopes) ? data.cooperationScopes : []
   formData.vendorLevel = data.vendorLevel || ''
-  formData.score = Number(data.score || 0)
+  formData.score = Number.isFinite(Number(data.score)) ? Number(data.score) : 3
   formData.businessContact = data.businessContact || ''
   formData.businessPhone = data.businessPhone || ''
   formData.status = data.status || formData.status
@@ -318,15 +391,18 @@ const loadSupportOptions = async () => {
   statusDictionaries.value = statusOptions
   hardwareOptions.value = hardwareAssets.map((item) => ({
     ...item,
-    displayLabel: buildDisplayLabel(item.assetCode, item.assetName),
+    summaryLabel: item.assetName || '-',
+    subtitle: item.assetCode || '',
   }))
   informationSystemOptions.value = informationSystems.map((item) => ({
     ...item,
-    displayLabel: buildDisplayLabel(item.code, item.name),
+    summaryLabel: item.name || '-',
+    subtitle: item.code || '',
   }))
   rawPersonOptions.value = persons.map((item) => ({
     ...item,
-    displayLabel: buildDisplayLabel(item.name, item.employeeNo),
+    summaryLabel: item.name || '-',
+    subtitle: item.employeeNo || '',
   }))
   ensureDefaultStatus()
 }
@@ -370,6 +446,10 @@ const handleLogoUpload = async (options) => {
 
 const handleLogoRemove = () => {
   formData.logoUrl = ''
+}
+
+const setScore = (value) => {
+  formData.score = value
 }
 
 const handleSubmit = async () => {
@@ -427,39 +507,127 @@ onMounted(async () => {
 
 <style lang="scss" scoped>
 .organization-page-card {
-  padding: 24px;
-  background: rgba(255, 255, 255, 0.96);
-  border: 1px solid #edf0f6;
-  border-radius: 16px;
-  box-shadow: 0 12px 40px rgba(28, 53, 91, 0.05);
+  padding: 0 4px 0 0;
+  background: transparent;
 }
 
-.organization-form-section + .organization-form-section {
-  margin-top: 28px;
-  padding-top: 24px;
-  border-top: 1px solid #edf0f6;
-}
-
-.organization-section-title {
-  margin-bottom: 16px;
-  color: #151b26;
-  font-size: 16px;
-  font-weight: 700;
-}
-
-.organization-form-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 18px 20px;
-
+.organization-provider-form {
   :deep(.el-form-item) {
     margin-bottom: 0;
+  }
+
+  :deep(.el-form-item__label) {
+    display: inline-flex;
+    align-items: center;
+    padding-bottom: 8px;
+    color: #444a57;
+    font-size: 14px;
+    line-height: 22px;
+  }
+
+  :deep(.el-form-item__label-wrap) {
+    margin: 0;
+  }
+
+  :deep(.el-form-item.is-required:not(.is-no-asterisk) > .el-form-item__label:before),
+  :deep(.el-form-item.is-required:not(.is-no-asterisk) .el-form-item__label:before) {
+    display: none;
   }
 
   :deep(.el-form-item__content),
   :deep(.el-select) {
     width: 100%;
   }
+
+  :deep(.el-input__wrapper),
+  :deep(.el-select__wrapper) {
+    min-height: 40px;
+    padding: 0 14px;
+    background: #f5f6f9;
+    box-shadow: none;
+    border-radius: 4px;
+  }
+
+  :deep(.el-input__wrapper.is-focus),
+  :deep(.el-select__wrapper.is-focused) {
+    background: #fff;
+    box-shadow: 0 0 0 1px #2e5ef0 inset;
+  }
+
+  :deep(.el-input__inner),
+  :deep(.el-select__placeholder),
+  :deep(.el-select__selected-item) {
+    color: #444a57;
+    font-size: 14px;
+    line-height: 22px;
+  }
+
+  :deep(.el-input__inner::placeholder) {
+    color: #b4b9c3;
+  }
+
+  :deep(.el-select__placeholder.is-transparent) {
+    color: #b4b9c3;
+  }
+
+  :deep(.el-select__tags) {
+    gap: 8px;
+  }
+
+  :deep(.el-select__tags .el-tag) {
+    height: 28px;
+    margin: 0;
+    padding: 0 8px;
+    color: #555d6d;
+    background: #ffffff;
+    border: 1px solid #e6e8ed;
+    border-radius: 4px;
+  }
+
+  :deep(.el-form-item.is-error .el-input__wrapper),
+  :deep(.el-form-item.is-error .el-select__wrapper),
+  :deep(.el-form-item.is-error .ec-object-multi-transfer__trigger) {
+    box-shadow: 0 0 0 1px #db4942 inset;
+  }
+
+  :deep(.el-form-item__error) {
+    padding-top: 6px;
+  }
+}
+
+.organization-form-section + .organization-form-section {
+  margin-top: 44px;
+}
+
+.organization-section-title {
+  margin-bottom: 18px;
+  color: #151b26;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 26px;
+}
+
+.organization-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px 24px;
+}
+
+.organization-form-grid--basic {
+  gap: 18px 24px;
+}
+
+.organization-form-grid--support {
+  margin-top: 18px;
+  align-items: start;
+}
+
+.organization-form-grid--relation {
+  gap: 24px 24px;
+}
+
+.organization-form-placeholder {
+  min-height: 1px;
 }
 
 .is-span-2 {
@@ -470,7 +638,7 @@ onMounted(async () => {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 10px;
+  gap: 8px;
 }
 
 .organization-logo-upload__control {
@@ -485,30 +653,30 @@ onMounted(async () => {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  width: 88px;
-  height: 88px;
+  gap: 8px;
+  width: 80px;
+  height: 80px;
   overflow: hidden;
   color: #6d7485;
-  background: #f7f9fd;
-  border: 1px dashed #d7deed;
-  border-radius: 12px;
+  background: #f5f6f9;
+  border: 1px dashed #dde2ec;
+  border-radius: 4px;
   cursor: pointer;
   transition: all 0.2s ease;
 
   > i {
-    font-size: 20px;
-    color: #4b6dff;
+    font-size: 28px;
+    color: #444a57;
   }
 
   > span {
     font-size: 12px;
-    line-height: 1.3;
+    line-height: 20px;
   }
 
   &:hover {
     border-color: #4b6dff;
-    box-shadow: 0 8px 18px rgba(75, 109, 255, 0.12);
+    box-shadow: none;
   }
 
   &.is-filled {
@@ -563,26 +731,111 @@ onMounted(async () => {
 .organization-score-field {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
   min-height: 32px;
+  gap: 6px;
+  padding-top: 2px;
 }
 
-.organization-score-field__value {
-  color: #6d7485;
-  font-size: 13px;
+.organization-score-field__star {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #c4c6cc;
+  cursor: pointer;
+
+  i {
+    font-size: 20px;
+    line-height: 1;
+  }
+
+  &.is-active {
+    color: #f98715;
+  }
+}
+
+.organization-form-item--transfer {
+  :deep(.ec-object-multi-transfer__trigger) {
+    min-height: 40px;
+    padding: 6px 14px;
+    background: #f5f6f9;
+    border: 1px solid transparent;
+    border-radius: 4px;
+  }
+
+  :deep(.ec-object-multi-transfer__tag),
+  :deep(.ec-object-multi-transfer__summary-text) {
+    height: 28px;
+    padding: 0 10px;
+    color: #555d6d;
+    background: #ffffff;
+    border: 1px solid #e6e8ed;
+    border-radius: 4px;
+    line-height: 26px;
+  }
+
+  :deep(.ec-object-multi-transfer__placeholder),
+  :deep(.ec-object-multi-transfer__suffix) {
+    color: #b4b9c3;
+    font-size: 14px;
+  }
+
+  :deep(.ec-object-multi-transfer__trigger.is-active) {
+    background: #fff;
+  }
+}
+
+.organization-form-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 32px;
+}
+
+.organization-form-actions__submit,
+.organization-form-actions__cancel {
+  min-width: 68px;
+  height: 32px;
+  padding: 0 16px;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.organization-form-actions__submit {
+  border-color: #2e5ef0;
+  background: #2e5ef0;
+}
+
+.organization-form-actions__cancel {
+  color: #555d6d;
+  background: #f0f2f5;
+  border-color: #f0f2f5;
+}
+
+.organization-form-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.organization-form-label__required {
+  color: #db4942;
+  line-height: 1;
 }
 
 @media only screen and (max-width: 991px) {
-  .organization-page-card {
-    padding: 16px;
-  }
-
   .organization-form-grid {
     grid-template-columns: 1fr;
   }
 
   .is-span-2 {
     grid-column: auto;
+  }
+
+  .organization-form-placeholder {
+    display: none;
   }
 }
 </style>

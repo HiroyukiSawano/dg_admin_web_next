@@ -1,125 +1,274 @@
 <template>
   <figma-resource-page
-    hide-tabs
     active-tab="projects"
-    :title="pageTitle"
-    :description="pageDescription"
+    :breadcrumbs="pageBreadcrumbs"
+    back-text="返回"
     back-path="/project/projects"
   >
-    <template #actions>
-      <el-button @click="router.push('/project/projects')">
-        {{ t('ec.global.button.text.cancel') }}
-      </el-button>
-      <el-button type="primary" :loading="submitLoading" @click="handleSubmit">
-        {{ t('ec.global.button.text.submit') }}
-      </el-button>
-    </template>
-
     <div v-loading="pageLoading" class="project-page-card">
-      <el-form ref="formRef" :model="formData" :rules="formRules" label-position="top">
+      <el-form
+        ref="formRef"
+        :model="formData"
+        :rules="formRules"
+        label-position="top"
+        class="project-form"
+      >
         <section class="project-form-section">
           <div class="project-section-title">{{ t('ec.project.section.basic') }}</div>
+
           <div class="project-form-grid">
-            <el-form-item :label="t('ec.project.common.code')" prop="code">
-              <el-input v-model="formData.code" clearable :placeholder="t('ec.project.form.codePlaceholder')" />
+            <el-form-item prop="code">
+              <template #label>
+                <span class="project-form-label">
+                  {{ t('ec.project.common.code') }}
+                  <span class="project-form-label__required">*</span>
+                </span>
+              </template>
+              <el-input v-model="formData.code" clearable :placeholder="t('ec.project.form.contentPlaceholder')" />
             </el-form-item>
-            <el-form-item :label="t('ec.project.common.name')" prop="name">
-              <el-input v-model="formData.name" clearable :placeholder="t('ec.project.form.namePlaceholder')" />
+
+            <el-form-item prop="name">
+              <template #label>
+                <span class="project-form-label">
+                  {{ t('ec.project.common.name') }}
+                  <span class="project-form-label__required">*</span>
+                </span>
+              </template>
+              <el-input v-model="formData.name" clearable :placeholder="t('ec.project.form.contentPlaceholder')" />
             </el-form-item>
-            <el-form-item :label="t('ec.project.common.projectType')" prop="projectType">
-              <el-select v-model="formData.projectType" :placeholder="t('ec.project.form.projectTypePlaceholder')">
+
+            <el-form-item prop="projectType">
+              <template #label>
+                <span class="project-form-label">
+                  {{ t('ec.project.common.projectType') }}
+                  <span class="project-form-label__required">*</span>
+                </span>
+              </template>
+              <el-select v-model="formData.projectType" clearable :placeholder="t('ec.project.form.selectPlaceholder')">
                 <el-option v-for="item in projectTypeOptions" :key="item.value" :label="item.label" :value="item.value" />
               </el-select>
             </el-form-item>
-            <el-form-item :label="t('ec.project.common.approvalBatchNo')" prop="approvalBatchNo">
-              <el-input v-model="formData.approvalBatchNo" clearable :placeholder="t('ec.project.form.approvalBatchNoPlaceholder')" />
+
+            <el-form-item prop="approvalBatchNo">
+              <template #label>
+                <span class="project-form-label">
+                  {{ t('ec.project.common.approvalBatchNo') }}
+                  <span class="project-form-label__required">*</span>
+                </span>
+              </template>
+              <el-input v-model="formData.approvalBatchNo" clearable :placeholder="t('ec.project.form.contentPlaceholder')" />
             </el-form-item>
-            <el-form-item :label="t('ec.project.common.projectBudget')" prop="projectBudget">
-              <el-input-number v-model="formData.projectBudget" :min="0" :precision="2" :controls="false" style="width: 100%;" />
+
+            <el-form-item prop="projectBudget">
+              <template #label>
+                <span class="project-form-label">
+                  {{ t('ec.project.form.projectBudgetLabel') }}
+                  <span class="project-form-label__required">*</span>
+                </span>
+              </template>
+              <el-input-number
+                v-model="formData.projectBudget"
+                :min="0"
+                :precision="2"
+                :controls="false"
+                :placeholder="t('ec.project.form.contentPlaceholder')"
+              />
             </el-form-item>
-            <el-form-item :label="t('ec.project.common.contractAmount')" prop="contractAmount">
-              <el-input-number v-model="formData.contractAmount" :min="0" :precision="2" :controls="false" style="width: 100%;" />
+
+            <el-form-item prop="contractAmount">
+              <template #label>
+                <span class="project-form-label">
+                  {{ t('ec.project.form.contractAmountLabel') }}
+                  <span class="project-form-label__required">*</span>
+                </span>
+              </template>
+              <el-input-number
+                v-model="formData.contractAmount"
+                :min="0"
+                :precision="2"
+                :controls="false"
+                :placeholder="t('ec.project.form.contentPlaceholder')"
+              />
             </el-form-item>
           </div>
         </section>
 
         <section class="project-form-section">
           <div class="project-section-title">{{ t('ec.project.section.owner') }}</div>
+
           <div class="project-form-grid">
-            <el-form-item :label="t('ec.project.common.ownerName')" prop="ownerName">
-              <el-input v-model="formData.ownerName" clearable :placeholder="t('ec.project.form.ownerNamePlaceholder')" />
+            <el-form-item prop="ownerName">
+              <template #label>
+                <span class="project-form-label">
+                  {{ t('ec.project.form.ownerNameLabel') }}
+                  <span class="project-form-label__required">*</span>
+                </span>
+              </template>
+              <el-input v-model="formData.ownerName" clearable :placeholder="t('ec.project.form.contentPlaceholder')" />
             </el-form-item>
-            <el-form-item :label="t('ec.project.common.ownerPhone')" prop="ownerPhone">
-              <el-input v-model="formData.ownerPhone" clearable :placeholder="t('ec.project.form.ownerPhonePlaceholder')" />
+
+            <el-form-item prop="ownerPhone">
+              <template #label>
+                <span class="project-form-label">
+                  {{ t('ec.project.form.ownerPhoneLabel') }}
+                  <span class="project-form-label__required">*</span>
+                </span>
+              </template>
+              <el-input v-model="formData.ownerPhone" clearable :placeholder="t('ec.project.form.contentPlaceholder')" />
             </el-form-item>
           </div>
         </section>
 
         <section class="project-form-section">
           <div class="project-section-title">{{ t('ec.project.section.period') }}</div>
+
           <div class="project-form-grid">
-            <el-form-item :label="t('ec.project.common.approvalDate')" prop="approvalDate">
-              <el-date-picker v-model="formData.approvalDate" type="date" value-format="YYYY-MM-DD" style="width: 100%;" />
+            <el-form-item prop="approvalDate">
+              <template #label>
+                <span class="project-form-label">
+                  {{ t('ec.project.common.approvalDate') }}
+                  <span class="project-form-label__required">*</span>
+                </span>
+              </template>
+              <el-date-picker v-model="formData.approvalDate" type="date" value-format="YYYY-MM-DD" :placeholder="t('ec.project.form.selectPlaceholder')" />
             </el-form-item>
-            <el-form-item :label="t('ec.project.common.startDate')" prop="startDate">
-              <el-date-picker v-model="formData.startDate" type="date" value-format="YYYY-MM-DD" style="width: 100%;" />
+
+            <el-form-item prop="startDate">
+              <template #label>
+                <span class="project-form-label">
+                  {{ t('ec.project.common.startDate') }}
+                  <span class="project-form-label__required">*</span>
+                </span>
+              </template>
+              <el-date-picker v-model="formData.startDate" type="date" value-format="YYYY-MM-DD" :placeholder="t('ec.project.form.selectPlaceholder')" />
             </el-form-item>
-            <el-form-item :label="t('ec.project.common.initialDeliveryDate')" prop="initialDeliveryDate">
-              <el-date-picker v-model="formData.initialDeliveryDate" type="date" value-format="YYYY-MM-DD" style="width: 100%;" />
+
+            <el-form-item prop="initialDeliveryDate">
+              <template #label>
+                <span class="project-form-label">
+                  {{ t('ec.project.common.initialDeliveryDate') }}
+                  <span class="project-form-label__required">*</span>
+                </span>
+              </template>
+              <el-date-picker v-model="formData.initialDeliveryDate" type="date" value-format="YYYY-MM-DD" :placeholder="t('ec.project.form.selectPlaceholder')" />
             </el-form-item>
-            <el-form-item :label="t('ec.project.common.endDate')" prop="endDate">
-              <el-date-picker
-                v-model="formData.endDate"
-                type="date"
-                value-format="YYYY-MM-DD"
-                :placeholder="t('ec.project.form.endDatePlaceholder')"
-                style="width: 100%;"
-              />
+
+            <el-form-item prop="endDate">
+              <template #label>
+                <span class="project-form-label">
+                  {{ t('ec.project.common.endDate') }}
+                  <span class="project-form-label__required">*</span>
+                </span>
+              </template>
+              <el-date-picker v-model="formData.endDate" type="date" value-format="YYYY-MM-DD" :placeholder="t('ec.project.form.selectPlaceholder')" />
             </el-form-item>
-            <el-form-item :label="t('ec.project.common.warrantyEndDate')" prop="warrantyEndDate">
-              <el-date-picker v-model="formData.warrantyEndDate" type="date" value-format="YYYY-MM-DD" style="width: 100%;" />
+
+            <el-form-item prop="warrantyEndDate">
+              <template #label>
+                <span class="project-form-label">
+                  {{ t('ec.project.common.warrantyEndDate') }}
+                  <span class="project-form-label__required">*</span>
+                </span>
+              </template>
+              <el-date-picker v-model="formData.warrantyEndDate" type="date" value-format="YYYY-MM-DD" :placeholder="t('ec.project.form.selectPlaceholder')" />
             </el-form-item>
-            <el-form-item :label="t('ec.project.common.stage')" class="is-span-2" prop="stage">
-              <el-input v-model="formData.stage" clearable :placeholder="t('ec.project.form.stagePlaceholder')" />
+
+            <el-form-item prop="stage">
+              <template #label>
+                <span class="project-form-label">
+                  {{ t('ec.project.common.stage') }}
+                  <span class="project-form-label__required">*</span>
+                </span>
+              </template>
+              <el-input v-model="formData.stage" clearable :placeholder="t('ec.project.form.contentPlaceholder')" />
             </el-form-item>
           </div>
         </section>
 
         <section class="project-form-section">
           <div class="project-section-title">{{ t('ec.project.section.payment') }}</div>
+
           <div class="project-form-grid">
-            <el-form-item :label="t('ec.project.common.paymentCycleName')" prop="paymentCycleName">
-              <el-input v-model="formData.paymentCycleName" clearable :placeholder="t('ec.project.form.paymentCycleNamePlaceholder')" />
+            <el-form-item prop="paymentCycleName">
+              <template #label>
+                <span class="project-form-label">
+                  {{ t('ec.project.form.paymentCycleNameLabel') }}
+                  <span class="project-form-label__required">*</span>
+                </span>
+              </template>
+              <el-input v-model="formData.paymentCycleName" clearable :placeholder="t('ec.project.form.contentPlaceholder')" />
             </el-form-item>
-            <el-form-item :label="t('ec.project.common.paymentRatio')" prop="paymentRatio">
-              <el-input-number v-model="formData.paymentRatio" :min="0" :max="100" :precision="2" :controls="false" style="width: 100%;" />
+
+            <el-form-item prop="paymentRatio">
+              <template #label>
+                <span class="project-form-label">
+                  {{ t('ec.project.form.paymentRatioLabel') }}
+                  <span class="project-form-label__required">*</span>
+                </span>
+              </template>
+              <el-input-number
+                v-model="formData.paymentRatio"
+                :min="0"
+                :max="100"
+                :precision="2"
+                :controls="false"
+                :placeholder="t('ec.project.form.contentPlaceholder')"
+              />
             </el-form-item>
-            <el-form-item :label="t('ec.project.common.paymentAmount')" prop="paymentAmount">
-              <el-input-number v-model="formData.paymentAmount" :min="0" :precision="2" :controls="false" style="width: 100%;" />
+
+            <el-form-item prop="paymentAmount">
+              <template #label>
+                <span class="project-form-label">
+                  {{ t('ec.project.form.paymentAmountLabel') }}
+                  <span class="project-form-label__required">*</span>
+                </span>
+              </template>
+              <el-input-number
+                v-model="formData.paymentAmount"
+                :min="0"
+                :precision="2"
+                :controls="false"
+                :placeholder="t('ec.project.form.contentPlaceholder')"
+              />
             </el-form-item>
-            <el-form-item :label="t('ec.project.common.paymentStatus')" prop="paymentStatus">
-              <el-select v-model="formData.paymentStatus" :placeholder="t('ec.project.form.paymentStatusPlaceholder')">
+
+            <el-form-item prop="plannedPaymentDate">
+              <template #label>
+                <span class="project-form-label">
+                  {{ t('ec.project.common.plannedPaymentDate') }}
+                  <span class="project-form-label__required">*</span>
+                </span>
+              </template>
+              <el-date-picker v-model="formData.plannedPaymentDate" type="date" value-format="YYYY-MM-DD" :placeholder="t('ec.project.form.selectPlaceholder')" />
+            </el-form-item>
+
+            <el-form-item prop="actualPaymentDate">
+              <template #label>
+                <span class="project-form-label">
+                  {{ t('ec.project.common.actualPaymentDate') }}
+                  <span class="project-form-label__required">*</span>
+                </span>
+              </template>
+              <el-date-picker v-model="formData.actualPaymentDate" type="date" value-format="YYYY-MM-DD" :placeholder="t('ec.project.form.selectPlaceholder')" />
+            </el-form-item>
+
+            <el-form-item prop="paymentStatus">
+              <template #label>
+                <span class="project-form-label">
+                  {{ t('ec.project.form.paymentStatusLabel') }}
+                  <span class="project-form-label__required">*</span>
+                </span>
+              </template>
+              <el-select v-model="formData.paymentStatus" clearable :placeholder="t('ec.project.form.selectPlaceholder')">
                 <el-option v-for="item in paymentStatusOptions" :key="item.value" :label="item.displayLabel" :value="item.value" />
               </el-select>
-            </el-form-item>
-            <el-form-item :label="t('ec.project.common.plannedPaymentDate')" prop="plannedPaymentDate">
-              <el-date-picker v-model="formData.plannedPaymentDate" type="date" value-format="YYYY-MM-DD" style="width: 100%;" />
-            </el-form-item>
-            <el-form-item :label="t('ec.project.common.actualPaymentDate')" prop="actualPaymentDate">
-              <el-date-picker v-model="formData.actualPaymentDate" type="date" value-format="YYYY-MM-DD" style="width: 100%;" />
             </el-form-item>
           </div>
         </section>
 
         <section class="project-form-section">
-          <div class="project-document-panel">
-            <div class="project-document-panel__head">
-              <div>
-                <div class="project-document-panel__title">{{ t('ec.project.section.documents') }}</div>
-                <div class="project-document-panel__summary" :class="{ 'has-result': hasUploadResult }">
-                  {{ uploadSummaryText }}
-                </div>
-              </div>
+          <div class="project-document-block">
+            <div class="project-document-toolbar">
               <el-upload
                 ref="uploadButtonRef"
                 action="#"
@@ -128,38 +277,60 @@
                 :multiple="true"
                 :on-change="handleDocumentQueued"
               >
-                <el-button type="primary" plain :disabled="documentUploading">
+                <el-button class="project-document-toolbar__button" :disabled="documentUploading">
                   {{ t('ec.project.document.select') }}
                 </el-button>
               </el-upload>
+              <span v-if="showUploadResultSummary" class="project-document-toolbar__summary">
+                <span>{{ t('ec.project.document.resultSummary.totalPrefix') }}</span>
+                <span class="project-document-toolbar__summary-count is-total">{{ lastUploadSummary.total }}</span>
+                <span>{{ t('ec.project.document.resultSummary.totalSuffix') }}</span>
+                <span>{{ t('ec.project.document.resultSummary.successPrefix') }}</span>
+                <span class="project-document-toolbar__summary-count is-success">{{ lastUploadSummary.success }}</span>
+                <span>{{ t('ec.project.document.resultSummary.successSuffix') }}</span>
+                <span>{{ t('ec.project.document.resultSummary.failedPrefix') }}</span>
+                <span class="project-document-toolbar__summary-count is-failed">{{ lastUploadSummary.failed }}</span>
+                <span>{{ t('ec.project.document.resultSummary.failedSuffix') }}</span>
+              </span>
+              <span v-else class="project-document-toolbar__hint">{{ t('ec.project.document.queueHint') }}</span>
             </div>
 
-            <el-table :data="queuedDocuments" row-key="uid" class="project-document-table project-document-table--queue">
-              <el-table-column prop="originalName" :label="t('ec.project.document.name')" min-width="240" show-overflow-tooltip />
-              <el-table-column :label="t('ec.project.document.size')" width="120">
+            <el-table :data="documentRows" class="project-document-table" :row-key="getDocumentRowKey">
+              <el-table-column prop="originalName" :label="t('ec.project.document.name')" min-width="320" show-overflow-tooltip />
+              <el-table-column :label="t('ec.project.document.size')" width="140">
                 <template #default="{ row }">
                   {{ formatFileSize(row.fileSize) }}
                 </template>
               </el-table-column>
               <el-table-column :label="t('ec.project.card.status')" min-width="180">
                 <template #default="{ row }">
-                  <div v-if="row.status === UPLOAD_STATUS.UPLOADING" class="project-upload-progress">
-                    <el-progress :percentage="row.progress" :stroke-width="6" :show-text="false" />
-                    <span>{{ row.progress }}%</span>
+                  <div v-if="row.rowType === 'queue' && row.status === UPLOAD_STATUS.UPLOADING" class="project-upload-progress">
+                    <span class="project-upload-progress__track">
+                      <span class="project-upload-progress__bar" :style="{ width: `${row.progress}%` }"></span>
+                    </span>
+                    <span class="project-upload-progress__text">{{ row.progress }}%</span>
                   </div>
-                  <div v-else class="project-upload-state" :class="`is-${row.status.toLowerCase()}`">
+                  <div v-else class="project-upload-state" :class="`is-${getDocumentStatusType(row)}`">
                     <span class="project-upload-state__dot"></span>
-                    <span>{{ getQueuedStatusLabel(row.status) }}</span>
+                    <span>{{ getDocumentStatusLabel(row) }}</span>
                   </div>
                 </template>
               </el-table-column>
-              <el-table-column :label="t('ec.project.common.actions')" width="120" fixed="right">
-                <template #default="{ $index }">
-                  <el-button type="danger" link :disabled="documentUploading" @click="removeQueuedDocument($index)">
-                    {{ t('ec.project.common.delete') }}
-                  </el-button>
+              <el-table-column :label="t('ec.project.common.actions')" width="116" fixed="right">
+                <template #default="{ row }">
+                  <div class="project-document-actions-cell">
+                    <el-button
+                      type="primary"
+                      link
+                      :disabled="row.rowType === 'queue' && row.status === UPLOAD_STATUS.UPLOADING"
+                      @click="handleRemoveDocumentRow(row)"
+                    >
+                      {{ t('ec.project.common.delete') }}
+                    </el-button>
+                  </div>
                 </template>
               </el-table-column>
+
               <template #empty>
                 <div class="project-upload-empty">
                   <el-upload
@@ -173,7 +344,7 @@
                     class="project-upload-dropzone"
                   >
                     <div class="project-upload-dropzone__icon">
-                      <i class="ri-upload-cloud-2-line"></i>
+                      <i class="ri-upload-2-line"></i>
                     </div>
                     <div class="project-upload-dropzone__title">{{ t('ec.project.document.dropTitle') }}</div>
                     <div class="project-upload-dropzone__hint">{{ t('ec.project.document.dropHint') }}</div>
@@ -182,55 +353,31 @@
               </template>
             </el-table>
 
-            <div class="project-document-actions">
-              <el-button :disabled="documentUploading || queuedDocuments.length === 0" @click="clearQueuedDocuments">
+            <div class="project-document-footer">
+              <el-button class="project-document-footer__cancel" :disabled="documentUploading || queuedDocuments.length === 0" @click="clearQueuedDocuments">
                 {{ t('ec.project.document.cancelUpload') }}
               </el-button>
-              <el-button type="primary" :loading="documentUploading" :disabled="!canUploadQueuedDocuments" @click="handleQueuedUpload">
+              <el-button
+                type="primary"
+                class="project-document-footer__confirm"
+                :loading="documentUploading"
+                :disabled="!canUploadQueuedDocuments"
+                @click="handleQueuedUpload"
+              >
                 {{ t('ec.project.document.confirmUpload') }}
               </el-button>
-            </div>
-
-            <div class="project-document-panel__saved">
-              <div class="project-document-panel__saved-title">{{ t('ec.project.document.savedTitle') }}</div>
-              <div class="project-document-panel__saved-hint">{{ t('ec.project.document.savedHint') }}</div>
-              <el-table :data="formData.documents" class="project-document-table">
-                <el-table-column prop="originalName" :label="t('ec.project.document.name')" min-width="220" show-overflow-tooltip />
-                <el-table-column :label="t('ec.project.document.size')" width="120">
-                  <template #default="{ row }">
-                    {{ formatFileSize(row.fileSize) }}
-                  </template>
-                </el-table-column>
-                <el-table-column :label="t('ec.project.document.uploadedAt')" width="180">
-                  <template #default="{ row }">
-                    {{ formatDateTime(row.uploadedAt) }}
-                  </template>
-                </el-table-column>
-                <el-table-column :label="t('ec.project.common.actions')" width="140" fixed="right">
-                  <template #default="{ row, $index }">
-                    <el-button type="primary" link @click="openDocument(row)">
-                      {{ t('ec.project.document.view') }}
-                    </el-button>
-                    <el-button type="danger" link @click="removeDocument($index)">
-                      {{ t('ec.project.common.delete') }}
-                    </el-button>
-                  </template>
-                </el-table-column>
-                <template #empty>
-                  <el-empty :image-size="56" :description="t('ec.project.document.empty')" />
-                </template>
-              </el-table>
             </div>
           </div>
         </section>
 
         <section class="project-form-section">
           <div class="project-section-title">{{ t('ec.project.section.relations') }}</div>
-          <div class="project-form-grid">
-            <el-form-item :label="t('ec.project.detail.persons')" class="is-span-2">
+
+          <div class="project-form-grid project-form-grid--relation">
+            <el-form-item :label="t('ec.project.detail.persons')" class="is-span-2 project-form-item--transfer">
               <ec-object-multi-transfer
                 v-model="formData.personIds"
-                :placeholder="t('ec.project.relation.personsPlaceholder')"
+                :placeholder="t('ec.project.form.selectPlaceholder')"
                 :title="`${t('ec.project.detail.persons')}${t('ec.organization.selector.titleSuffix')}`"
                 :selected-title="t('ec.organization.selector.selected')"
                 :search-placeholder="t('ec.organization.selector.searchPlaceholder')"
@@ -240,10 +387,11 @@
                 subtitle-key="employeeNo"
               />
             </el-form-item>
-            <el-form-item :label="t('ec.project.detail.informationSystems')">
+
+            <el-form-item :label="t('ec.project.detail.informationSystems')" class="project-form-item--transfer">
               <ec-object-multi-transfer
                 v-model="formData.informationSystemIds"
-                :placeholder="t('ec.project.relation.informationSystemsPlaceholder')"
+                :placeholder="t('ec.project.form.selectPlaceholder')"
                 :title="`${t('ec.project.detail.informationSystems')}${t('ec.organization.selector.titleSuffix')}`"
                 :selected-title="t('ec.organization.selector.selected')"
                 :search-placeholder="t('ec.organization.selector.searchPlaceholder')"
@@ -253,10 +401,11 @@
                 subtitle-key="code"
               />
             </el-form-item>
-            <el-form-item :label="t('ec.project.detail.hardwareAssets')">
+
+            <el-form-item :label="t('ec.project.detail.hardwareAssets')" class="project-form-item--transfer">
               <ec-object-multi-transfer
                 v-model="formData.hardwareAssetIds"
-                :placeholder="t('ec.project.relation.hardwareAssetsPlaceholder')"
+                :placeholder="t('ec.project.form.selectPlaceholder')"
                 :title="`${t('ec.project.detail.hardwareAssets')}${t('ec.organization.selector.titleSuffix')}`"
                 :selected-title="t('ec.organization.selector.selected')"
                 :search-placeholder="t('ec.organization.selector.searchPlaceholder')"
@@ -268,6 +417,15 @@
             </el-form-item>
           </div>
         </section>
+
+        <div class="project-form-actions">
+          <el-button type="primary" :loading="submitLoading" class="project-form-actions__submit" @click="handleSubmit">
+            {{ t('ec.global.button.text.confirm') }}
+          </el-button>
+          <el-button class="project-form-actions__cancel" @click="router.push('/project/projects')">
+            {{ t('ec.global.button.text.cancel') }}
+          </el-button>
+        </div>
       </el-form>
     </div>
   </figma-resource-page>
@@ -289,7 +447,7 @@ import {
   updateProject,
   uploadProjectDocument,
 } from '@/services/modules/projectService'
-import { formatDateTime, formatFileSize, normalizeIdList } from './helpers'
+import { formatFileSize, normalizeIdList } from './helpers'
 import EcObjectMultiTransfer from '@/components/EcObjectMultiTransfer.vue'
 import FigmaResourcePage from '@/views/organization/components/FigmaResourcePage.vue'
 
@@ -318,6 +476,7 @@ const personOptions = ref([])
 const informationSystemOptions = ref([])
 const hardwareOptions = ref([])
 const queuedDocuments = ref([])
+const lastUploadSummary = ref(null)
 
 const formData = reactive({
   code: '',
@@ -349,8 +508,10 @@ const formData = reactive({
 })
 
 const isEdit = computed(() => Boolean(route.params.id))
-const pageTitle = computed(() => (isEdit.value ? t('ec.project.page.editTitle') : t('ec.project.page.createTitle')))
-const pageDescription = computed(() => (isEdit.value ? t('ec.project.page.editDescription') : t('ec.project.page.createDescription')))
+const pageBreadcrumbs = computed(() => ([
+  { label: 'ec.menu.name.projectAssets' },
+  { label: isEdit.value ? 'ec.project.page.editTitle' : 'ec.project.page.createTitle' },
+]))
 
 const projectTypeOptions = computed(() => ([
   { value: 'NEW_BUILD', label: t('ec.project.type.newBuild') },
@@ -388,33 +549,25 @@ const formRules = computed(() => ({
   paymentStatus: [{ required: true, message: t('ec.project.validation.paymentStatusRequired'), trigger: 'change' }],
 }))
 
-const uploadStats = computed(() => {
-  return queuedDocuments.value.reduce((acc, item) => {
-    acc.total += 1
-    if (item.status === UPLOAD_STATUS.PENDING) acc.pending += 1
-    if (item.status === UPLOAD_STATUS.UPLOADING) acc.uploading += 1
-    if (item.status === UPLOAD_STATUS.SUCCESS) acc.success += 1
-    if (item.status === UPLOAD_STATUS.FAILED) acc.failed += 1
-    return acc
-  }, {
-    total: 0,
-    pending: 0,
-    uploading: 0,
-    success: 0,
-    failed: 0,
-  })
-})
-
-const hasUploadResult = computed(() => uploadStats.value.success > 0 || uploadStats.value.failed > 0)
 const canUploadQueuedDocuments = computed(() => {
   return queuedDocuments.value.some((item) => item.status === UPLOAD_STATUS.PENDING || item.status === UPLOAD_STATUS.FAILED)
 })
-const uploadSummaryText = computed(() => {
-  if (hasUploadResult.value) {
-    return t('ec.project.document.resultSummary', uploadStats.value)
-  }
-  return t('ec.project.document.queueHint')
+
+const showUploadResultSummary = computed(() => {
+  return Boolean(lastUploadSummary.value) && !documentUploading.value
 })
+
+const documentRows = computed(() => ([
+  ...queuedDocuments.value.map((item) => ({
+    ...item,
+    rowType: 'queue',
+  })),
+  ...formData.documents.map((item, index) => ({
+    ...item,
+    rowType: 'saved',
+    documentIndex: index,
+  })),
+]))
 
 const normalizeDocuments = (documents = []) => {
   return (Array.isArray(documents) ? documents : []).map((item) => ({
@@ -444,6 +597,27 @@ const getQueuedStatusLabel = (status) => {
   if (status === UPLOAD_STATUS.SUCCESS) return t('ec.project.document.success')
   if (status === UPLOAD_STATUS.FAILED) return t('ec.project.document.failed')
   return status || '-'
+}
+
+const getDocumentRowKey = (row) => {
+  if (row.rowType === 'queue') {
+    return row.uid
+  }
+  return `saved-${row.id || row.fileUrl || row.fileName || row.originalName || row.documentIndex}`
+}
+
+const getDocumentStatusLabel = (row) => {
+  if (row.rowType === 'saved') {
+    return t('ec.project.document.success')
+  }
+  return getQueuedStatusLabel(row.status)
+}
+
+const getDocumentStatusType = (row) => {
+  if (row.rowType === 'saved') {
+    return 'success'
+  }
+  return String(row.status || '').toLowerCase()
 }
 
 const clearUploadSelection = () => {
@@ -524,12 +698,14 @@ const fillForm = (detail) => {
   formData.hardwareAssetIds = normalizeIdList(detail?.hardwareAssetIds)
   formData.remark = project.remark || ''
   queuedDocuments.value = []
+  lastUploadSummary.value = null
 }
 
 const handleDocumentQueued = (uploadFile) => {
   const rawFile = uploadFile?.raw || uploadFile
   clearUploadSelection()
   if (!rawFile || !validateDocumentFile(rawFile)) return
+  lastUploadSummary.value = null
   queuedDocuments.value.push(createQueuedDocument(rawFile))
 }
 
@@ -541,6 +717,7 @@ const handleQueuedUpload = async () => {
   }
 
   documentUploading.value = true
+  lastUploadSummary.value = null
   let successCount = 0
   let failedCount = 0
 
@@ -569,6 +746,13 @@ const handleQueuedUpload = async () => {
     }
   } finally {
     documentUploading.value = false
+    lastUploadSummary.value = {
+      total: uploadableItems.length,
+      success: successCount,
+      failed: failedCount,
+    }
+    queuedDocuments.value = queuedDocuments.value.filter((item) => item.status !== UPLOAD_STATUS.SUCCESS)
+    clearUploadSelection()
   }
 
   if (successCount > 0 && failedCount === 0) {
@@ -588,17 +772,20 @@ const clearQueuedDocuments = () => {
   ElMessage.success(t('ec.project.document.clearQueueSuccess'))
 }
 
-const removeQueuedDocument = (index) => {
-  queuedDocuments.value.splice(index, 1)
-}
-
-const openDocument = (item) => {
-  if (!item?.fileUrl) return
-  window.open(item.fileUrl, '_blank', 'noopener')
+const removeQueuedDocument = (uid) => {
+  queuedDocuments.value = queuedDocuments.value.filter((item) => item.uid !== uid)
 }
 
 const removeDocument = (index) => {
   formData.documents.splice(index, 1)
+}
+
+const handleRemoveDocumentRow = (row) => {
+  if (row.rowType === 'queue') {
+    removeQueuedDocument(row.uid)
+    return
+  }
+  removeDocument(row.documentIndex)
 }
 
 const buildPayload = () => {
@@ -679,87 +866,213 @@ onMounted(async () => {
 
 <style lang="scss" scoped>
 .project-page-card {
-  padding: 24px;
-  background: rgba(255, 255, 255, 0.96);
-  border: 1px solid #edf0f6;
-  border-radius: 16px;
-  box-shadow: 0 12px 40px rgba(28, 53, 91, 0.05);
+  padding: 0 4px 0 0;
+  background: transparent;
+}
+
+.project-form {
+  :deep(.el-form-item) {
+    margin-bottom: 0;
+  }
+
+  :deep(.el-form-item__label) {
+    display: inline-flex;
+    align-items: center;
+    padding-bottom: 4px;
+    color: #444a57;
+    font-size: 14px;
+    line-height: 22px;
+  }
+
+  :deep(.el-form-item__label-wrap) {
+    margin: 0;
+  }
+
+  :deep(.el-form-item.is-required:not(.is-no-asterisk) > .el-form-item__label:before),
+  :deep(.el-form-item.is-required:not(.is-no-asterisk) .el-form-item__label:before) {
+    display: none;
+  }
+
+  :deep(.el-form-item__content),
+  :deep(.el-input),
+  :deep(.el-select),
+  :deep(.el-input-number),
+  :deep(.el-date-editor) {
+    width: 100%;
+  }
+
+  :deep(.el-input__wrapper),
+  :deep(.el-select__wrapper),
+  :deep(.el-input-number .el-input__wrapper) {
+    min-height: 32px;
+    padding: 0 12px;
+    background: #f5f6f9;
+    box-shadow: none;
+    border-radius: 4px;
+  }
+
+  :deep(.el-input__wrapper.is-focus),
+  :deep(.el-select__wrapper.is-focused),
+  :deep(.el-input-number .el-input__wrapper.is-focus) {
+    background: #fff;
+    box-shadow: 0 0 0 1px #2e5ef0 inset;
+  }
+
+  :deep(.el-input__inner),
+  :deep(.el-select__selected-item),
+  :deep(.el-select__placeholder),
+  :deep(.el-input-number .el-input__inner) {
+    color: #444a57;
+    font-size: 14px;
+    line-height: 22px;
+  }
+
+  :deep(.el-input__inner::placeholder),
+  :deep(.el-input-number .el-input__inner::placeholder) {
+    color: #858a99;
+  }
+
+  :deep(.el-select__placeholder.is-transparent) {
+    color: #858a99;
+  }
+
+  :deep(.el-date-editor .el-input__wrapper) {
+    padding-right: 8px;
+  }
+
+  :deep(.el-range__icon),
+  :deep(.el-input__icon),
+  :deep(.el-select__caret) {
+    color: #999faa;
+  }
+
+  :deep(.el-form-item.is-error .el-input__wrapper),
+  :deep(.el-form-item.is-error .el-select__wrapper),
+  :deep(.el-form-item.is-error .el-input-number .el-input__wrapper),
+  :deep(.el-form-item.is-error .ec-object-multi-transfer__trigger) {
+    box-shadow: 0 0 0 1px #db4942 inset;
+  }
+
+  :deep(.el-form-item__error) {
+    padding-top: 4px;
+  }
 }
 
 .project-form-section + .project-form-section {
-  margin-top: 28px;
+  margin-top: 34px;
 }
 
-.project-section-title,
-.project-document-panel__title {
+.project-section-title {
+  margin-bottom: 16px;
   color: #151b26;
   font-size: 16px;
   font-weight: 700;
+  line-height: 24px;
 }
 
 .project-form-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 18px 20px;
-  margin-top: 20px;
+  gap: 18px 24px;
+}
 
-  :deep(.el-form-item) {
-    margin-bottom: 0;
-  }
-
-  :deep(.el-form-item__content),
-  :deep(.el-select),
-  :deep(.el-input),
-  :deep(.el-input-number) {
-    width: 100%;
-  }
+.project-form-grid--relation {
+  gap: 20px 24px;
 }
 
 .is-span-2 {
   grid-column: 1 / -1;
 }
 
-.project-document-panel {
-  margin-top: 20px;
-  padding: 20px;
-  background: #f8f9fc;
-  border: 1px solid #edf0f6;
-  border-radius: 16px;
+.project-form-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
 }
 
-.project-document-panel__head {
+.project-form-label__required {
+  color: #db4942;
+  line-height: 1;
+}
+
+.project-document-block {
+  padding-top: 2px;
+}
+
+.project-document-toolbar {
   display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 16px;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 14px;
 }
 
-.project-document-panel__summary {
-  margin-top: 8px;
+.project-document-toolbar__button {
+  min-width: 82px;
+  height: 32px;
+  padding: 0 16px;
+  color: #555d6d;
+  background: #f0f2f5;
+  border-color: #f0f2f5;
+  border-radius: 4px;
+}
+
+.project-document-toolbar__hint {
   color: #858a99;
   font-size: 12px;
   line-height: 20px;
+}
 
-  &.has-result {
-    color: #444a57;
+.project-document-toolbar__summary {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  color: #444a57;
+  font-size: 12px;
+  line-height: 20px;
+}
+
+.project-document-toolbar__summary-count {
+  margin: 0 2px;
+  font-weight: 600;
+
+  &.is-total {
+    color: #2e5ef0;
+  }
+
+  &.is-success {
+    color: #36b23e;
+  }
+
+  &.is-failed {
+    color: #db4942;
   }
 }
 
 .project-document-table {
-  :deep(th.el-table__cell) {
-    background: #f1f4fb;
+  :deep(.el-table__header-wrapper th.el-table__cell) {
+    height: 46px;
+    color: #151b26;
+    background: #f5f6f9;
+    font-weight: 600;
   }
-}
 
-.project-document-table--queue {
+  :deep(.el-table__row td.el-table__cell) {
+    height: 46px;
+  }
+
   :deep(.el-table__empty-block) {
-    padding: 12px 0;
+    padding: 0;
   }
 
   :deep(.el-table__empty-text) {
     width: 100%;
   }
+}
+
+.project-document-actions-cell {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .project-upload-empty {
@@ -776,9 +1089,10 @@ onMounted(async () => {
   }
 
   :deep(.el-upload-dragger) {
-    padding: 44px 20px;
+    padding: 60px 20px;
     background: #f5f6f9;
     border-color: #e6e8ed;
+    border-radius: 0 0 4px 4px;
   }
 }
 
@@ -786,50 +1100,23 @@ onMounted(async () => {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 44px;
-  height: 44px;
+  width: 28px;
+  height: 28px;
   margin-bottom: 12px;
-  color: var(--el-color-primary);
-  font-size: 26px;
-  background: rgba(46, 94, 240, 0.1);
-  border-radius: 14px;
+  color: #fff;
+  font-size: 16px;
+  background: #2e5ef0;
+  border-radius: 4px;
 }
 
 .project-upload-dropzone__title {
-  color: #444a57;
+  color: #555d6d;
   font-size: 14px;
   line-height: 22px;
 }
 
 .project-upload-dropzone__hint {
-  margin-top: 4px;
-  color: #858a99;
-  font-size: 12px;
-  line-height: 20px;
-}
-
-.project-document-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 8px;
-  margin-top: 16px;
-}
-
-.project-document-panel__saved {
-  margin-top: 20px;
-  padding-top: 20px;
-  border-top: 1px solid #e6eaf2;
-}
-
-.project-document-panel__saved-title {
-  color: #151b26;
-  font-size: 14px;
-  font-weight: 700;
-}
-
-.project-document-panel__saved-hint {
   margin-top: 6px;
-  margin-bottom: 14px;
   color: #858a99;
   font-size: 12px;
   line-height: 20px;
@@ -838,16 +1125,29 @@ onMounted(async () => {
 .project-upload-progress {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
+}
 
-  :deep(.el-progress) {
-    flex: 1;
-  }
+.project-upload-progress__track {
+  position: relative;
+  flex: 0 0 60px;
+  height: 4px;
+  overflow: hidden;
+  background: #e6e8ed;
+  border-radius: 999px;
+}
 
-  > span {
-    color: #444a57;
-    font-size: 13px;
-  }
+.project-upload-progress__bar {
+  position: absolute;
+  inset: 0 auto 0 0;
+  background: #2e5ef0;
+  border-radius: 999px;
+}
+
+.project-upload-progress__text {
+  color: #444a57;
+  font-size: 14px;
+  line-height: 22px;
 }
 
 .project-upload-state {
@@ -856,9 +1156,10 @@ onMounted(async () => {
   gap: 6px;
   color: #444a57;
   font-size: 14px;
+  line-height: 22px;
 
   &.is-pending .project-upload-state__dot {
-    background: #f5a623;
+    background: #c4c6cc;
   }
 
   &.is-success .project-upload-state__dot {
@@ -874,14 +1175,106 @@ onMounted(async () => {
   width: 6px;
   height: 6px;
   border-radius: 999px;
-  background: #f5a623;
+}
+
+.project-document-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.project-document-footer__cancel,
+.project-document-footer__confirm {
+  min-width: 84px;
+  height: 32px;
+  padding: 0 16px;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.project-document-footer__cancel {
+  color: #555d6d;
+  background: #f0f2f5;
+  border-color: #f0f2f5;
+}
+
+.project-document-footer__cancel.is-disabled,
+.project-document-footer__confirm.is-disabled {
+  opacity: 1;
+}
+
+.project-document-footer__cancel.is-disabled {
+  color: #8f96a3;
+  background: #f0f2f5;
+  border-color: #f0f2f5;
+}
+
+.project-document-footer__confirm.is-disabled {
+  color: #fff;
+  background: #b8c9ff;
+  border-color: #b8c9ff;
+}
+
+.project-form-item--transfer {
+  :deep(.ec-object-multi-transfer__trigger) {
+    min-height: 32px;
+    padding: 2px 12px;
+    background: #f5f6f9;
+    border: 1px solid transparent;
+    border-radius: 4px;
+  }
+
+  :deep(.ec-object-multi-transfer__tag),
+  :deep(.ec-object-multi-transfer__summary-text) {
+    height: 28px;
+    padding: 0 10px;
+    color: #555d6d;
+    background: #fff;
+    border: 1px solid #e6e8ed;
+    border-radius: 4px;
+    line-height: 26px;
+  }
+
+  :deep(.ec-object-multi-transfer__placeholder),
+  :deep(.ec-object-multi-transfer__suffix) {
+    color: #858a99;
+    font-size: 14px;
+  }
+
+  :deep(.ec-object-multi-transfer__trigger.is-active) {
+    background: #fff;
+  }
+}
+
+.project-form-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 32px;
+}
+
+.project-form-actions__submit,
+.project-form-actions__cancel {
+  min-width: 68px;
+  height: 32px;
+  padding: 0 16px;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.project-form-actions__submit {
+  border-color: #2e5ef0;
+  background: #2e5ef0;
+}
+
+.project-form-actions__cancel {
+  color: #555d6d;
+  background: #f0f2f5;
+  border-color: #f0f2f5;
 }
 
 @media only screen and (max-width: 991px) {
-  .project-page-card {
-    padding: 16px;
-  }
-
   .project-form-grid {
     grid-template-columns: 1fr;
   }
@@ -890,8 +1283,9 @@ onMounted(async () => {
     grid-column: auto;
   }
 
-  .project-document-panel__head,
-  .project-document-actions {
+  .project-document-toolbar,
+  .project-document-footer,
+  .project-form-actions {
     align-items: stretch;
     flex-direction: column;
   }
