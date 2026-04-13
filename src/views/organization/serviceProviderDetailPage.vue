@@ -81,6 +81,7 @@
               :badge="item.badge"
               :badge-tone="item.badgeTone"
               :icon-src="item.iconSrc"
+              :avatar-variant="item.avatarVariant"
               :meta-items="item.metaItems"
               avatar
             />
@@ -98,6 +99,7 @@
               :badge="item.badge"
               :badge-tone="item.badgeTone"
               :icon-src="item.iconSrc"
+              :icon-variant="item.iconVariant"
               :meta-items="item.metaItems"
             />
           </div>
@@ -112,6 +114,7 @@
               :key="`hardware-${item.id}`"
               :title="item.title"
               :icon-src="item.iconSrc"
+              :icon-variant="item.iconVariant"
               :meta-items="item.metaItems"
             />
           </div>
@@ -128,6 +131,7 @@
               :badge="item.badge"
               :badge-tone="item.badgeTone"
               :icon-src="item.iconSrc"
+              :icon-variant="item.iconVariant"
               :meta-items="item.metaItems"
             />
           </div>
@@ -268,7 +272,8 @@ const personCards = computed(() => {
     title: item.name || '-',
     badge: item.relationLabel || '',
     badgeTone: getPersonBadgeTone(item.relationLabel),
-    iconSrc: item.photoUrl || (index % 2 === 1 ? personAvatarFemale : personAvatarMale),
+    iconSrc: resolvePersonAvatar(item, index),
+    avatarVariant: resolvePersonAvatarVariant(item, index),
     metaItems: [
       { label: t('ec.organization.serviceProvider.detail.card.mobile'), value: item.mobile || '-' },
       { label: t('ec.organization.serviceProvider.detail.card.employeeNo'), value: item.employeeNo || '-' },
@@ -284,6 +289,7 @@ const softwareCards = computed(() => {
     badge: getSystemTypeLabel(item.systemType),
     badgeTone: getSoftwareBadgeTone(item.systemType),
     iconSrc: getSoftwareIcon(item.systemType),
+    iconVariant: getSoftwareIconVariant(item.systemType),
     metaItems: [
       { label: t('ec.organization.serviceProvider.detail.card.code'), value: item.code || '-' },
       { label: t('ec.organization.serviceProvider.detail.card.type'), value: getSystemTypeLabel(item.systemType) },
@@ -299,6 +305,7 @@ const hardwareCards = computed(() => {
     id: item.id,
     title: item.name || '-',
     iconSrc: getHardwareIcon(item.hardwareCategory),
+    iconVariant: getHardwareIconVariant(item.hardwareCategory),
     metaItems: [
       { label: t('ec.organization.serviceProvider.detail.card.code'), value: item.code || '-' },
       { label: t('ec.organization.serviceProvider.detail.card.ip'), value: item.managementIp || '-' },
@@ -318,6 +325,7 @@ const projectCards = computed(() => {
     badge: getProjectBadgeLabel(item.projectType),
     badgeTone: 'blue',
     iconSrc: projectFolder,
+    iconVariant: 'project-folder',
     metaItems: [
       { label: t('ec.organization.serviceProvider.detail.card.code'), value: item.code || '-' },
       { label: t('ec.organization.serviceProvider.detail.card.type'), value: getProjectTypeLabel(item.projectType) },
@@ -354,6 +362,34 @@ const getPersonBadgeTone = (label) => {
   return label && label.includes('负责人') ? 'blue' : 'gray'
 }
 
+const normalizeGender = (value) => {
+  return String(value || '').trim().toLowerCase()
+}
+
+const getStableFallbackAvatarVariant = (item, index) => {
+  const candidate = [item.id, item.employeeNo, item.name, index]
+    .filter((value) => value !== undefined && value !== null && value !== '')
+    .join('-')
+  const total = Array.from(candidate).reduce((sum, char) => sum + char.charCodeAt(0), 0)
+  return total % 2 === 0 ? 'male' : 'female'
+}
+
+const resolvePersonAvatarVariant = (item, index) => {
+  const gender = normalizeGender(item.gender)
+  if (gender === '女' || gender === 'female' || gender === 'f') {
+    return 'female'
+  }
+  if (gender === '男' || gender === 'male' || gender === 'm') {
+    return 'male'
+  }
+
+  return getStableFallbackAvatarVariant(item, index)
+}
+
+const resolvePersonAvatar = (item, index) => {
+  return resolvePersonAvatarVariant(item, index) === 'female' ? personAvatarFemale : personAvatarMale
+}
+
 const getSoftwareBadgeTone = (systemType) => {
   if (systemType === 'SUPPORT_SYSTEM' || systemType === 'BASIC_SUPPORT') {
     return 'green'
@@ -374,8 +410,22 @@ const getSoftwareIcon = (systemType) => {
   return softwareSupport
 }
 
+const getSoftwareIconVariant = (systemType) => {
+  if (systemType === 'INTERNAL_OFFICE' || systemType === 'DATABASE_SOFTWARE') {
+    return 'software-office'
+  }
+  if (systemType === 'EXTERNAL_SERVICE') {
+    return 'software-external'
+  }
+  return 'software-support'
+}
+
 const getHardwareIcon = (hardwareCategory) => {
   return hardwareCategory === 'SERVER' ? hardwareServer : hardwareTerminal
+}
+
+const getHardwareIconVariant = (hardwareCategory) => {
+  return hardwareCategory === 'SERVER' ? 'hardware-server' : 'hardware-terminal'
 }
 
 const getProjectBadgeLabel = (projectType) => {

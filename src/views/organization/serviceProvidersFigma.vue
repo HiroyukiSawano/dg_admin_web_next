@@ -46,6 +46,9 @@
         <el-button class="organization-figma-search" type="primary" @click="handleSearch">
           {{ t('ec.global.button.text.search') }}
         </el-button>
+        <el-button class="organization-figma-reset" @click="handleReset">
+          {{ t('ec.global.button.text.reset') }}
+        </el-button>
       </div>
     </template>
 
@@ -147,7 +150,6 @@
               <template #dropdown>
                 <el-dropdown-menu>
                   <el-dropdown-item command="detail">{{ t('ec.organization.common.detail') }}</el-dropdown-item>
-                  <el-dropdown-item command="relations">{{ t('ec.organization.common.relations') }}</el-dropdown-item>
                 </el-dropdown-menu>
               </template>
             </el-dropdown>
@@ -377,6 +379,14 @@ const handleSearch = () => {
   loadData()
 }
 
+const handleReset = () => {
+  queryForm.keyword = ''
+  queryForm.cooperationScope = ''
+  queryForm.vendorLevel = ''
+  pagination.currentPage = 1
+  loadData()
+}
+
 const handlePageChange = (page) => {
   pagination.currentPage = page
   loadData()
@@ -391,10 +401,6 @@ const handlePageSizeChange = (pageSize) => {
 const handleRowCommand = (command, row) => {
   if (command === 'detail') {
     router.push(`/organization/service-providers/${row.id}/detail`)
-    return
-  }
-  if (command === 'relations') {
-    router.push(`/organization/service-providers/${row.id}/relations`)
   }
 }
 
@@ -450,6 +456,18 @@ onMounted(async () => {
   border-radius: 4px;
   background: #2e5ef0;
   box-shadow: none;
+  font-size: 14px;
+}
+
+.organization-figma-reset {
+  min-width: 68px;
+  height: 32px;
+  padding-inline: 12px;
+  border: 0;
+  border-radius: 4px;
+  background: #f5f6f9;
+  box-shadow: none;
+  color: #444a57;
   font-size: 14px;
 }
 
@@ -719,11 +737,9 @@ onMounted(async () => {
   }
 
   .organization-figma-field,
-  .organization-figma-field--keyword {
-    width: 100%;
-  }
-
-  .organization-figma-search {
+  .organization-figma-field--keyword,
+  .organization-figma-search,
+  .organization-figma-reset {
     width: 100%;
   }
 

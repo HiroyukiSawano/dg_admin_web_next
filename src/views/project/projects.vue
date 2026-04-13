@@ -62,7 +62,6 @@
         <template #default="{ row }">
           <el-button type="primary" link @click="openDetail(row)">{{ t('ec.project.common.detail') }}</el-button>
           <el-button type="primary" link @click="openEdit(row)">{{ t('ec.project.common.edit') }}</el-button>
-          <el-button type="primary" link @click="openRelationDialog(row)">{{ t('ec.project.common.relations') }}</el-button>
           <el-button type="danger" link @click="handleDelete(row)">{{ t('ec.project.common.delete') }}</el-button>
         </template>
       </el-table-column>

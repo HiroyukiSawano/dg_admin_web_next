@@ -4,168 +4,112 @@
     :title="t('ec.software.page.detailTitle')"
     :description="t('ec.software.page.detailDescription')"
     back-path="/software/informationSystems"
+    :breadcrumbs="[
+      '软件资源',
+      '基本详情',
+    ]"
   >
-    <template #actions>
-      <el-button @click="router.push(`/software/informationSystems/${route.params.id}/relations`)">
-        {{ t('ec.software.common.relations') }}
-      </el-button>
-      <el-button type="primary" @click="router.push(`/software/informationSystems/${route.params.id}/edit`)">
-        {{ t('ec.software.common.edit') }}
-      </el-button>
-    </template>
-
-    <div v-loading="pageLoading" class="software-detail-page">
-      <section class="software-page-card">
-        <div class="software-detail-header">
-          <div>
-            <div class="software-detail-title">{{ detailRecord.informationSystem?.name || '-' }}</div>
-            <div class="software-detail-subtitle">{{ detailRecord.informationSystem?.code || '-' }}</div>
-          </div>
-          <el-tag :type="getStatusTagType(detailRecord.informationSystem?.status, informationSystemStatusMap)">
-            {{ getStatusLabel(detailRecord.informationSystem?.status, informationSystemStatusMap) }}
-          </el-tag>
-        </div>
-
-        <div class="software-detail-section">
-          <div class="software-section-title">{{ t('ec.software.section.basic') }}</div>
-          <div class="software-detail-grid">
-            <div class="software-detail-item">
+    <div v-loading="pageLoading" class="organization-detail-page">
+      <section class="organization-detail-panel">
+        <section class="organization-detail-section">
+          <div class="organization-section-title">{{ t('ec.software.section.basic') }}</div>
+          <div class="organization-detail-grid">
+            <div class="organization-detail-item">
               <span>{{ t('ec.software.common.code') }}</span>
               <strong>{{ detailRecord.informationSystem?.code || '-' }}</strong>
             </div>
-            <div class="software-detail-item">
+            <div class="organization-detail-item">
               <span>{{ t('ec.software.common.name') }}</span>
               <strong>{{ detailRecord.informationSystem?.name || '-' }}</strong>
             </div>
-            <div class="software-detail-item">
+            <div class="organization-detail-item">
               <span>{{ t('ec.software.common.systemType') }}</span>
               <strong>{{ getSystemTypeLabel(detailRecord.informationSystem?.systemType) }}</strong>
             </div>
-            <div class="software-detail-item">
+            <div class="organization-detail-item">
               <span>{{ t('ec.software.common.versionNo') }}</span>
               <strong>{{ detailRecord.informationSystem?.versionNo || '-' }}</strong>
             </div>
-            <div class="software-detail-item">
+            <div class="organization-detail-item">
               <span>{{ t('ec.software.common.deploymentArchitecture') }}</span>
               <strong>{{ getDeploymentArchitectureLabel(detailRecord.informationSystem?.deploymentArchitecture) }}</strong>
             </div>
-            <div class="software-detail-item">
+            <div class="organization-detail-item">
               <span>{{ t('ec.software.common.owner') }}</span>
               <strong>{{ detailRecord.informationSystem?.ownerName || '-' }}</strong>
             </div>
-            <div class="software-detail-item">
+            <div class="organization-detail-item">
               <span>{{ t('ec.software.common.contactPhone') }}</span>
               <strong>{{ detailRecord.informationSystem?.contactPhone || '-' }}</strong>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      <section class="software-page-card">
-        <div class="software-section-title">{{ t('ec.software.detail.persons') }}</div>
-        <div v-if="detailRecord.persons.length > 0" class="software-resource-grid">
-          <article v-for="item in detailRecord.persons" :key="item.id" class="software-resource-card">
-            <div class="software-resource-card__title">{{ item.name || '-' }}</div>
-            <div class="software-resource-card__meta-grid">
-              <div class="software-resource-card__meta">
-                <span>{{ t('ec.software.card.employeeNo') }}</span>
-                <strong>{{ item.employeeNo || '-' }}</strong>
-              </div>
-              <div class="software-resource-card__meta">
-                <span>{{ t('ec.software.card.mobile') }}</span>
-                <strong>{{ item.mobile || '-' }}</strong>
-              </div>
-            </div>
-          </article>
-        </div>
-        <el-empty v-else :description="t('ec.software.common.noRelation')" />
-      </section>
+        <section class="organization-detail-section">
+          <div class="organization-section-title">{{ t('ec.software.detail.persons') }}</div>
+          <div v-if="personCards.length > 0" class="organization-resource-grid">
+            <service-provider-relation-card
+              v-for="item in personCards"
+              :key="`person-${item.id}`"
+              :title="item.title"
+              :badge="item.badge"
+              :badge-tone="item.badgeTone"
+              :icon-src="item.iconSrc"
+              :avatar-variant="item.avatarVariant"
+              :meta-items="item.metaItems"
+              avatar
+            />
+          </div>
+          <div v-else class="organization-resource-empty">{{ t('ec.software.common.noRelation') }}</div>
+        </section>
 
-      <section class="software-page-card">
-        <div class="software-section-title">{{ t('ec.software.detail.serviceProviders') }}</div>
-        <div v-if="detailRecord.serviceProviders.length > 0" class="software-resource-grid">
-          <article v-for="item in detailRecord.serviceProviders" :key="item.id" class="software-resource-card">
-            <div class="software-resource-card__title">{{ item.name || '-' }}</div>
-            <div class="software-resource-card__meta-grid">
-              <div class="software-resource-card__meta">
-                <span>{{ t('ec.software.common.code') }}</span>
-                <strong>{{ item.code || '-' }}</strong>
-              </div>
-              <div class="software-resource-card__meta">
-                <span>{{ t('ec.software.card.creditCode') }}</span>
-                <strong>{{ item.unifiedSocialCreditCode || '-' }}</strong>
-              </div>
-              <div class="software-resource-card__meta">
-                <span>{{ t('ec.software.card.contact') }}</span>
-                <strong>{{ item.businessContact || '-' }}</strong>
-              </div>
-              <div class="software-resource-card__meta">
-                <span>{{ t('ec.software.card.phone') }}</span>
-                <strong>{{ item.businessPhone || '-' }}</strong>
-              </div>
-            </div>
-          </article>
-        </div>
-        <el-empty v-else :description="t('ec.software.common.noRelation')" />
-      </section>
+        <section class="organization-detail-section">
+          <div class="organization-section-title">{{ t('ec.software.detail.serviceProviders') }}</div>
+          <div v-if="serviceProviderCards.length > 0" class="organization-resource-grid">
+            <service-provider-vendor-card
+              v-for="item in serviceProviderCards"
+              :key="`provider-${item.id}`"
+              :title="item.title"
+              :icon-src="item.iconSrc"
+              :icon-variant="item.iconVariant"
+              :badges="item.badges"
+              :meta-items="item.metaItems"
+            />
+          </div>
+          <div v-else class="organization-resource-empty">{{ t('ec.software.common.noRelation') }}</div>
+        </section>
 
-      <section class="software-page-card">
-        <div class="software-section-title">{{ t('ec.software.detail.hardwareAssets') }}</div>
-        <div v-if="detailRecord.hardwareAssets.length > 0" class="software-resource-grid">
-          <article v-for="item in detailRecord.hardwareAssets" :key="item.id" class="software-resource-card">
-            <div class="software-resource-card__title">{{ item.name || '-' }}</div>
-            <div class="software-resource-card__meta-grid">
-              <div class="software-resource-card__meta">
-                <span>{{ t('ec.software.card.assetCode') }}</span>
-                <strong>{{ item.code || '-' }}</strong>
-              </div>
-              <div class="software-resource-card__meta">
-                <span>{{ t('ec.software.card.managementIp') }}</span>
-                <strong>{{ item.managementIp || '-' }}</strong>
-              </div>
-              <div class="software-resource-card__meta">
-                <span>{{ t('ec.software.card.cpuModel') }}</span>
-                <strong>{{ item.cpuModel || '-' }}</strong>
-              </div>
-              <div class="software-resource-card__meta">
-                <span>{{ t('ec.software.card.memoryGb') }}</span>
-                <strong>{{ item.memoryGb ?? '-' }}</strong>
-              </div>
-            </div>
-          </article>
-        </div>
-        <el-empty v-else :description="t('ec.software.common.noRelation')" />
-      </section>
+        <section class="organization-detail-section">
+          <div class="organization-section-title">{{ t('ec.software.detail.hardwareAssets') }}</div>
+          <div v-if="hardwareCards.length > 0" class="organization-resource-grid">
+            <service-provider-relation-card
+              v-for="item in hardwareCards"
+              :key="`hardware-${item.id}`"
+              :title="item.title"
+              :icon-src="item.iconSrc"
+              :icon-variant="item.iconVariant"
+              :meta-items="item.metaItems"
+            />
+          </div>
+          <div v-else class="organization-resource-empty">{{ t('ec.software.common.noRelation') }}</div>
+        </section>
 
-      <section class="software-page-card">
-        <div class="software-section-title">{{ t('ec.software.detail.projects') }}</div>
-        <div v-if="detailRecord.projects.length > 0" class="software-resource-grid">
-          <article v-for="item in detailRecord.projects" :key="item.id" class="software-resource-card">
-            <div class="software-resource-card__head">
-              <div class="software-resource-card__title">{{ item.name || '-' }}</div>
-              <span class="software-resource-card__tag">{{ getProjectTypeLabel(item.projectType) }}</span>
-            </div>
-            <div class="software-resource-card__meta-grid">
-              <div class="software-resource-card__meta">
-                <span>{{ t('ec.software.common.code') }}</span>
-                <strong>{{ item.code || '-' }}</strong>
-              </div>
-              <div class="software-resource-card__meta">
-                <span>{{ t('ec.software.card.projectType') }}</span>
-                <strong>{{ getProjectTypeLabel(item.projectType) }}</strong>
-              </div>
-              <div class="software-resource-card__meta">
-                <span>{{ t('ec.software.card.projectStatus') }}</span>
-                <strong>{{ item.projectStatus || '-' }}</strong>
-              </div>
-              <div class="software-resource-card__meta">
-                <span>{{ t('ec.software.card.ownerName') }}</span>
-                <strong>{{ item.ownerName || '-' }}</strong>
-              </div>
-            </div>
-          </article>
-        </div>
-        <el-empty v-else :description="t('ec.software.common.noRelation')" />
+        <section class="organization-detail-section">
+          <div class="organization-section-title">{{ t('ec.software.detail.projects') }}</div>
+          <div v-if="projectCards.length > 0" class="organization-resource-grid">
+            <service-provider-relation-card
+              v-for="item in projectCards"
+              :key="`project-${item.id}`"
+              :title="item.title"
+              :badge="item.badge"
+              :badge-tone="item.badgeTone"
+              :icon-src="item.iconSrc"
+              :icon-variant="item.iconVariant"
+              :meta-items="item.metaItems"
+            />
+          </div>
+          <div v-else class="organization-resource-empty">{{ t('ec.software.common.noRelation') }}</div>
+        </section>
       </section>
     </div>
   </figma-resource-page>
@@ -174,19 +118,29 @@
 <script setup>
 import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { useRoute, useRouter } from 'vue-router'
+import { useRoute } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { getStatusDictionaries } from '@/services/modules/dictionaryService'
-import { buildStatusOptionMap, getStatusLabel, getStatusTagType } from '@/utils/statusDictionary'
+import { buildStatusOptionMap, getStatusLabel } from '@/utils/statusDictionary'
 import { getInformationSystemDetail } from '@/services/modules/softwareService'
 import FigmaResourcePage from '@/views/organization/components/FigmaResourcePage.vue'
+import ServiceProviderRelationCard from '@/views/organization/components/ServiceProviderRelationCard.vue'
+import ServiceProviderVendorCard from '@/views/organization/components/ServiceProviderVendorCard.vue'
+import {
+  getHardwareIcon,
+  getHardwareIconVariant,
+  getProjectIcon,
+  getProjectIconVariant,
+  getProviderIcon,
+  getProviderIconVariant,
+  resolvePersonAvatar,
+  resolvePersonAvatarVariant,
+} from '@/views/organization/components/relationVisuals'
 
 defineOptions({ name: 'SoftwareDetailPage' })
 
 const { t, locale } = useI18n()
 const route = useRoute()
-const router = useRouter()
-
 const pageLoading = ref(false)
 const statusDictionaries = ref({})
 const detailRecord = ref({
@@ -207,6 +161,7 @@ const systemTypeMap = computed(() => ({
   DATABASE_SOFTWARE: t('ec.software.type.databaseSoftware'),
   BASIC_SUPPORT: t('ec.software.type.basicSupport'),
   SECURITY_SOFTWARE: t('ec.software.type.securitySoftware'),
+  SUPPORT_SYSTEM: t('ec.software.type.supportSystem'),
 }))
 
 const deploymentArchitectureMap = computed(() => ({
@@ -222,180 +177,268 @@ const projectTypeMap = computed(() => ({
   SERVICE_PURCHASE: t('ec.project.type.servicePurchase'),
   HARDWARE_PURCHASE: t('ec.project.type.hardwarePurchase'),
   INTEGRATION_PROJECT: t('ec.project.type.integrationProject'),
+  UPGRADE: t('ec.project.type.softwareUpgrade'),
+  OPERATION: t('ec.project.type.opsProject'),
 }))
 
-const informationSystemStatusMap = computed(() => {
-  return buildStatusOptionMap(statusDictionaries.value.informationSystemStatus, locale.value)
+const projectBadgeMap = computed(() => ({
+  NEW_BUILD: t('ec.organization.serviceProvider.projectBadge.newBuild'),
+  SOFTWARE_UPGRADE: t('ec.organization.serviceProvider.projectBadge.softwareUpgrade'),
+  OPS_PROJECT: t('ec.organization.serviceProvider.projectBadge.opsProject'),
+  SERVICE_PURCHASE: t('ec.organization.serviceProvider.projectBadge.servicePurchase'),
+  HARDWARE_PURCHASE: t('ec.organization.serviceProvider.projectBadge.hardwarePurchase'),
+  INTEGRATION_PROJECT: t('ec.organization.serviceProvider.projectBadge.integrationProject'),
+  UPGRADE: t('ec.organization.serviceProvider.projectBadge.softwareUpgrade'),
+  OPERATION: t('ec.organization.serviceProvider.projectBadge.opsProject'),
+}))
+
+const projectStatusMap = computed(() => buildStatusOptionMap(statusDictionaries.value.projectStatus, locale.value))
+
+const cooperationScopeMap = computed(() => ({
+  SOFTWARE_DEVELOPMENT: t('ec.organization.serviceProvider.scope.softwareDevelopment'),
+  OPERATIONS_SERVICE: t('ec.organization.serviceProvider.scope.operationsService'),
+  HARDWARE_PROCUREMENT: t('ec.organization.serviceProvider.scope.hardwareProcurement'),
+  INTEGRATION: t('ec.organization.serviceProvider.scope.integration'),
+}))
+
+const vendorLevelMap = computed(() => ({
+  STRATEGIC_PARTNER: t('ec.organization.serviceProvider.vendorLevel.strategicPartner'),
+  CORE_SUPPLIER: t('ec.organization.serviceProvider.vendorLevel.coreSupplier'),
+  GENERAL_SUPPLIER: t('ec.organization.serviceProvider.vendorLevel.generalSupplier'),
+}))
+
+const providerCardLabels = computed(() => {
+  if (locale.value.startsWith('zh')) {
+    return {
+      type: '类型',
+      score: '评分等级',
+      owner: '负责人',
+      phone: '联系电话',
+    }
+  }
+
+  return {
+    type: 'Type',
+    score: 'Rating',
+    owner: 'Owner',
+    phone: 'Phone',
+  }
 })
 
 const getSystemTypeLabel = (value) => systemTypeMap.value[value] || value || '-'
 const getDeploymentArchitectureLabel = (value) => deploymentArchitectureMap.value[value] || value || '-'
 const getProjectTypeLabel = (value) => projectTypeMap.value[value] || value || '-'
 
-const loadDetail = async () => {
-  const [statusOptions, detail] = await Promise.all([
-    getStatusDictionaries(),
-    getInformationSystemDetail(route.params.id),
-  ])
-
-  statusDictionaries.value = statusOptions
-  detailRecord.value = detail
+const getProjectBadgeLabel = (projectType) => {
+  return projectBadgeMap.value[projectType] || getProjectTypeLabel(projectType)
 }
 
-onMounted(async () => {
+const getProviderBadges = (scopes) => {
+  return (Array.isArray(scopes) ? scopes : [])
+    .map((item) => cooperationScopeMap.value[item] || item)
+    .filter(Boolean)
+    .slice(0, 2)
+}
+
+const getProviderTypeLabel = (item) => {
+  if (item?.vendorLevel && vendorLevelMap.value[item.vendorLevel]) {
+    return vendorLevelMap.value[item.vendorLevel]
+  }
+
+  const [primaryScope] = getProviderBadges(item?.cooperationScopes)
+  return primaryScope || '-'
+}
+
+const formatMemory = (value) => {
+  return value == null || value === '' ? '-' : `${value}GB`
+}
+
+const personCards = computed(() => {
+  const persons = Array.isArray(detailRecord.value.persons) ? detailRecord.value.persons : []
+  return persons.map((item, index) => {
+    const isOwner = item.name && item.name === detailRecord.value.informationSystem?.ownerName
+    return {
+      id: item.id,
+      title: item.name || '-',
+      badge: isOwner ? '软件负责人' : '关联人员',
+      badgeTone: isOwner ? 'blue' : 'gray',
+      iconSrc: resolvePersonAvatar(item, index),
+      avatarVariant: resolvePersonAvatarVariant(item, index),
+      metaItems: [
+        { label: t('ec.software.card.mobile'), value: item.mobile || '-' },
+        { label: t('ec.software.card.employeeNo'), value: item.employeeNo || '-' },
+      ],
+    }
+  })
+})
+
+const serviceProviderCards = computed(() => {
+  const providers = Array.isArray(detailRecord.value.serviceProviders) ? detailRecord.value.serviceProviders : []
+  return providers.map((item) => ({
+    id: item.id,
+    title: item.name || '-',
+    iconSrc: getProviderIcon(item.logoUrl),
+    iconVariant: getProviderIconVariant(item.logoUrl),
+    badges: getProviderBadges(item.cooperationScopes),
+    metaItems: [
+      { label: t('ec.software.common.code'), value: item.code || '-' },
+      { label: t('ec.software.card.creditCode'), value: item.unifiedSocialCreditCode || '-' },
+      { label: providerCardLabels.value.type, value: getProviderTypeLabel(item) },
+      { label: providerCardLabels.value.score, value: item.score, type: 'rating' },
+      { label: providerCardLabels.value.owner, value: item.businessContact || '-' },
+      { label: providerCardLabels.value.phone, value: item.businessPhone || '-' },
+    ],
+  }))
+})
+
+const hardwareCards = computed(() => {
+  const hardwareAssets = Array.isArray(detailRecord.value.hardwareAssets) ? detailRecord.value.hardwareAssets : []
+  return hardwareAssets.map((item) => ({
+    id: item.id,
+    title: item.name || '-',
+    iconSrc: getHardwareIcon(item.hardwareCategory),
+    iconVariant: getHardwareIconVariant(item.hardwareCategory),
+    metaItems: [
+      { label: t('ec.software.card.assetCode'), value: item.code || '-' },
+      { label: t('ec.software.card.managementIp'), value: item.managementIp || '-' },
+      { label: t('ec.software.card.cpuModel'), value: item.cpuModel || '-' },
+      { label: t('ec.software.card.memoryGb'), value: formatMemory(item.memoryGb) },
+    ],
+  }))
+})
+
+const projectCards = computed(() => {
+  const projects = Array.isArray(detailRecord.value.projects) ? detailRecord.value.projects : []
+  return projects.map((item) => ({
+    id: item.id,
+    title: item.name || '-',
+    badge: getProjectBadgeLabel(item.projectType),
+    badgeTone: 'blue',
+    iconSrc: getProjectIcon(),
+    iconVariant: getProjectIconVariant(),
+    metaItems: [
+      { label: t('ec.software.common.code'), value: item.code || '-' },
+      { label: t('ec.software.card.projectType'), value: getProjectTypeLabel(item.projectType) },
+      { label: t('ec.software.card.projectStatus'), value: getStatusLabel(item.projectStatus, projectStatusMap.value) },
+      { label: t('ec.software.card.ownerName'), value: item.ownerName || '-' },
+    ],
+  }))
+})
+
+const loadDetail = async () => {
   pageLoading.value = true
   try {
-    await loadDetail()
+    const [statusOptions, detail] = await Promise.all([
+      getStatusDictionaries(),
+      getInformationSystemDetail(route.params.id),
+    ])
+    statusDictionaries.value = statusOptions
+    detailRecord.value = detail
   } catch (error) {
     ElMessage.error(error.message || t('ec.software.message.detailFailed'))
   } finally {
     pageLoading.value = false
   }
-})
+}
+
+onMounted(loadDetail)
 </script>
 
 <style lang="scss" scoped>
-.software-detail-page {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
+.organization-detail-page {
+  width: 100%;
 }
 
-.software-page-card {
-  padding: 24px;
+.organization-detail-panel {
+  padding: 16px;
   background: rgba(255, 255, 255, 0.96);
   border: 1px solid #edf0f6;
   border-radius: 16px;
   box-shadow: 0 12px 40px rgba(28, 53, 91, 0.05);
 }
 
-.software-detail-header {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 16px;
-  padding-bottom: 20px;
-  border-bottom: 1px solid #edf0f6;
+.organization-detail-section + .organization-detail-section {
+  margin-top: 28px;
 }
 
-.software-detail-title {
-  color: #151b26;
-  font-size: 22px;
-  font-weight: 700;
-}
-
-.software-detail-subtitle {
-  margin-top: 6px;
-  color: #858a99;
-}
-
-.software-detail-section + .software-detail-section {
-  margin-top: 24px;
-}
-
-.software-section-title {
+.organization-section-title {
   color: #151b26;
   font-size: 16px;
-  font-weight: 700;
+  font-weight: 600;
+  line-height: 24px;
 }
 
-.software-detail-grid {
+.organization-detail-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 18px 20px;
-  margin-top: 20px;
+  gap: 8px 24px;
+  margin-top: 8px;
 }
 
-.software-detail-item {
+.organization-detail-item {
   display: flex;
-  flex-direction: column;
-  gap: 8px;
+  align-items: center;
+  min-height: 32px;
+  color: #444a57;
+  font-size: 14px;
+  line-height: 22px;
 
   > span {
+    flex: 0 0 120px;
     color: #858a99;
-    font-size: 13px;
   }
 
   > strong {
-    color: #151b26;
+    flex: 1;
+    min-width: 0;
+    font-weight: 400;
     word-break: break-all;
-    white-space: pre-wrap;
   }
 }
 
-.software-resource-grid {
+.organization-resource-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 16px;
-  margin-top: 20px;
+  margin-top: 8px;
 }
 
-.software-resource-card {
-  padding: 18px;
-  background: #f8f9fc;
-  border: 1px solid #edf0f6;
-  border-radius: 14px;
-}
-
-.software-resource-card__head {
+.organization-resource-empty {
   display: flex;
-  gap: 12px;
-  align-items: flex-start;
-  justify-content: space-between;
-}
-
-.software-resource-card__title {
-  color: #151b26;
-  font-size: 16px;
-  font-weight: 700;
-}
-
-.software-resource-card__tag {
-  display: inline-flex;
-  flex-shrink: 0;
   align-items: center;
   justify-content: center;
-  min-width: 52px;
-  padding: 2px 8px;
-  color: #2e5ef0;
-  font-size: 12px;
-  line-height: 20px;
-  background: #ebf0ff;
-  border-radius: 999px;
+  min-height: 80px;
+  margin-top: 8px;
+  color: #999faa;
+  font-size: 14px;
+  line-height: 22px;
+  background: linear-gradient(115deg, #ffffff 41.12%, #f9faff 97.72%);
+  border: 1px solid #e5e7eb;
+  border-radius: 4px;
 }
 
-.software-resource-card__meta-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 14px 16px;
-  margin-top: 16px;
-}
-
-.software-resource-card__meta {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-
-  > span {
-    color: #858a99;
-    font-size: 12px;
-  }
-
-  > strong {
-    color: #151b26;
-    word-break: break-all;
+@media only screen and (max-width: 1199px) {
+  .organization-resource-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
 @media only screen and (max-width: 991px) {
-  .software-page-card {
-    padding: 16px;
+  .organization-detail-panel {
+    padding: 16px 12px;
   }
 
-  .software-detail-grid,
-  .software-resource-grid,
-  .software-resource-card__meta-grid {
+  .organization-detail-grid,
+  .organization-resource-grid {
     grid-template-columns: 1fr;
+  }
+
+  .organization-detail-item {
+    align-items: flex-start;
+
+    > span {
+      flex-basis: 104px;
+    }
   }
 }
 </style>

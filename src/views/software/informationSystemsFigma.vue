@@ -149,7 +149,6 @@
               <template #dropdown>
                 <el-dropdown-menu>
                   <el-dropdown-item command="detail">{{ t('ec.software.common.detail') }}</el-dropdown-item>
-                  <el-dropdown-item command="relations">{{ t('ec.software.common.relations') }}</el-dropdown-item>
                 </el-dropdown-menu>
               </template>
             </el-dropdown>
@@ -416,10 +415,6 @@ const handlePageSizeChange = (size) => {
 const handleRowCommand = (command, row) => {
   if (command === 'detail') {
     router.push(`/software/informationSystems/${row.id}/detail`)
-    return
-  }
-  if (command === 'relations') {
-    router.push(`/software/informationSystems/${row.id}/relations`)
   }
 }
 
