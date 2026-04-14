@@ -95,6 +95,40 @@
         </section>
 
         <section class="organization-detail-section">
+          <div class="organization-section-title">{{ t('ec.software.detail.middlewares') }}</div>
+          <div v-if="middlewareCards.length > 0" class="organization-resource-grid">
+            <service-provider-relation-card
+              v-for="item in middlewareCards"
+              :key="`middleware-${item.id}`"
+              :title="item.title"
+              :badge="item.badge"
+              badge-tone="blue"
+              :icon-src="item.iconSrc"
+              :icon-variant="item.iconVariant"
+              :meta-items="item.metaItems"
+            />
+          </div>
+          <div v-else class="organization-resource-empty">{{ t('ec.software.common.noRelation') }}</div>
+        </section>
+
+        <section class="organization-detail-section">
+          <div class="organization-section-title">{{ t('ec.software.detail.databases') }}</div>
+          <div v-if="databaseCards.length > 0" class="organization-resource-grid">
+            <service-provider-relation-card
+              v-for="item in databaseCards"
+              :key="`database-${item.id}`"
+              :title="item.title"
+              :badge="item.badge"
+              badge-tone="blue"
+              :icon-src="item.iconSrc"
+              :icon-variant="item.iconVariant"
+              :meta-items="item.metaItems"
+            />
+          </div>
+          <div v-else class="organization-resource-empty">{{ t('ec.software.common.noRelation') }}</div>
+        </section>
+
+        <section class="organization-detail-section">
           <div class="organization-section-title">{{ t('ec.software.detail.projects') }}</div>
           <div v-if="projectCards.length > 0" class="organization-resource-grid">
             <service-provider-relation-card
@@ -133,6 +167,8 @@ import {
   getProjectIconVariant,
   getProviderIcon,
   getProviderIconVariant,
+  getSoftwareIcon,
+  getSoftwareIconVariant,
   resolvePersonAvatar,
   resolvePersonAvatarVariant,
 } from '@/views/organization/components/relationVisuals'
@@ -149,10 +185,14 @@ const detailRecord = ref({
   personIds: [],
   hardwareAssetIds: [],
   projectIds: [],
+  middlewareIds: [],
+  databaseIds: [],
   serviceProviders: [],
   persons: [],
   hardwareAssets: [],
   projects: [],
+  middlewares: [],
+  databases: [],
 })
 
 const systemTypeMap = computed(() => ({
@@ -168,6 +208,32 @@ const deploymentArchitectureMap = computed(() => ({
   SINGLE: t('ec.software.deployment.single'),
   CLUSTER: t('ec.software.deployment.cluster'),
   CONTAINERIZED: t('ec.software.deployment.containerized'),
+}))
+
+const middlewareTypeMap = computed(() => ({
+  TOMCAT: t('ec.middleware.type.tomcat'),
+  NGINX: t('ec.middleware.type.nginx'),
+  REDIS: t('ec.middleware.type.redis'),
+  KAFKA: t('ec.middleware.type.kafka'),
+  ROCKETMQ: t('ec.middleware.type.rocketmq'),
+  ELASTICSEARCH: t('ec.middleware.type.elasticsearch'),
+  NACOS: t('ec.middleware.type.nacos'),
+  OTHER: t('ec.middleware.type.other'),
+}))
+
+const databaseTypeMap = computed(() => ({
+  MYSQL: t('ec.database.type.mysql'),
+  ORACLE: t('ec.database.type.oracle'),
+  POSTGRESQL: t('ec.database.type.postgresql'),
+  SQLSERVER: t('ec.database.type.sqlserver'),
+  GAUSSDB: t('ec.database.type.gaussdb'),
+  DAMENG: t('ec.database.type.dameng'),
+  OTHER: t('ec.database.type.other'),
+}))
+
+const commonStatusMap = computed(() => ({
+  ACTIVE: t('ec.middleware.status.active'),
+  INACTIVE: t('ec.middleware.status.inactive'),
 }))
 
 const projectTypeMap = computed(() => ({
@@ -228,6 +294,9 @@ const providerCardLabels = computed(() => {
 const getSystemTypeLabel = (value) => systemTypeMap.value[value] || value || '-'
 const getDeploymentArchitectureLabel = (value) => deploymentArchitectureMap.value[value] || value || '-'
 const getProjectTypeLabel = (value) => projectTypeMap.value[value] || value || '-'
+const getMiddlewareTypeLabel = (value) => middlewareTypeMap.value[value] || value || '-'
+const getDatabaseTypeLabel = (value) => databaseTypeMap.value[value] || value || '-'
+const getCommonStatusLabel = (value) => commonStatusMap.value[value] || value || '-'
 
 const getProjectBadgeLabel = (projectType) => {
   return projectBadgeMap.value[projectType] || getProjectTypeLabel(projectType)
@@ -303,6 +372,38 @@ const hardwareCards = computed(() => {
       { label: t('ec.software.card.managementIp'), value: item.managementIp || '-' },
       { label: t('ec.software.card.cpuModel'), value: item.cpuModel || '-' },
       { label: t('ec.software.card.memoryGb'), value: formatMemory(item.memoryGb) },
+    ],
+  }))
+})
+
+const middlewareCards = computed(() => {
+  const middlewares = Array.isArray(detailRecord.value.middlewares) ? detailRecord.value.middlewares : []
+  return middlewares.map((item) => ({
+    id: item.id,
+    title: item.middlewareName || '-',
+    badge: getMiddlewareTypeLabel(item.middlewareType),
+    iconSrc: getSoftwareIcon('BASIC_SUPPORT'),
+    iconVariant: getSoftwareIconVariant('BASIC_SUPPORT'),
+    metaItems: [
+      { label: t('ec.middleware.common.code'), value: item.middlewareCode || '-' },
+      { label: t('ec.middleware.common.version'), value: item.version || '-' },
+      { label: t('ec.middleware.common.status'), value: getCommonStatusLabel(item.status) },
+    ],
+  }))
+})
+
+const databaseCards = computed(() => {
+  const databases = Array.isArray(detailRecord.value.databases) ? detailRecord.value.databases : []
+  return databases.map((item) => ({
+    id: item.id,
+    title: item.databaseName || '-',
+    badge: getDatabaseTypeLabel(item.databaseType),
+    iconSrc: getSoftwareIcon('DATABASE_SOFTWARE'),
+    iconVariant: getSoftwareIconVariant('DATABASE_SOFTWARE'),
+    metaItems: [
+      { label: t('ec.database.common.code'), value: item.databaseCode || '-' },
+      { label: t('ec.database.common.version'), value: item.version || '-' },
+      { label: t('ec.database.common.status'), value: getCommonStatusLabel(item.status) },
     ],
   }))
 })

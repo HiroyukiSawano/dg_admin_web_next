@@ -295,6 +295,20 @@ const sideMenus = computed(() => {
       active: route.path.startsWith('/software'),
     },
     {
+      key: 'middleware',
+      label: 'ec.menu.name.middleware',
+      icon: 'ri-node-tree',
+      path: '/middleware/middlewareResources',
+      active: route.path.startsWith('/middleware'),
+    },
+    {
+      key: 'database',
+      label: 'ec.menu.name.database',
+      icon: 'ri-database-2-line',
+      path: '/database/databaseResources',
+      active: route.path.startsWith('/database'),
+    },
+    {
       key: 'hardware',
       label: 'ec.menu.name.hardware',
       icon: 'ri-database-2-line',
@@ -333,12 +347,16 @@ const isServiceProviderListVariant = computed(() => props.variant === 'service-p
 const isPersonListVariant = computed(() => props.variant === 'person-list')
 const isProjectListVariant = computed(() => props.variant === 'project-list')
 const isSoftwareListVariant = computed(() => props.variant === 'software-list')
+const isMiddlewareListVariant = computed(() => props.variant === 'middleware-list')
+const isDatabaseListVariant = computed(() => props.variant === 'database-list')
 const isHardwareListVariant = computed(() => props.variant === 'hardware-list')
 const isResourceListVariant = computed(() => {
   return isServiceProviderListVariant.value
     || isPersonListVariant.value
     || isProjectListVariant.value
     || isSoftwareListVariant.value
+    || isMiddlewareListVariant.value
+    || isDatabaseListVariant.value
     || isHardwareListVariant.value
 })
 const isAsideCollapsed = computed(() => device.value === 'desktop' && collapse.value)
@@ -357,6 +375,8 @@ const shellClass = computed(() => ({
   'figma-shell--person-list': isPersonListVariant.value,
   'figma-shell--project-list': isProjectListVariant.value,
   'figma-shell--software-list': isSoftwareListVariant.value,
+  'figma-shell--middleware-list': isMiddlewareListVariant.value,
+  'figma-shell--database-list': isDatabaseListVariant.value,
   'figma-shell--hardware-list': isHardwareListVariant.value,
   'figma-shell--aside-collapsed': isAsideCollapsed.value,
 }))
@@ -388,6 +408,8 @@ const statsClass = computed(() => ({
   'figma-shell__stats--person-list': isPersonListVariant.value,
   'figma-shell__stats--project-list': isProjectListVariant.value,
   'figma-shell__stats--software-list': isSoftwareListVariant.value,
+  'figma-shell__stats--middleware-list': isMiddlewareListVariant.value,
+  'figma-shell__stats--database-list': isDatabaseListVariant.value,
   'figma-shell__stats--hardware-list': isHardwareListVariant.value,
 }))
 
@@ -397,6 +419,8 @@ const contentClass = computed(() => ({
   'figma-shell__content--person-list': isPersonListVariant.value,
   'figma-shell__content--project-list': isProjectListVariant.value,
   'figma-shell__content--software-list': isSoftwareListVariant.value,
+  'figma-shell__content--middleware-list': isMiddlewareListVariant.value,
+  'figma-shell__content--database-list': isDatabaseListVariant.value,
   'figma-shell__content--hardware-list': isHardwareListVariant.value,
 }))
 
@@ -406,6 +430,8 @@ const toolbarClass = computed(() => ({
   'figma-shell__toolbar--person-list': isPersonListVariant.value,
   'figma-shell__toolbar--project-list': isProjectListVariant.value,
   'figma-shell__toolbar--software-list': isSoftwareListVariant.value,
+  'figma-shell__toolbar--middleware-list': isMiddlewareListVariant.value,
+  'figma-shell__toolbar--database-list': isDatabaseListVariant.value,
   'figma-shell__toolbar--hardware-list': isHardwareListVariant.value,
 }))
 
@@ -415,6 +441,8 @@ const paginationClass = computed(() => ({
   'figma-shell__pagination--person-list': isPersonListVariant.value,
   'figma-shell__pagination--project-list': isProjectListVariant.value,
   'figma-shell__pagination--software-list': isSoftwareListVariant.value,
+  'figma-shell__pagination--middleware-list': isMiddlewareListVariant.value,
+  'figma-shell__pagination--database-list': isDatabaseListVariant.value,
   'figma-shell__pagination--hardware-list': isHardwareListVariant.value,
 }))
 
@@ -899,6 +927,11 @@ const toggleSidebar = () => {
   grid-template-columns: repeat(6, minmax(0, 1fr));
 }
 
+.figma-shell__stats--middleware-list,
+.figma-shell__stats--database-list {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
 .figma-shell__stats--hardware-list {
   grid-template-columns: repeat(5, minmax(0, 1fr));
 }
@@ -1183,6 +1216,30 @@ const toggleSidebar = () => {
   height: 20px;
 }
 
+.figma-shell__stats--middleware-list .figma-shell__stat-card.is-middleware-total .figma-shell__stat-icon,
+.figma-shell__stats--database-list .figma-shell__stat-card.is-database-total .figma-shell__stat-icon {
+  top: 15px;
+  right: 24px;
+  width: 22.63px;
+  height: 20.02px;
+}
+
+.figma-shell__stats--middleware-list .figma-shell__stat-card.is-middleware-active .figma-shell__stat-icon,
+.figma-shell__stats--database-list .figma-shell__stat-card.is-database-active .figma-shell__stat-icon {
+  top: 16px;
+  right: 24px;
+  width: 22.38px;
+  height: 20.02px;
+}
+
+.figma-shell__stats--middleware-list .figma-shell__stat-card.is-middleware-inactive .figma-shell__stat-icon,
+.figma-shell__stats--database-list .figma-shell__stat-card.is-database-inactive .figma-shell__stat-icon {
+  top: 15px;
+  right: 18px;
+  width: 20px;
+  height: 20px;
+}
+
 .figma-shell__stats--service-provider-list .figma-shell__stat-card.is-total .figma-shell__stat-icon-image {
   top: -19.98%;
   left: -35.35%;
@@ -1306,6 +1363,30 @@ const toggleSidebar = () => {
 }
 
 .figma-shell__stats--hardware-list .figma-shell__stat-card.is-peripheral .figma-shell__stat-icon-image {
+  top: -20%;
+  left: -40%;
+  width: 180%;
+  height: 180%;
+}
+
+.figma-shell__stats--middleware-list .figma-shell__stat-card.is-middleware-total .figma-shell__stat-icon-image,
+.figma-shell__stats--database-list .figma-shell__stat-card.is-database-total .figma-shell__stat-icon-image {
+  top: -19.98%;
+  left: -35.35%;
+  width: 170.7%;
+  height: 179.93%;
+}
+
+.figma-shell__stats--middleware-list .figma-shell__stat-card.is-middleware-active .figma-shell__stat-icon-image,
+.figma-shell__stats--database-list .figma-shell__stat-card.is-database-active .figma-shell__stat-icon-image {
+  top: -19.98%;
+  left: -35.75%;
+  width: 171.5%;
+  height: 179.94%;
+}
+
+.figma-shell__stats--middleware-list .figma-shell__stat-card.is-middleware-inactive .figma-shell__stat-icon-image,
+.figma-shell__stats--database-list .figma-shell__stat-card.is-database-inactive .figma-shell__stat-icon-image {
   top: -20%;
   left: -40%;
   width: 180%;

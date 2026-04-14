@@ -62,6 +62,34 @@
             subtitle-key="assetCode"
           />
         </el-form-item>
+
+        <el-form-item :label="t('ec.software.detail.middlewares')">
+          <ec-object-multi-transfer
+            v-model="relationForm.middlewareIds"
+            :placeholder="t('ec.software.relation.middlewaresPlaceholder')"
+            :title="`${t('ec.software.detail.middlewares')}${t('ec.organization.selector.titleSuffix')}`"
+            :selected-title="t('ec.organization.selector.selected')"
+            :search-placeholder="t('ec.organization.selector.searchPlaceholder')"
+            :options="middlewareOptions"
+            label-key="middlewareName"
+            value-key="id"
+            subtitle-key="middlewareCode"
+          />
+        </el-form-item>
+
+        <el-form-item :label="t('ec.software.detail.databases')">
+          <ec-object-multi-transfer
+            v-model="relationForm.databaseIds"
+            :placeholder="t('ec.software.relation.databasesPlaceholder')"
+            :title="`${t('ec.software.detail.databases')}${t('ec.organization.selector.titleSuffix')}`"
+            :selected-title="t('ec.organization.selector.selected')"
+            :search-placeholder="t('ec.organization.selector.searchPlaceholder')"
+            :options="databaseOptions"
+            label-key="databaseName"
+            value-key="id"
+            subtitle-key="databaseCode"
+          />
+        </el-form-item>
       </el-form>
     </div>
   </figma-resource-page>
@@ -73,8 +101,10 @@ import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import {
+  getSoftwareDatabaseOptions,
   getInformationSystemDetail,
   getSoftwareHardwareOptions,
+  getSoftwareMiddlewareOptions,
   getSoftwarePersonOptions,
   getSoftwareServiceProviderOptions,
   syncInformationSystemRelations,
@@ -95,23 +125,31 @@ const detailRecord = ref({ informationSystem: null })
 const serviceProviderOptions = ref([])
 const personOptions = ref([])
 const hardwareOptions = ref([])
+const middlewareOptions = ref([])
+const databaseOptions = ref([])
 
 const relationForm = reactive({
   serviceProviderIds: [],
   personIds: [],
   hardwareAssetIds: [],
+  middlewareIds: [],
+  databaseIds: [],
 })
 
 const loadSupportOptions = async () => {
-  const [serviceProviders, persons, hardwareAssets] = await Promise.all([
+  const [serviceProviders, persons, hardwareAssets, middlewares, databases] = await Promise.all([
     getSoftwareServiceProviderOptions(),
     getSoftwarePersonOptions(),
     getSoftwareHardwareOptions(),
+    getSoftwareMiddlewareOptions(),
+    getSoftwareDatabaseOptions(),
   ])
 
   serviceProviderOptions.value = Array.isArray(serviceProviders) ? serviceProviders : []
   personOptions.value = Array.isArray(persons) ? persons : []
   hardwareOptions.value = Array.isArray(hardwareAssets) ? hardwareAssets : []
+  middlewareOptions.value = Array.isArray(middlewares) ? middlewares : []
+  databaseOptions.value = Array.isArray(databases) ? databases : []
 }
 
 const loadDetail = async () => {
@@ -120,6 +158,8 @@ const loadDetail = async () => {
   relationForm.serviceProviderIds = normalizeIdList(detail.serviceProviderIds)
   relationForm.personIds = normalizeIdList(detail.personIds)
   relationForm.hardwareAssetIds = normalizeIdList(detail.hardwareAssetIds)
+  relationForm.middlewareIds = normalizeIdList(detail.middlewareIds)
+  relationForm.databaseIds = normalizeIdList(detail.databaseIds)
 }
 
 const handleSubmit = async () => {
@@ -129,6 +169,8 @@ const handleSubmit = async () => {
       serviceProviderIds: relationForm.serviceProviderIds,
       personIds: relationForm.personIds,
       hardwareAssetIds: relationForm.hardwareAssetIds,
+      middlewareIds: relationForm.middlewareIds,
+      databaseIds: relationForm.databaseIds,
     })
     ElMessage.success(t('ec.software.relation.saveSuccess'))
     router.replace(`/software/informationSystems/${route.params.id}/detail`)

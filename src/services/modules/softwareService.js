@@ -27,10 +27,14 @@ const normalizeInformationSystemDetail = (payload) => {
     personIds: Array.isArray(payload?.personIds) ? payload.personIds : [],
     hardwareAssetIds: Array.isArray(payload?.hardwareAssetIds) ? payload.hardwareAssetIds : [],
     projectIds: Array.isArray(payload?.projectIds) ? payload.projectIds : [],
+    middlewareIds: Array.isArray(payload?.middlewareIds) ? payload.middlewareIds : [],
+    databaseIds: Array.isArray(payload?.databaseIds) ? payload.databaseIds : [],
     serviceProviders: Array.isArray(payload?.serviceProviders) ? payload.serviceProviders : [],
     persons: Array.isArray(payload?.persons) ? payload.persons : [],
     hardwareAssets: Array.isArray(payload?.hardwareAssets) ? payload.hardwareAssets : [],
     projects: Array.isArray(payload?.projects) ? payload.projects : [],
+    middlewares: Array.isArray(payload?.middlewares) ? payload.middlewares : [],
+    databases: Array.isArray(payload?.databases) ? payload.databases : [],
   }
 }
 
@@ -130,6 +134,24 @@ export const getSoftwareProjectOptions = async () => {
 export const getSoftwareHardwareOptions = async () => {
   const payload = await resolveEamResponse({
     url: '/api/v1/hardware-assets/options',
+    method: 'GET',
+  })
+
+  return Array.isArray(payload) ? payload : []
+}
+
+export const getSoftwareMiddlewareOptions = async () => {
+  const payload = await resolveEamResponse({
+    url: '/api/v1/middleware-resources/options',
+    method: 'GET',
+  })
+
+  return Array.isArray(payload) ? payload : []
+}
+
+export const getSoftwareDatabaseOptions = async () => {
+  const payload = await resolveEamResponse({
+    url: '/api/v1/database-resources/options',
     method: 'GET',
   })
 

@@ -168,6 +168,44 @@
                 subtitle-key="assetCode"
               />
             </el-form-item>
+
+            <el-form-item class="software-form-item--transfer">
+              <template #label>
+                <span class="software-form-label">
+                  {{ t('ec.software.detail.middlewares') }}
+                </span>
+              </template>
+              <ec-object-multi-transfer
+                v-model="formData.middlewareIds"
+                :placeholder="t('ec.software.relation.middlewaresPlaceholder')"
+                :title="`${t('ec.software.detail.middlewares')}${t('ec.organization.selector.titleSuffix')}`"
+                :selected-title="t('ec.organization.selector.selected')"
+                :search-placeholder="t('ec.organization.selector.searchPlaceholder')"
+                :options="middlewareOptions"
+                label-key="middlewareName"
+                value-key="id"
+                subtitle-key="middlewareCode"
+              />
+            </el-form-item>
+
+            <el-form-item class="software-form-item--transfer">
+              <template #label>
+                <span class="software-form-label">
+                  {{ t('ec.software.detail.databases') }}
+                </span>
+              </template>
+              <ec-object-multi-transfer
+                v-model="formData.databaseIds"
+                :placeholder="t('ec.software.relation.databasesPlaceholder')"
+                :title="`${t('ec.software.detail.databases')}${t('ec.organization.selector.titleSuffix')}`"
+                :selected-title="t('ec.organization.selector.selected')"
+                :search-placeholder="t('ec.organization.selector.searchPlaceholder')"
+                :options="databaseOptions"
+                label-key="databaseName"
+                value-key="id"
+                subtitle-key="databaseCode"
+              />
+            </el-form-item>
           </div>
         </section>
         
@@ -191,8 +229,10 @@ import { useRoute, useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import {
   createInformationSystem,
+  getSoftwareDatabaseOptions,
   getInformationSystemDetail,
   getSoftwareHardwareOptions,
+  getSoftwareMiddlewareOptions,
   getSoftwarePersonOptions,
   getSoftwareServiceProviderOptions,
   updateInformationSystem,
@@ -213,6 +253,8 @@ const submitLoading = ref(false)
 const serviceProviderOptions = ref([])
 const personOptions = ref([])
 const hardwareOptions = ref([])
+const middlewareOptions = ref([])
+const databaseOptions = ref([])
 
 const formData = reactive({
   code: '',
@@ -227,6 +269,8 @@ const formData = reactive({
   serviceProviderIds: [],
   personIds: [],
   hardwareAssetIds: [],
+  middlewareIds: [],
+  databaseIds: [],
 })
 
 const isEdit = computed(() => Boolean(route.params.id))
@@ -260,15 +304,19 @@ const formRules = computed(() => ({
 }))
 
 const loadSupportData = async () => {
-  const [serviceProviders, persons, hardwareAssets] = await Promise.all([
+  const [serviceProviders, persons, hardwareAssets, middlewares, databases] = await Promise.all([
     getSoftwareServiceProviderOptions(),
     getSoftwarePersonOptions(),
     getSoftwareHardwareOptions(),
+    getSoftwareMiddlewareOptions(),
+    getSoftwareDatabaseOptions(),
   ])
 
   serviceProviderOptions.value = Array.isArray(serviceProviders) ? serviceProviders : []
   personOptions.value = Array.isArray(persons) ? persons : []
   hardwareOptions.value = Array.isArray(hardwareAssets) ? hardwareAssets : []
+  middlewareOptions.value = Array.isArray(middlewares) ? middlewares : []
+  databaseOptions.value = Array.isArray(databases) ? databases : []
 }
 
 const fillForm = (detail) => {
@@ -285,6 +333,8 @@ const fillForm = (detail) => {
   formData.serviceProviderIds = normalizeIdList(detail?.serviceProviderIds)
   formData.personIds = normalizeIdList(detail?.personIds)
   formData.hardwareAssetIds = normalizeIdList(detail?.hardwareAssetIds)
+  formData.middlewareIds = normalizeIdList(detail?.middlewareIds)
+  formData.databaseIds = normalizeIdList(detail?.databaseIds)
 }
 
 const buildPayload = () => ({
@@ -300,6 +350,8 @@ const buildPayload = () => ({
   serviceProviderIds: formData.serviceProviderIds,
   personIds: formData.personIds,
   hardwareAssetIds: formData.hardwareAssetIds,
+  middlewareIds: formData.middlewareIds,
+  databaseIds: formData.databaseIds,
 })
 
 const loadDetail = async () => {
