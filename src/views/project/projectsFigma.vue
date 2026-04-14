@@ -72,6 +72,7 @@
       v-loading="tableLoading"
       :data="tableData"
       height="100%"
+      @row-click="handleRowClick"
       row-key="id"
       class="project-figma-table"
     >
@@ -128,22 +129,20 @@
       >
         <template #default="{ row }">
           <div class="project-figma-actions">
-            <button class="project-figma-icon-button" type="button" @click="router.push(`/project/projects/${row.id}/edit`)">
+            <button
+              class="project-figma-icon-button"
+              type="button"
+              :title="t('ec.project.common.detail')"
+              @click.stop="handleDetailClick(row)"
+            >
+              <i class="ri-eye-line"></i>
+            </button>
+            <button class="project-figma-icon-button" type="button" @click.stop="router.push(`/project/projects/${row.id}/edit`)">
               <i class="ri-edit-line"></i>
             </button>
-            <button class="project-figma-icon-button is-danger" type="button" @click="handleDelete(row)">
+            <button class="project-figma-icon-button is-danger" type="button" @click.stop="handleDelete(row)">
               <i class="ri-delete-bin-line"></i>
             </button>
-            <el-dropdown trigger="click" @command="(command) => handleRowCommand(command, row)">
-              <button class="project-figma-icon-button" type="button">
-                <i class="ri-more-line"></i>
-              </button>
-              <template #dropdown>
-                <el-dropdown-menu>
-                  <el-dropdown-item command="detail">{{ t('ec.project.common.detail') }}</el-dropdown-item>
-                </el-dropdown-menu>
-              </template>
-            </el-dropdown>
           </div>
         </template>
       </el-table-column>
@@ -439,10 +438,12 @@ const handlePageSizeChange = (pageSize) => {
   loadData()
 }
 
-const handleRowCommand = (command, row) => {
-  if (command === 'detail') {
-    router.push(`/project/projects/${row.id}/detail`)
-  }
+const handleDetailClick = (row) => {
+  router.push(`/project/projects/${row.id}/detail`)
+}
+
+const handleRowClick = (row) => {
+  handleDetailClick(row)
 }
 
 const handleDelete = async (row) => {
@@ -592,6 +593,10 @@ onMounted(async () => {
     min-height: 0;
   }
 
+  :deep(.el-table__body tr) {
+    cursor: pointer;
+  }
+
   :deep(th.el-table__cell) {
     height: 46px;
     padding: 0;
@@ -634,7 +639,7 @@ onMounted(async () => {
 .project-figma-actions {
   display: flex;
   align-items: center;
-  gap: 24px;
+  gap: 18px;
 }
 
 .project-figma-icon-button {

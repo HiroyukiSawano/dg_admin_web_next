@@ -65,7 +65,7 @@ export default {
   'ec.software.form.systemTypePlaceholder': 'Select software type',
   'ec.software.form.versionNoPlaceholder': 'Enter version',
   'ec.software.form.deploymentArchitecturePlaceholder': 'Select deployment architecture',
-  'ec.software.form.ownerPlaceholder': 'Select owner',
+  'ec.software.form.ownerPlaceholder': 'Enter owner',
   'ec.software.form.ownerSelectTitle': 'Select Owner',
   'ec.software.form.contactPhonePlaceholder': 'Enter contact phone',
   'ec.software.form.statusPlaceholder': 'Select software status',

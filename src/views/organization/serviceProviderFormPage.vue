@@ -148,23 +148,25 @@
                   :http-request="handleLogoUpload"
                   :show-file-list="false"
                 >
-                  <div class="organization-logo-upload" :class="{ 'is-filled': Boolean(formData.logoUrl), 'is-loading': logoUploading }">
-                    <template v-if="formData.logoUrl">
-                      <img class="organization-logo-upload__image" :src="formData.logoUrl" alt="logo preview" />
-                      <div class="organization-logo-upload__mask">
-                        <i class="ri-image-edit-line"></i>
-                        <span>{{ t('ec.organization.serviceProvider.form.logoReplace') }}</span>
-                      </div>
-                    </template>
-                    <template v-else>
-                      <i class="ri-add-line"></i>
-                      <span>{{ t('ec.organization.serviceProvider.form.logoUpload') }}</span>
-                    </template>
+                  <div class="organization-logo-upload" :class="{ 'is-loading': logoUploading }">
+                    <div class="organization-logo-upload__preview" :class="{ 'is-empty': !formData.logoUrl }">
+                      <img
+                        v-if="formData.logoUrl"
+                        class="organization-logo-upload__image"
+                        :src="formData.logoUrl"
+                        alt="logo preview"
+                      />
+                      <template v-else>
+                        <i class="ri-image-add-line"></i>
+                        <span>{{ t('ec.organization.serviceProvider.form.logoUpload') }}</span>
+                      </template>
+                    </div>
+                    <div v-if="formData.logoUrl" class="organization-logo-upload__button">
+                      <i :class="logoUploading ? 'ri-loader-4-line' : 'ri-upload-line'"></i>
+                      <span>{{ t('ec.organization.serviceProvider.form.logoReplace') }}</span>
+                    </div>
                   </div>
                 </el-upload>
-                <el-button v-if="formData.logoUrl" link type="danger" class="organization-logo-remove" @click="handleLogoRemove">
-                  {{ t('ec.organization.serviceProvider.form.logoRemove') }}
-                </el-button>
               </div>
             </el-form-item>
             <div class="organization-form-placeholder" aria-hidden="true"></div>
@@ -444,10 +446,6 @@ const handleLogoUpload = async (options) => {
   }
 }
 
-const handleLogoRemove = () => {
-  formData.logoUrl = ''
-}
-
 const setScore = (value) => {
   formData.score = value
 }
@@ -636,36 +634,46 @@ onMounted(async () => {
 
 .organization-logo-field {
   display: flex;
-  flex-direction: column;
   align-items: flex-start;
-  gap: 8px;
 }
 
 .organization-logo-upload__control {
   :deep(.el-upload) {
     display: block;
+    text-align: left;
   }
 }
 
 .organization-logo-upload {
-  position: relative;
+  display: flex;
+  align-items: flex-end;
+  gap: 16px;
+  color: #444a57;
+  cursor: pointer;
+
+  &.is-loading {
+    pointer-events: none;
+    opacity: 0.7;
+  }
+}
+
+.organization-logo-upload__preview {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: 6px;
   width: 80px;
   height: 80px;
   overflow: hidden;
   color: #6d7485;
   background: #f5f6f9;
-  border: 1px dashed #dde2ec;
+  border: 1px solid #e5e9f2;
   border-radius: 4px;
-  cursor: pointer;
   transition: all 0.2s ease;
 
   > i {
-    font-size: 28px;
+    font-size: 22px;
     color: #444a57;
   }
 
@@ -674,58 +682,48 @@ onMounted(async () => {
     line-height: 20px;
   }
 
-  &:hover {
+  &.is-empty {
+    border-style: dashed;
+  }
+}
+
+.organization-logo-upload:hover .organization-logo-upload__preview {
+  &.is-empty {
     border-color: #4b6dff;
-    box-shadow: none;
+  }
+}
+
+.organization-logo-upload__button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  min-width: 98px;
+  height: 32px;
+  padding: 5px 12px;
+  font-size: 14px;
+  line-height: 22px;
+  color: #444a57;
+  background: #e6e8ed;
+  border-radius: 4px;
+  transition: background-color 0.2s ease, color 0.2s ease;
+
+  > i {
+    font-size: 14px;
+    line-height: 1;
   }
 
-  &.is-filled {
-    padding: 0;
-    border-style: solid;
-    background: #fff;
-  }
-
-  &.is-loading {
-    pointer-events: none;
-    opacity: 0.7;
+  &:hover {
+    color: #335cff;
+    background: #edf1ff;
   }
 }
 
 .organization-logo-upload__image {
   width: 100%;
   height: 100%;
-  object-fit: contain;
+  object-fit: cover;
   background: #fff;
-}
-
-.organization-logo-upload__mask {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  color: #fff;
-  background: rgba(21, 27, 38, 0.56);
-  opacity: 0;
-  transition: opacity 0.2s ease;
-
-  > i {
-    font-size: 18px;
-  }
-
-  > span {
-    font-size: 12px;
-  }
-}
-
-.organization-logo-upload:hover .organization-logo-upload__mask {
-  opacity: 1;
-}
-
-.organization-logo-remove {
-  padding: 0;
 }
 
 .organization-score-field {

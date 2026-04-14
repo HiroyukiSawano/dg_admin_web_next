@@ -79,23 +79,17 @@
               </el-select>
             </el-form-item>
             
-            <el-form-item prop="ownerPersonId">
+            <el-form-item prop="ownerName">
               <template #label>
                 <span class="software-form-label">
                   {{ t('ec.software.common.owner') }}
                   <span class="software-form-label__required">*</span>
                 </span>
               </template>
-              <ec-object-single-select
-                v-model="formData.ownerPersonId"
+              <el-input
+                v-model="formData.ownerName"
+                clearable
                 :placeholder="t('ec.software.form.ownerPlaceholder')"
-                :title="t('ec.software.form.ownerSelectTitle')"
-                :search-placeholder="t('ec.organization.selector.searchPlaceholder')"
-                :options="personOptions"
-                label-key="name"
-                value-key="id"
-                subtitle-key="employeeNo"
-                @change="handleOwnerChange"
               />
             </el-form-item>
             
@@ -203,7 +197,6 @@ import {
   getSoftwareServiceProviderOptions,
   updateInformationSystem,
 } from '@/services/modules/softwareService'
-import EcObjectSingleSelect from '@/components/EcObjectSingleSelect.vue'
 import EcObjectMultiTransfer from '@/components/EcObjectMultiTransfer.vue'
 import { normalizeIdList } from './helpers'
 import FigmaResourcePage from '@/views/organization/components/FigmaResourcePage.vue'
@@ -227,7 +220,7 @@ const formData = reactive({
   systemType: '',
   versionNo: '',
   deploymentArchitecture: '',
-  ownerPersonId: null,
+  ownerName: '',
   contactPhone: '',
   status: 'ACTIVE',
   remark: '',
@@ -256,17 +249,13 @@ const deploymentArchitectureOptions = computed(() => ([
   { value: 'CONTAINERIZED', label: t('ec.software.deployment.containerized') },
 ]))
 
-const personMap = computed(() => {
-  return new Map((Array.isArray(personOptions.value) ? personOptions.value : []).map((item) => [item.id, item]))
-})
-
 const formRules = computed(() => ({
   code: [{ required: true, message: t('ec.software.validation.codeRequired'), trigger: 'blur' }],
   name: [{ required: true, message: t('ec.software.validation.nameRequired'), trigger: 'blur' }],
   systemType: [{ required: true, message: t('ec.software.validation.systemTypeRequired'), trigger: 'change' }],
   versionNo: [{ required: true, message: t('ec.software.validation.versionNoRequired'), trigger: 'blur' }],
   deploymentArchitecture: [{ required: true, message: t('ec.software.validation.deploymentArchitectureRequired'), trigger: 'change' }],
-  ownerPersonId: [{ required: true, message: t('ec.software.validation.ownerRequired'), trigger: 'change' }],
+  ownerName: [{ required: true, message: t('ec.software.validation.ownerRequired'), trigger: 'blur' }],
   contactPhone: [{ required: true, message: t('ec.software.validation.contactPhoneRequired'), trigger: 'blur' }],
 }))
 
@@ -289,7 +278,7 @@ const fillForm = (detail) => {
   formData.systemType = informationSystem.systemType || ''
   formData.versionNo = informationSystem.versionNo || ''
   formData.deploymentArchitecture = informationSystem.deploymentArchitecture || ''
-  formData.ownerPersonId = informationSystem.ownerPersonId ?? null
+  formData.ownerName = informationSystem.ownerName || ''
   formData.contactPhone = informationSystem.contactPhone || ''
   formData.status = informationSystem.status || 'ACTIVE'
   formData.remark = informationSystem.remark || ''
@@ -304,7 +293,7 @@ const buildPayload = () => ({
   systemType: formData.systemType,
   versionNo: formData.versionNo,
   deploymentArchitecture: formData.deploymentArchitecture,
-  ownerPersonId: formData.ownerPersonId,
+  ownerName: formData.ownerName,
   contactPhone: formData.contactPhone,
   status: formData.status,
   remark: formData.remark,
@@ -312,15 +301,6 @@ const buildPayload = () => ({
   personIds: formData.personIds,
   hardwareAssetIds: formData.hardwareAssetIds,
 })
-
-const handleOwnerChange = (value) => {
-  const owner = personMap.value.get(value)
-  if (owner) {
-    formData.contactPhone = owner.mobile || ''
-    return
-  }
-  formData.contactPhone = ''
-}
 
 const loadDetail = async () => {
   if (!isEdit.value) return

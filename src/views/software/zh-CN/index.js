@@ -65,7 +65,7 @@ export default {
   'ec.software.form.systemTypePlaceholder': '请选择软件类型',
   'ec.software.form.versionNoPlaceholder': '请输入版本号',
   'ec.software.form.deploymentArchitecturePlaceholder': '请选择部署架构',
-  'ec.software.form.ownerPlaceholder': '请选择负责人',
+  'ec.software.form.ownerPlaceholder': '请输入负责人',
   'ec.software.form.ownerSelectTitle': '选择负责人',
   'ec.software.form.contactPhonePlaceholder': '请输入联系电话',
   'ec.software.form.statusPlaceholder': '请选择软件状态',
@@ -78,7 +78,7 @@ export default {
   'ec.software.validation.systemTypeRequired': '请选择软件类型',
   'ec.software.validation.versionNoRequired': '请输入版本号',
   'ec.software.validation.deploymentArchitectureRequired': '请选择部署架构',
-  'ec.software.validation.ownerRequired': '请选择负责人',
+  'ec.software.validation.ownerRequired': '请输入负责人',
   'ec.software.validation.contactPhoneRequired': '请输入联系电话',
   'ec.software.validation.statusRequired': '请选择软件状态',
 

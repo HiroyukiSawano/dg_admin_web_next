@@ -768,7 +768,7 @@ const toggleSidebar = () => {
 }
 
 .figma-shell__panel-header--platform {
-  min-height: 64px;
+  min-height: 40px;
   padding: 0 16px;
   border-bottom: 1px solid #e6e8ed;
 }

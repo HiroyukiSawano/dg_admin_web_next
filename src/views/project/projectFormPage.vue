@@ -927,6 +927,10 @@ onMounted(async () => {
     line-height: 22px;
   }
 
+  :deep(.el-input-number .el-input__inner) {
+    text-align: left;
+  }
+
   :deep(.el-input__inner::placeholder),
   :deep(.el-input-number .el-input__inner::placeholder) {
     color: #858a99;

@@ -72,6 +72,7 @@
       v-loading="tableLoading"
       :data="tableData"
       height="100%"
+      @row-click="handleRowClick"
       row-key="id"
       class="organization-figma-table"
     >
@@ -104,16 +105,29 @@
         min-width="128"
       >
         <template #default="{ row }">
-          <div class="organization-figma-tags">
-            <span
-              v-for="scope in normalizeScopeValues(row.cooperationScopes)"
-              :key="scope"
-              class="organization-figma-tag"
-              :class="`is-${getScopeVisual(scope).tone}`"
-            >
-              {{ getScopeVisual(scope).label }}
-            </span>
-            <span v-if="normalizeScopeValues(row.cooperationScopes).length === 0">-</span>
+          <div class="organization-figma-scope-cell" :title="row.cooperationScopeDisplay?.tooltip">
+            <template v-if="row.cooperationScopeDisplay?.scopes.length > 0">
+              <div class="organization-figma-tags">
+                <span
+                  v-for="scope in row.cooperationScopeDisplay.visibleScopes"
+                  :key="scope"
+                  class="organization-figma-tag"
+                  :class="`is-${getScopeVisual(scope).tone}`"
+                >
+                  {{ getScopeVisual(scope).label }}
+                </span>
+                <el-tooltip
+                  v-if="row.cooperationScopeDisplay.hiddenCount > 0"
+                  :content="row.cooperationScopeDisplay.tooltip"
+                  placement="top"
+                >
+                  <span class="organization-figma-tag is-default organization-figma-tag--more">
+                    <i class="ri-more-line"></i>
+                  </span>
+                </el-tooltip>
+              </div>
+            </template>
+            <span v-else class="organization-figma-scope-empty">-</span>
           </div>
         </template>
       </el-table-column>
@@ -137,22 +151,20 @@
       >
         <template #default="{ row }">
           <div class="organization-figma-actions">
-            <button class="organization-figma-icon-button" type="button" @click="router.push(`/organization/service-providers/${row.id}/edit`)">
+            <button
+              class="organization-figma-icon-button"
+              type="button"
+              :title="t('ec.organization.common.detail')"
+              @click.stop="handleDetailClick(row)"
+            >
+              <i class="ri-eye-line"></i>
+            </button>
+            <button class="organization-figma-icon-button" type="button" @click.stop="router.push(`/organization/service-providers/${row.id}/edit`)">
               <i class="ri-edit-line"></i>
             </button>
-            <button class="organization-figma-icon-button is-danger" type="button" @click="handleDelete(row)">
+            <button class="organization-figma-icon-button is-danger" type="button" @click.stop="handleDelete(row)">
               <i class="ri-delete-bin-line"></i>
             </button>
-            <el-dropdown trigger="click" @command="(command) => handleRowCommand(command, row)">
-              <button class="organization-figma-icon-button" type="button">
-                <i class="ri-more-line"></i>
-              </button>
-              <template #dropdown>
-                <el-dropdown-menu>
-                  <el-dropdown-item command="detail">{{ t('ec.organization.common.detail') }}</el-dropdown-item>
-                </el-dropdown-menu>
-              </template>
-            </el-dropdown>
           </div>
         </template>
       </el-table-column>
@@ -327,7 +339,25 @@ const getScopeVisual = (value) => {
 }
 
 const normalizeScopeValues = (value) => {
-  return Array.isArray(value) ? value : []
+  const scopes = Array.isArray(value)
+    ? value
+    : typeof value === 'string'
+      ? value.split(/[,，;；]/)
+      : []
+  return Array.from(new Set(scopes.map((item) => String(item || '').trim()).filter(Boolean)))
+}
+
+const getScopeDisplay = (value) => {
+  const scopes = normalizeScopeValues(value)
+  const visibleScopes = scopes.length > 2 ? scopes.slice(0, 1) : scopes.slice(0, 2)
+  const hiddenCount = Math.max(scopes.length - visibleScopes.length, 0)
+
+  return {
+    scopes,
+    visibleScopes,
+    hiddenCount,
+    tooltip: scopes.map((scope) => getScopeVisual(scope).label).join('、'),
+  }
 }
 
 const resetStats = () => {
@@ -348,7 +378,12 @@ const loadData = async () => {
       cooperationScope: queryForm.cooperationScope || undefined,
       vendorLevel: queryForm.vendorLevel || undefined,
     })
-    tableData.value = Array.isArray(pageData.records) ? pageData.records : []
+    tableData.value = Array.isArray(pageData.records)
+      ? pageData.records.map((item) => ({
+        ...item,
+        cooperationScopeDisplay: getScopeDisplay(item.cooperationScopes),
+      }))
+      : []
     pagination.total = Number(pageData.total || 0)
   } catch (error) {
     ElMessage.error(error.message || t('ec.organization.serviceProvider.message.loadFailed'))
@@ -398,10 +433,12 @@ const handlePageSizeChange = (pageSize) => {
   loadData()
 }
 
-const handleRowCommand = (command, row) => {
-  if (command === 'detail') {
-    router.push(`/organization/service-providers/${row.id}/detail`)
-  }
+const handleDetailClick = (row) => {
+  router.push(`/organization/service-providers/${row.id}/detail`)
+}
+
+const handleRowClick = (row) => {
+  handleDetailClick(row)
 }
 
 const handleDelete = async (row) => {
@@ -553,6 +590,10 @@ onMounted(async () => {
     min-height: 0;
   }
 
+  :deep(.el-table__body tr) {
+    cursor: pointer;
+  }
+
   :deep(th.el-table__cell) {
     height: 46px;
     padding: 0;
@@ -574,15 +615,32 @@ onMounted(async () => {
 
 .organization-figma-tags {
   display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
+  flex-wrap: nowrap;
+  gap: 4px;
   align-items: center;
+  max-width: 100%;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.organization-figma-scope-cell {
+  display: flex;
+  align-items: center;
+  min-height: 22px;
+  min-width: 0;
+}
+
+.organization-figma-scope-empty {
+  color: #858a99;
+  font-size: 14px;
+  line-height: 22px;
 }
 
 .organization-figma-tag {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
   min-width: 52px;
   padding: 2px 8px;
   border-radius: 2px;
@@ -614,12 +672,23 @@ onMounted(async () => {
     background: #f5f6f9;
     color: #858a99;
   }
+
+  &--more {
+    width: 24px;
+    min-width: 24px;
+    padding: 2px 0;
+
+    i {
+      font-size: 14px;
+      line-height: 1;
+    }
+  }
 }
 
 .organization-figma-actions {
   display: flex;
   align-items: center;
-  gap: 24px;
+  gap: 18px;
 }
 
 .organization-figma-icon-button {

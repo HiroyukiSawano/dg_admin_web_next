@@ -72,6 +72,7 @@
       v-loading="tableLoading"
       :data="tableData"
       height="100%"
+      @row-click="handleRowClick"
       row-key="id"
       class="hardware-figma-table"
     >
@@ -128,22 +129,20 @@
       >
         <template #default="{ row }">
           <div class="hardware-figma-actions">
-            <button class="hardware-figma-icon-button" type="button" @click="router.push(`/hardware/hardwareAssets/${row.id}/edit`)">
+            <button
+              class="hardware-figma-icon-button"
+              type="button"
+              :title="t('ec.hardware.common.detail')"
+              @click.stop="handleDetailClick(row)"
+            >
+              <i class="ri-eye-line"></i>
+            </button>
+            <button class="hardware-figma-icon-button" type="button" @click.stop="router.push(`/hardware/hardwareAssets/${row.id}/edit`)">
               <i class="ri-edit-line"></i>
             </button>
-            <button class="hardware-figma-icon-button is-danger" type="button" @click="handleDelete(row)">
+            <button class="hardware-figma-icon-button is-danger" type="button" @click.stop="handleDelete(row)">
               <i class="ri-delete-bin-line"></i>
             </button>
-            <el-dropdown trigger="click" @command="(command) => handleRowCommand(command, row)">
-              <button class="hardware-figma-icon-button" type="button">
-                <i class="ri-more-line"></i>
-              </button>
-              <template #dropdown>
-                <el-dropdown-menu>
-                  <el-dropdown-item command="detail">{{ t('ec.hardware.common.detail') }}</el-dropdown-item>
-                </el-dropdown-menu>
-              </template>
-            </el-dropdown>
           </div>
         </template>
       </el-table-column>
@@ -394,10 +393,12 @@ const handlePageSizeChange = (size) => {
   loadData()
 }
 
-const handleRowCommand = (command, row) => {
-  if (command === 'detail') {
-    router.push(`/hardware/hardwareAssets/${row.id}/detail`)
-  }
+const handleDetailClick = (row) => {
+  router.push(`/hardware/hardwareAssets/${row.id}/detail`)
+}
+
+const handleRowClick = (row) => {
+  handleDetailClick(row)
 }
 
 const handleDelete = async (row) => {
@@ -546,6 +547,10 @@ onMounted(async () => {
     min-height: 0;
   }
 
+  :deep(.el-table__body tr) {
+    cursor: pointer;
+  }
+
   :deep(th.el-table__cell) {
     height: 46px;
     padding: 0;
@@ -600,7 +605,7 @@ onMounted(async () => {
 .hardware-figma-actions {
   display: flex;
   align-items: center;
-  gap: 24px;
+  gap: 18px;
 }
 
 .hardware-figma-icon-button {

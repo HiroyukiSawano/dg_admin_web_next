@@ -24,7 +24,7 @@
               <strong>{{ detailRecord.project?.name || '-' }}</strong>
             </div>
             <div class="organization-detail-item">
-              <span>{{ t('ec.project.common.projectType') }}</span>
+              <span>{{ detailText.projectType }}</span>
               <strong>{{ getProjectTypeLabel(detailRecord.project?.projectType) }}</strong>
             </div>
             <div class="organization-detail-item">
@@ -32,12 +32,12 @@
               <strong>{{ detailRecord.project?.approvalBatchNo || '-' }}</strong>
             </div>
             <div class="organization-detail-item">
-              <span>{{ t('ec.project.common.projectBudget') }}</span>
-              <strong>{{ formatAmount(detailRecord.project?.projectBudget) }}</strong>
+              <span>{{ detailText.projectBudget }}</span>
+              <strong>{{ formatDetailAmount(detailRecord.project?.projectBudget) }}</strong>
             </div>
             <div class="organization-detail-item">
-              <span>{{ t('ec.project.common.contractAmount') }}</span>
-              <strong>{{ formatAmount(detailRecord.project?.contractAmount) }}</strong>
+              <span>{{ detailText.contractAmount }}</span>
+              <strong>{{ formatDetailAmount(detailRecord.project?.contractAmount) }}</strong>
             </div>
           </div>
         </section>
@@ -46,11 +46,11 @@
           <div class="organization-section-title">{{ t('ec.project.section.owner') }}</div>
           <div class="organization-detail-grid">
             <div class="organization-detail-item">
-              <span>{{ t('ec.project.common.ownerName') }}</span>
+              <span>{{ detailText.ownerName }}</span>
               <strong>{{ detailRecord.project?.ownerName || '-' }}</strong>
             </div>
             <div class="organization-detail-item">
-              <span>{{ t('ec.project.common.ownerPhone') }}</span>
+              <span>{{ detailText.ownerPhone }}</span>
               <strong>{{ detailRecord.project?.ownerPhone || '-' }}</strong>
             </div>
           </div>
@@ -61,23 +61,23 @@
           <div class="organization-detail-grid">
             <div class="organization-detail-item">
               <span>{{ t('ec.project.common.approvalDate') }}</span>
-              <strong>{{ formatDate(detailRecord.project?.approvalDate) }}</strong>
+              <strong>{{ formatProjectDate(detailRecord.project?.approvalDate) }}</strong>
             </div>
             <div class="organization-detail-item">
               <span>{{ t('ec.project.common.startDate') }}</span>
-              <strong>{{ formatDate(detailRecord.project?.startDate) }}</strong>
+              <strong>{{ formatProjectDate(detailRecord.project?.startDate) }}</strong>
             </div>
             <div class="organization-detail-item">
               <span>{{ t('ec.project.common.initialDeliveryDate') }}</span>
-              <strong>{{ formatDate(detailRecord.project?.initialDeliveryDate) }}</strong>
+              <strong>{{ formatProjectDate(detailRecord.project?.initialDeliveryDate) }}</strong>
             </div>
             <div class="organization-detail-item">
               <span>{{ t('ec.project.common.endDate') }}</span>
-              <strong>{{ formatDate(detailRecord.project?.endDate) }}</strong>
+              <strong>{{ formatProjectDate(detailRecord.project?.endDate) }}</strong>
             </div>
             <div class="organization-detail-item">
               <span>{{ t('ec.project.common.warrantyEndDate') }}</span>
-              <strong>{{ formatDate(detailRecord.project?.warrantyEndDate) }}</strong>
+              <strong>{{ formatProjectDate(detailRecord.project?.warrantyEndDate) }}</strong>
             </div>
             <div class="organization-detail-item">
               <span>{{ t('ec.project.common.stage') }}</span>
@@ -87,30 +87,30 @@
         </section>
 
         <section class="organization-detail-section">
-          <div class="organization-section-title">{{ t('ec.project.section.payment') }}</div>
+          <div class="organization-section-title">{{ detailText.paymentSection }}</div>
           <div class="organization-detail-grid">
             <div class="organization-detail-item">
-              <span>{{ t('ec.project.common.paymentCycleName') }}</span>
+              <span>{{ detailText.paymentCycleName }}</span>
               <strong>{{ detailRecord.project?.paymentCycleName || '-' }}</strong>
             </div>
             <div class="organization-detail-item">
-              <span>{{ t('ec.project.common.paymentRatio') }}</span>
+              <span>{{ detailText.paymentRatio }}</span>
               <strong>{{ detailRecord.project?.paymentRatio == null ? '-' : `${detailRecord.project.paymentRatio}%` }}</strong>
             </div>
             <div class="organization-detail-item">
-              <span>{{ t('ec.project.common.paymentAmount') }}</span>
-              <strong>{{ formatAmount(detailRecord.project?.paymentAmount) }}</strong>
+              <span>{{ detailText.paymentAmount }}</span>
+              <strong>{{ formatDetailAmount(detailRecord.project?.paymentAmount) }}</strong>
             </div>
             <div class="organization-detail-item">
               <span>{{ t('ec.project.common.plannedPaymentDate') }}</span>
-              <strong>{{ formatDate(detailRecord.project?.plannedPaymentDate) }}</strong>
+              <strong>{{ formatProjectDate(detailRecord.project?.plannedPaymentDate) }}</strong>
             </div>
             <div class="organization-detail-item">
               <span>{{ t('ec.project.common.actualPaymentDate') }}</span>
-              <strong>{{ formatDate(detailRecord.project?.actualPaymentDate) }}</strong>
+              <strong>{{ formatProjectDate(detailRecord.project?.actualPaymentDate) }}</strong>
             </div>
             <div class="organization-detail-item">
-              <span>{{ t('ec.project.common.paymentStatus') }}</span>
+              <span>{{ detailText.paymentStatus }}</span>
               <strong>{{ getStatusLabel(detailRecord.project?.paymentStatus, paymentStatusMap) }}</strong>
             </div>
           </div>
@@ -118,20 +118,19 @@
 
         <section class="organization-detail-section">
           <div class="organization-section-title">{{ t('ec.project.section.documents') }}</div>
-          <div class="project-detail-hint">{{ t('ec.project.document.detailHint') }}</div>
           <el-table :data="detailRecord.documents" class="project-document-table">
-            <el-table-column prop="originalName" :label="t('ec.project.document.name')" min-width="220" show-overflow-tooltip />
-            <el-table-column :label="t('ec.project.document.size')" width="120">
+            <el-table-column prop="originalName" :label="t('ec.project.document.name')" min-width="299" show-overflow-tooltip />
+            <el-table-column :label="t('ec.project.document.size')" width="299">
               <template #default="{ row }">
-                {{ formatFileSize(row.fileSize) }}
+                {{ formatProjectFileSize(row.fileSize) }}
               </template>
             </el-table-column>
-            <el-table-column :label="t('ec.project.document.uploadedAt')" width="180">
+            <el-table-column :label="t('ec.project.document.uploadedAt')" width="299">
               <template #default="{ row }">
-                {{ formatDateTime(row.uploadedAt) }}
+                {{ formatDate(row.uploadedAt) }}
               </template>
             </el-table-column>
-            <el-table-column :label="t('ec.project.common.actions')" width="120">
+            <el-table-column :label="t('ec.project.common.actions')" width="116">
               <template #default="{ row }">
                 <el-button type="primary" link @click="openDocument(row)">
                   {{ t('ec.project.document.view') }}
@@ -224,10 +223,11 @@ import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute } from 'vue-router'
 import { ElMessage } from 'element-plus'
+import dayjs from 'dayjs'
 import { getStatusDictionaries } from '@/services/modules/dictionaryService'
 import { buildStatusOptionMap } from '@/utils/statusDictionary'
 import { getProjectDetail } from '@/services/modules/projectService'
-import { formatAmount, formatDate, formatDateTime, formatFileSize, getStatusLabel } from './helpers'
+import { formatDate, getStatusLabel } from './helpers'
 import FigmaResourcePage from '@/views/organization/components/FigmaResourcePage.vue'
 import ServiceProviderRelationCard from '@/views/organization/components/ServiceProviderRelationCard.vue'
 import ServiceProviderVendorCard from '@/views/organization/components/ServiceProviderVendorCard.vue'
@@ -267,17 +267,6 @@ const projectTypeMap = computed(() => ({
   INTEGRATION_PROJECT: t('ec.project.type.integrationProject'),
   UPGRADE: t('ec.project.type.softwareUpgrade'),
   OPERATION: t('ec.project.type.opsProject'),
-}))
-
-const projectBadgeMap = computed(() => ({
-  NEW_BUILD: t('ec.organization.serviceProvider.projectBadge.newBuild'),
-  SOFTWARE_UPGRADE: t('ec.organization.serviceProvider.projectBadge.softwareUpgrade'),
-  OPS_PROJECT: t('ec.organization.serviceProvider.projectBadge.opsProject'),
-  SERVICE_PURCHASE: t('ec.organization.serviceProvider.projectBadge.servicePurchase'),
-  HARDWARE_PURCHASE: t('ec.organization.serviceProvider.projectBadge.hardwarePurchase'),
-  INTEGRATION_PROJECT: t('ec.organization.serviceProvider.projectBadge.integrationProject'),
-  UPGRADE: t('ec.organization.serviceProvider.projectBadge.softwareUpgrade'),
-  OPERATION: t('ec.organization.serviceProvider.projectBadge.opsProject'),
 }))
 
 const systemTypeMap = computed(() => ({
@@ -320,15 +309,48 @@ const providerCardLabels = computed(() => {
   }
 })
 
-const projectStatusMap = computed(() => buildStatusOptionMap(statusDictionaries.value.projectStatus, locale.value))
 const paymentStatusMap = computed(() => buildStatusOptionMap(statusDictionaries.value.paymentStatus, locale.value))
 
 const getProjectTypeLabel = (value) => projectTypeMap.value[value] || value || '-'
 const getSystemTypeLabel = (value) => systemTypeMap.value[value] || value || '-'
 
-const getProjectBadgeLabel = (projectType) => {
-  return projectBadgeMap.value[projectType] || getProjectTypeLabel(projectType)
-}
+const isZhLocale = computed(() => locale.value.startsWith('zh'))
+
+const detailText = computed(() => {
+  if (isZhLocale.value) {
+    return {
+      projectType: '类型',
+      projectBudget: '项目预算',
+      contractAmount: '项目合同金额',
+      ownerName: '姓名',
+      ownerPhone: '联系电话',
+      paymentSection: '项目支付周期',
+      paymentCycleName: '周期名称',
+      paymentRatio: '付款比例',
+      paymentAmount: '付款金额',
+      paymentStatus: '状态',
+      personPhone: '电话',
+      hardwareIp: 'IP',
+      softwareVendor: '开发商',
+    }
+  }
+
+  return {
+    projectType: t('ec.project.common.projectType'),
+    projectBudget: t('ec.project.common.projectBudget'),
+    contractAmount: t('ec.project.common.contractAmount'),
+    ownerName: t('ec.project.common.ownerName'),
+    ownerPhone: t('ec.project.common.ownerPhone'),
+    paymentSection: t('ec.project.section.payment'),
+    paymentCycleName: t('ec.project.common.paymentCycleName'),
+    paymentRatio: t('ec.project.common.paymentRatio'),
+    paymentAmount: t('ec.project.common.paymentAmount'),
+    paymentStatus: t('ec.project.common.paymentStatus'),
+    personPhone: t('ec.project.card.mobile'),
+    hardwareIp: t('ec.project.card.ip'),
+    softwareVendor: t('ec.project.card.vendor'),
+  }
+})
 
 const getProviderBadges = (scopes) => {
   return (Array.isArray(scopes) ? scopes : [])
@@ -350,6 +372,29 @@ const formatMemory = (value) => {
   return value == null || value === '' ? '-' : `${value}GB`
 }
 
+const formatDetailAmount = (value) => {
+  if (value == null || value === '') return '-'
+  const raw = String(value)
+  if (raw.includes('万')) return raw
+  const numeric = Number(value)
+  if (Number.isNaN(numeric)) return raw
+  const formatted = Number.isInteger(numeric) ? String(numeric) : String(Number(numeric.toFixed(2)))
+  return isZhLocale.value ? `${formatted}万元` : formatted
+}
+
+const formatProjectDate = (value) => {
+  if (!value) return '-'
+  return isZhLocale.value ? dayjs(value).format('YYYYMMDD') : formatDate(value)
+}
+
+const formatProjectFileSize = (value) => {
+  const size = Number(value || 0)
+  if (!size) return '-'
+  if (size >= 1024 * 1024) return `${Number((size / 1024 / 1024).toFixed(2))}mb`
+  if (size >= 1024) return `${Number((size / 1024).toFixed(2))}kb`
+  return `${size}b`
+}
+
 const openDocument = (item) => {
   if (!item?.fileUrl) return
   window.open(item.fileUrl, '_blank', 'noopener')
@@ -367,7 +412,7 @@ const personCards = computed(() => {
       iconSrc: resolvePersonAvatar(item, index),
       avatarVariant: resolvePersonAvatarVariant(item, index),
       metaItems: [
-        { label: t('ec.project.card.mobile'), value: item.mobile || '-' },
+        { label: detailText.value.personPhone, value: item.mobile || '-' },
         { label: t('ec.project.card.employeeNo'), value: item.employeeNo || '-' },
       ],
     }
@@ -386,7 +431,7 @@ const softwareCards = computed(() => {
     metaItems: [
       { label: t('ec.project.card.code'), value: item.code || '-' },
       { label: t('ec.project.card.type'), value: getSystemTypeLabel(item.systemType) },
-      { label: t('ec.project.card.vendor'), value: item.serviceProviderName || '-' },
+      { label: detailText.value.softwareVendor, value: item.serviceProviderName || '-' },
       { label: t('ec.project.card.owner'), value: item.ownerName || '-' },
     ],
   }))
@@ -401,7 +446,7 @@ const hardwareCards = computed(() => {
     iconVariant: getHardwareIconVariant(item.hardwareCategory),
     metaItems: [
       { label: t('ec.project.card.code'), value: item.code || '-' },
-      { label: t('ec.project.card.ip'), value: item.managementIp || '-' },
+      { label: detailText.value.hardwareIp, value: item.managementIp || '-' },
       { label: t('ec.project.card.cpu'), value: item.cpuModel || '-' },
       { label: t('ec.project.card.memory'), value: formatMemory(item.memoryGb) },
       { label: t('ec.project.card.vendor'), value: item.serviceProviderName || '-' },
@@ -454,15 +499,11 @@ onMounted(loadDetail)
 }
 
 .organization-detail-panel {
-  padding: 16px;
-  background: rgba(255, 255, 255, 0.96);
-  border: 1px solid #edf0f6;
-  border-radius: 16px;
-  box-shadow: 0 12px 40px rgba(28, 53, 91, 0.05);
+  background: transparent;
 }
 
 .organization-detail-section + .organization-detail-section {
-  margin-top: 28px;
+  margin-top: 32px;
 }
 
 .organization-section-title {
@@ -481,6 +522,7 @@ onMounted(loadDetail)
 
 .organization-detail-item {
   display: flex;
+  gap: 16px;
   align-items: center;
   min-height: 32px;
   color: #444a57;
@@ -500,18 +542,35 @@ onMounted(loadDetail)
   }
 }
 
-.project-detail-hint {
-  margin-top: 8px;
-  color: #858a99;
-  font-size: 12px;
-  line-height: 20px;
-}
-
 .project-document-table {
   margin-top: 8px;
 
+  :deep(.el-table) {
+    --el-table-border-color: #edeef3;
+    --el-table-header-bg-color: #f5f6f9;
+    --el-table-row-hover-bg-color: #f8faff;
+  }
+
+  :deep(.el-table__inner-wrapper::before) {
+    display: none;
+  }
+
   :deep(th.el-table__cell) {
-    background: #f1f4fb;
+    height: 46px;
+    padding: 0;
+    background: #f5f6f9;
+    color: #151b26;
+    font-weight: 600;
+  }
+
+  :deep(td.el-table__cell) {
+    height: 46px;
+    padding: 0;
+    color: #444a57;
+  }
+
+  :deep(.cell) {
+    line-height: 22px;
   }
 }
 
@@ -524,7 +583,7 @@ onMounted(loadDetail)
 
 .organization-resource-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(3, 326px);
   gap: 16px;
   margin-top: 8px;
 }
@@ -550,10 +609,6 @@ onMounted(loadDetail)
 }
 
 @media only screen and (max-width: 991px) {
-  .organization-detail-panel {
-    padding: 16px 12px;
-  }
-
   .organization-detail-grid,
   .organization-resource-grid {
     grid-template-columns: 1fr;
