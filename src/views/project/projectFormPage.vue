@@ -120,149 +120,161 @@
         </section>
 
         <section class="project-form-section">
-          <div class="project-section-title">{{ t('ec.project.section.period') }}</div>
+          <div class="project-repeatable-header">
+            <div class="project-section-title">{{ t('ec.project.section.period') }}</div>
+            <el-button type="primary" class="project-repeatable-add" @click="addProjectPeriod">
+              <i class="ri-add-line"></i>
+              {{ t('ec.project.form.addCycle') }}
+            </el-button>
+          </div>
 
-          <div class="project-form-grid">
-            <el-form-item prop="approvalDate">
-              <template #label>
-                <span class="project-form-label">
-                  {{ t('ec.project.common.approvalDate') }}
-                  <span class="project-form-label__required">*</span>
-                </span>
-              </template>
-              <el-date-picker v-model="formData.approvalDate" type="date" value-format="YYYY-MM-DD" :placeholder="t('ec.project.form.selectPlaceholder')" />
-            </el-form-item>
+          <div class="project-cycle-list">
+            <div
+              v-for="(period, index) in formData.projectPeriods"
+              :key="period.uid"
+              class="project-cycle-row project-cycle-row--period"
+            >
+              <div class="project-cycle-fields">
+                <el-form-item
+                  :prop="`projectPeriods.${index}.stageName`"
+                  :rules="requiredRule(t('ec.project.form.stageNameLabel'), 'blur')"
+                >
+                  <template #label>
+                    <span class="project-form-label">
+                      {{ t('ec.project.form.stageNameLabel') }}
+                      <span class="project-form-label__required">*</span>
+                    </span>
+                  </template>
+                  <el-input v-model="period.stageName" clearable :placeholder="t('ec.project.form.contentPlaceholder')" />
+                </el-form-item>
 
-            <el-form-item prop="startDate">
-              <template #label>
-                <span class="project-form-label">
-                  {{ t('ec.project.common.startDate') }}
-                  <span class="project-form-label__required">*</span>
-                </span>
-              </template>
-              <el-date-picker v-model="formData.startDate" type="date" value-format="YYYY-MM-DD" :placeholder="t('ec.project.form.selectPlaceholder')" />
-            </el-form-item>
+                <el-form-item
+                  :prop="`projectPeriods.${index}.plannedDate`"
+                  :rules="requiredRule(t('ec.project.form.plannedTimeLabel'), 'change')"
+                >
+                  <template #label>
+                    <span class="project-form-label">
+                      {{ t('ec.project.form.plannedTimeLabel') }}
+                      <span class="project-form-label__required">*</span>
+                    </span>
+                  </template>
+                  <el-date-picker v-model="period.plannedDate" type="date" value-format="YYYY-MM-DD" :placeholder="t('ec.project.form.selectPlaceholder')" />
+                </el-form-item>
 
-            <el-form-item prop="initialDeliveryDate">
-              <template #label>
-                <span class="project-form-label">
-                  {{ t('ec.project.common.initialDeliveryDate') }}
-                  <span class="project-form-label__required">*</span>
-                </span>
-              </template>
-              <el-date-picker v-model="formData.initialDeliveryDate" type="date" value-format="YYYY-MM-DD" :placeholder="t('ec.project.form.selectPlaceholder')" />
-            </el-form-item>
+                <el-form-item :prop="`projectPeriods.${index}.actualDate`">
+                  <template #label>
+                    <span class="project-form-label">
+                      {{ t('ec.project.form.actualTimeLabel') }}
+                      <span class="project-form-label__required">*</span>
+                    </span>
+                  </template>
+                  <el-date-picker v-model="period.actualDate" type="date" value-format="YYYY-MM-DD" :placeholder="t('ec.project.form.selectPlaceholder')" />
+                </el-form-item>
+              </div>
 
-            <el-form-item prop="endDate">
-              <template #label>
-                <span class="project-form-label">
-                  {{ t('ec.project.common.endDate') }}
-                  <span class="project-form-label__required">*</span>
-                </span>
-              </template>
-              <el-date-picker v-model="formData.endDate" type="date" value-format="YYYY-MM-DD" :placeholder="t('ec.project.form.selectPlaceholder')" />
-            </el-form-item>
-
-            <el-form-item prop="warrantyEndDate">
-              <template #label>
-                <span class="project-form-label">
-                  {{ t('ec.project.common.warrantyEndDate') }}
-                  <span class="project-form-label__required">*</span>
-                </span>
-              </template>
-              <el-date-picker v-model="formData.warrantyEndDate" type="date" value-format="YYYY-MM-DD" :placeholder="t('ec.project.form.selectPlaceholder')" />
-            </el-form-item>
-
-            <el-form-item prop="stage">
-              <template #label>
-                <span class="project-form-label">
-                  {{ t('ec.project.common.stage') }}
-                  <span class="project-form-label__required">*</span>
-                </span>
-              </template>
-              <el-input v-model="formData.stage" clearable :placeholder="t('ec.project.form.contentPlaceholder')" />
-            </el-form-item>
+              <el-button type="primary" link class="project-cycle-remove" @click="removeProjectPeriod(index)">
+                {{ t('ec.project.common.delete') }}
+              </el-button>
+            </div>
           </div>
         </section>
 
         <section class="project-form-section">
-          <div class="project-section-title">{{ t('ec.project.section.payment') }}</div>
+          <div class="project-repeatable-header">
+            <div class="project-section-title">{{ t('ec.project.section.payment') }}</div>
+            <el-button type="primary" class="project-repeatable-add" @click="addPaymentCycle">
+              <i class="ri-add-line"></i>
+              {{ t('ec.project.form.addCycle') }}
+            </el-button>
+          </div>
 
-          <div class="project-form-grid">
-            <el-form-item prop="paymentCycleName">
-              <template #label>
-                <span class="project-form-label">
-                  {{ t('ec.project.form.paymentCycleNameLabel') }}
-                  <span class="project-form-label__required">*</span>
-                </span>
-              </template>
-              <el-input v-model="formData.paymentCycleName" clearable :placeholder="t('ec.project.form.contentPlaceholder')" />
-            </el-form-item>
+          <div class="project-cycle-list">
+            <div
+              v-for="(paymentCycle, index) in formData.paymentCycles"
+              :key="paymentCycle.uid"
+              class="project-cycle-row project-cycle-row--payment"
+            >
+              <div class="project-cycle-fields">
+                <el-form-item
+                  :prop="`paymentCycles.${index}.stageName`"
+                  :rules="requiredRule(t('ec.project.form.stageNameLabel'), 'blur')"
+                >
+                  <template #label>
+                    <span class="project-form-label">
+                      {{ t('ec.project.form.stageNameLabel') }}
+                      <span class="project-form-label__required">*</span>
+                    </span>
+                  </template>
+                  <el-input v-model="paymentCycle.stageName" clearable :placeholder="t('ec.project.form.contentPlaceholder')" />
+                </el-form-item>
 
-            <el-form-item prop="paymentRatio">
-              <template #label>
-                <span class="project-form-label">
-                  {{ t('ec.project.form.paymentRatioLabel') }}
-                  <span class="project-form-label__required">*</span>
-                </span>
-              </template>
-              <el-input-number
-                v-model="formData.paymentRatio"
-                :min="0"
-                :max="100"
-                :precision="2"
-                :controls="false"
-                :placeholder="t('ec.project.form.contentPlaceholder')"
-              />
-            </el-form-item>
+                <el-form-item
+                  :prop="`paymentCycles.${index}.paymentRatio`"
+                  :rules="requiredRule(t('ec.project.form.paymentRatioLabel'), 'change')"
+                >
+                  <template #label>
+                    <span class="project-form-label">
+                      {{ t('ec.project.form.paymentRatioLabel') }}
+                      <span class="project-form-label__required">*</span>
+                    </span>
+                  </template>
+                  <el-input-number
+                    v-model="paymentCycle.paymentRatio"
+                    :min="0"
+                    :max="100"
+                    :precision="2"
+                    :controls="false"
+                    :placeholder="t('ec.project.form.contentPlaceholder')"
+                  />
+                </el-form-item>
 
-            <el-form-item prop="paymentAmount">
-              <template #label>
-                <span class="project-form-label">
-                  {{ t('ec.project.form.paymentAmountLabel') }}
-                  <span class="project-form-label__required">*</span>
-                </span>
-              </template>
-              <el-input-number
-                v-model="formData.paymentAmount"
-                :min="0"
-                :precision="2"
-                :controls="false"
-                :placeholder="t('ec.project.form.contentPlaceholder')"
-              />
-            </el-form-item>
+                <el-form-item
+                  :prop="`paymentCycles.${index}.paymentAmount`"
+                  :rules="requiredRule(t('ec.project.form.paymentAmountLabel'), 'change')"
+                >
+                  <template #label>
+                    <span class="project-form-label">
+                      {{ t('ec.project.form.paymentAmountLabel') }}
+                      <span class="project-form-label__required">*</span>
+                    </span>
+                  </template>
+                  <el-input-number
+                    v-model="paymentCycle.paymentAmount"
+                    :min="0"
+                    :precision="2"
+                    :controls="false"
+                    :placeholder="t('ec.project.form.contentPlaceholder')"
+                  />
+                </el-form-item>
 
-            <el-form-item prop="plannedPaymentDate">
-              <template #label>
-                <span class="project-form-label">
-                  {{ t('ec.project.common.plannedPaymentDate') }}
-                  <span class="project-form-label__required">*</span>
-                </span>
-              </template>
-              <el-date-picker v-model="formData.plannedPaymentDate" type="date" value-format="YYYY-MM-DD" :placeholder="t('ec.project.form.selectPlaceholder')" />
-            </el-form-item>
+                <el-form-item
+                  :prop="`paymentCycles.${index}.plannedPaymentDate`"
+                  :rules="requiredRule(t('ec.project.common.plannedPaymentDate'), 'change')"
+                >
+                  <template #label>
+                    <span class="project-form-label">
+                      {{ t('ec.project.common.plannedPaymentDate') }}
+                      <span class="project-form-label__required">*</span>
+                    </span>
+                  </template>
+                  <el-date-picker v-model="paymentCycle.plannedPaymentDate" type="date" value-format="YYYY-MM-DD" :placeholder="t('ec.project.form.selectPlaceholder')" />
+                </el-form-item>
 
-            <el-form-item prop="actualPaymentDate">
-              <template #label>
-                <span class="project-form-label">
-                  {{ t('ec.project.common.actualPaymentDate') }}
-                  <span class="project-form-label__required">*</span>
-                </span>
-              </template>
-              <el-date-picker v-model="formData.actualPaymentDate" type="date" value-format="YYYY-MM-DD" :placeholder="t('ec.project.form.selectPlaceholder')" />
-            </el-form-item>
+                <el-form-item :prop="`paymentCycles.${index}.actualPaymentDate`">
+                  <template #label>
+                    <span class="project-form-label">
+                      {{ t('ec.project.common.actualPaymentDate') }}
+                      <span class="project-form-label__required">*</span>
+                    </span>
+                  </template>
+                  <el-date-picker v-model="paymentCycle.actualPaymentDate" type="date" value-format="YYYY-MM-DD" :placeholder="t('ec.project.form.selectPlaceholder')" />
+                </el-form-item>
+              </div>
 
-            <el-form-item prop="paymentStatus">
-              <template #label>
-                <span class="project-form-label">
-                  {{ t('ec.project.form.paymentStatusLabel') }}
-                  <span class="project-form-label__required">*</span>
-                </span>
-              </template>
-              <el-select v-model="formData.paymentStatus" clearable :placeholder="t('ec.project.form.selectPlaceholder')">
-                <el-option v-for="item in paymentStatusOptions" :key="item.value" :label="item.displayLabel" :value="item.value" />
-              </el-select>
-            </el-form-item>
+              <el-button type="primary" link class="project-cycle-remove" @click="removePaymentCycle(index)">
+                {{ t('ec.project.common.delete') }}
+              </el-button>
+            </div>
           </div>
         </section>
 
@@ -436,8 +448,6 @@ import { computed, onMounted, reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
-import { getStatusDictionaries } from '@/services/modules/dictionaryService'
-import { buildStatusOptionMap } from '@/utils/statusDictionary'
 import {
   createProject,
   getProjectDetail,
@@ -454,6 +464,8 @@ import FigmaResourcePage from '@/views/organization/components/FigmaResourcePage
 defineOptions({ name: 'ProjectFormPage' })
 
 const MAX_QUEUED_DOCUMENTS = 5
+let cycleUidSeed = 0
+
 const UPLOAD_STATUS = Object.freeze({
   PENDING: 'PENDING',
   UPLOADING: 'UPLOADING',
@@ -461,7 +473,7 @@ const UPLOAD_STATUS = Object.freeze({
   FAILED: 'FAILED',
 })
 
-const { t, locale } = useI18n()
+const { t } = useI18n()
 const route = useRoute()
 const router = useRouter()
 
@@ -471,7 +483,6 @@ const uploadDropzoneRef = ref(null)
 const pageLoading = ref(false)
 const submitLoading = ref(false)
 const documentUploading = ref(false)
-const statusDictionaries = ref({})
 const personOptions = ref([])
 const informationSystemOptions = ref([])
 const hardwareOptions = ref([])
@@ -488,18 +499,8 @@ const formData = reactive({
   contractAmount: null,
   ownerName: '',
   ownerPhone: '',
-  approvalDate: '',
-  startDate: '',
-  initialDeliveryDate: '',
-  endDate: '',
-  warrantyEndDate: '',
-  stage: '',
-  paymentCycleName: '',
-  paymentRatio: null,
-  paymentAmount: null,
-  plannedPaymentDate: '',
-  actualPaymentDate: '',
-  paymentStatus: 'PENDING',
+  projectPeriods: [],
+  paymentCycles: [],
   documents: [],
   personIds: [],
   informationSystemIds: [],
@@ -522,9 +523,41 @@ const projectTypeOptions = computed(() => ([
   { value: 'INTEGRATION_PROJECT', label: t('ec.project.type.integrationProject') },
 ]))
 
-const paymentStatusOptions = computed(() => {
-  return Object.values(buildStatusOptionMap(statusDictionaries.value.paymentStatus, locale.value))
+const createProjectPeriodRow = (overrides = {}) => ({
+  uid: `period-${Date.now()}-${cycleUidSeed++}`,
+  stageName: '',
+  plannedDate: '',
+  actualDate: '',
+  ...overrides,
 })
+
+const createPaymentCycleRow = (overrides = {}) => ({
+  uid: `payment-${Date.now()}-${cycleUidSeed++}`,
+  stageName: '',
+  paymentRatio: null,
+  paymentAmount: null,
+  plannedPaymentDate: '',
+  actualPaymentDate: '',
+  ...overrides,
+})
+
+const resetDefaultCycles = () => {
+  formData.projectPeriods = [
+    createProjectPeriodRow(),
+    createProjectPeriodRow(),
+  ]
+  formData.paymentCycles = [
+    createPaymentCycleRow(),
+  ]
+}
+
+resetDefaultCycles()
+
+const requiredRule = (label, trigger = 'blur') => ([{
+  required: true,
+  message: t('ec.project.validation.dynamicRequired', { label }),
+  trigger,
+}])
 
 const formRules = computed(() => ({
   code: [{ required: true, message: t('ec.project.validation.codeRequired'), trigger: 'blur' }],
@@ -535,18 +568,6 @@ const formRules = computed(() => ({
   contractAmount: [{ required: true, message: t('ec.project.validation.contractAmountRequired'), trigger: 'change' }],
   ownerName: [{ required: true, message: t('ec.project.validation.ownerNameRequired'), trigger: 'blur' }],
   ownerPhone: [{ required: true, message: t('ec.project.validation.ownerPhoneRequired'), trigger: 'blur' }],
-  approvalDate: [{ required: true, message: t('ec.project.validation.approvalDateRequired'), trigger: 'change' }],
-  startDate: [{ required: true, message: t('ec.project.validation.startDateRequired'), trigger: 'change' }],
-  initialDeliveryDate: [{ required: true, message: t('ec.project.validation.initialDeliveryDateRequired'), trigger: 'change' }],
-  endDate: [{ required: true, message: t('ec.project.validation.endDateRequired'), trigger: 'change' }],
-  warrantyEndDate: [{ required: true, message: t('ec.project.validation.warrantyEndDateRequired'), trigger: 'change' }],
-  stage: [{ required: true, message: t('ec.project.validation.stageRequired'), trigger: 'blur' }],
-  paymentCycleName: [{ required: true, message: t('ec.project.validation.paymentCycleNameRequired'), trigger: 'blur' }],
-  paymentRatio: [{ required: true, message: t('ec.project.validation.paymentRatioRequired'), trigger: 'change' }],
-  paymentAmount: [{ required: true, message: t('ec.project.validation.paymentAmountRequired'), trigger: 'change' }],
-  plannedPaymentDate: [{ required: true, message: t('ec.project.validation.plannedPaymentDateRequired'), trigger: 'change' }],
-  actualPaymentDate: [{ required: true, message: t('ec.project.validation.actualPaymentDateRequired'), trigger: 'change' }],
-  paymentStatus: [{ required: true, message: t('ec.project.validation.paymentStatusRequired'), trigger: 'change' }],
 }))
 
 const canUploadQueuedDocuments = computed(() => {
@@ -656,17 +677,60 @@ const appendUploadedDocument = (item, result) => {
 }
 
 const loadSupportData = async () => {
-  const [statusOptions, persons, informationSystems, hardwareAssets] = await Promise.all([
-    getStatusDictionaries(),
+  const [persons, informationSystems, hardwareAssets] = await Promise.all([
     getProjectPersonOptions(),
     getProjectInformationSystemOptions(),
     getProjectHardwareOptions(),
   ])
 
-  statusDictionaries.value = statusOptions
   personOptions.value = Array.isArray(persons) ? persons : []
   informationSystemOptions.value = Array.isArray(informationSystems) ? informationSystems : []
   hardwareOptions.value = Array.isArray(hardwareAssets) ? hardwareAssets : []
+}
+
+const normalizeProjectPeriods = (periods = [], project = {}) => {
+  const source = Array.isArray(periods) && periods.length > 0
+    ? periods
+    : [
+        { stageName: t('ec.project.common.approvalDate'), plannedDate: project.approvalDate },
+        { stageName: t('ec.project.common.startDate'), plannedDate: project.startDate },
+        { stageName: t('ec.project.common.initialDeliveryDate'), plannedDate: project.initialDeliveryDate },
+        { stageName: t('ec.project.common.endDate'), plannedDate: project.endDate },
+        { stageName: t('ec.project.common.warrantyEndDate'), plannedDate: project.warrantyEndDate },
+      ].filter((item) => item.plannedDate)
+
+  return source.map((item) => createProjectPeriodRow({
+    stageName: item.stageName || '',
+    plannedDate: item.plannedDate || '',
+    actualDate: item.actualDate || '',
+  }))
+}
+
+const normalizePaymentCycles = (paymentCycles = [], project = {}) => {
+  const hasLegacyPayment = project.paymentCycleName
+    || project.paymentRatio != null
+    || project.paymentAmount != null
+    || project.plannedPaymentDate
+    || project.actualPaymentDate
+  const source = Array.isArray(paymentCycles) && paymentCycles.length > 0
+    ? paymentCycles
+    : hasLegacyPayment
+      ? [{
+          stageName: project.paymentCycleName || '',
+          paymentRatio: project.paymentRatio,
+          paymentAmount: project.paymentAmount,
+          plannedPaymentDate: project.plannedPaymentDate,
+          actualPaymentDate: project.actualPaymentDate,
+        }]
+      : []
+
+  return source.map((item) => createPaymentCycleRow({
+    stageName: item.stageName || '',
+    paymentRatio: item.paymentRatio ?? null,
+    paymentAmount: item.paymentAmount ?? null,
+    plannedPaymentDate: item.plannedPaymentDate || '',
+    actualPaymentDate: item.actualPaymentDate || '',
+  }))
 }
 
 const fillForm = (detail) => {
@@ -680,18 +744,14 @@ const fillForm = (detail) => {
   formData.contractAmount = project.contractAmount
   formData.ownerName = project.ownerName || ''
   formData.ownerPhone = project.ownerPhone || ''
-  formData.approvalDate = project.approvalDate || ''
-  formData.startDate = project.startDate || ''
-  formData.initialDeliveryDate = project.initialDeliveryDate || ''
-  formData.endDate = project.endDate || ''
-  formData.warrantyEndDate = project.warrantyEndDate || ''
-  formData.stage = project.stage || ''
-  formData.paymentCycleName = project.paymentCycleName || ''
-  formData.paymentRatio = project.paymentRatio
-  formData.paymentAmount = project.paymentAmount
-  formData.plannedPaymentDate = project.plannedPaymentDate || ''
-  formData.actualPaymentDate = project.actualPaymentDate || ''
-  formData.paymentStatus = project.paymentStatus || 'PENDING'
+  formData.projectPeriods = normalizeProjectPeriods(detail?.projectPeriods, project)
+  if (formData.projectPeriods.length === 0) {
+    formData.projectPeriods = [createProjectPeriodRow()]
+  }
+  formData.paymentCycles = normalizePaymentCycles(detail?.paymentCycles, project)
+  if (formData.paymentCycles.length === 0) {
+    formData.paymentCycles = [createPaymentCycleRow()]
+  }
   formData.documents = normalizeDocuments(detail?.documents)
   formData.personIds = normalizeIdList(detail?.personIds)
   formData.informationSystemIds = normalizeIdList(detail?.informationSystemIds)
@@ -699,6 +759,22 @@ const fillForm = (detail) => {
   formData.remark = project.remark || ''
   queuedDocuments.value = []
   lastUploadSummary.value = null
+}
+
+const addProjectPeriod = () => {
+  formData.projectPeriods.push(createProjectPeriodRow())
+}
+
+const removeProjectPeriod = (index) => {
+  formData.projectPeriods.splice(index, 1)
+}
+
+const addPaymentCycle = () => {
+  formData.paymentCycles.push(createPaymentCycleRow())
+}
+
+const removePaymentCycle = (index) => {
+  formData.paymentCycles.splice(index, 1)
 }
 
 const handleDocumentQueued = (uploadFile) => {
@@ -799,18 +875,18 @@ const buildPayload = () => {
     contractAmount: formData.contractAmount,
     ownerName: formData.ownerName,
     ownerPhone: formData.ownerPhone,
-    approvalDate: formData.approvalDate,
-    startDate: formData.startDate,
-    initialDeliveryDate: formData.initialDeliveryDate,
-    endDate: formData.endDate,
-    warrantyEndDate: formData.warrantyEndDate,
-    stage: formData.stage,
-    paymentCycleName: formData.paymentCycleName,
-    paymentRatio: formData.paymentRatio,
-    paymentAmount: formData.paymentAmount,
-    plannedPaymentDate: formData.plannedPaymentDate,
-    actualPaymentDate: formData.actualPaymentDate,
-    paymentStatus: formData.paymentStatus,
+    projectPeriods: formData.projectPeriods.map((item) => ({
+      stageName: String(item.stageName || '').trim(),
+      plannedDate: item.plannedDate || null,
+      actualDate: item.actualDate || null,
+    })),
+    paymentCycles: formData.paymentCycles.map((item) => ({
+      stageName: String(item.stageName || '').trim(),
+      paymentRatio: item.paymentRatio,
+      paymentAmount: item.paymentAmount,
+      plannedPaymentDate: item.plannedPaymentDate || null,
+      actualPaymentDate: item.actualPaymentDate || null,
+    })),
     remark: formData.remark,
     documents: formData.documents.map((item) => ({
       fileName: item.fileName,
@@ -827,6 +903,14 @@ const buildPayload = () => {
 
 const handleSubmit = async () => {
   if (!formRef.value || documentUploading.value) return
+  if (formData.projectPeriods.length === 0) {
+    ElMessage.error(t('ec.project.validation.projectPeriodRequired'))
+    return
+  }
+  if (formData.paymentCycles.length === 0) {
+    ElMessage.error(t('ec.project.validation.paymentCycleRequired'))
+    return
+  }
   const valid = await formRef.value.validate().catch(() => false)
   if (!valid) return
 
@@ -871,6 +955,9 @@ onMounted(async () => {
 }
 
 .project-form {
+  max-width: 1012px;
+  font-family: 'PingFang SC', sans-serif;
+
   :deep(.el-form-item) {
     margin-bottom: 0;
   }
@@ -970,8 +1057,137 @@ onMounted(async () => {
   margin-bottom: 16px;
   color: #151b26;
   font-size: 16px;
-  font-weight: 700;
+  font-weight: 600;
   line-height: 24px;
+}
+
+.project-repeatable-header {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 16px;
+
+  .project-section-title {
+    margin-bottom: 0;
+  }
+}
+
+.project-repeatable-add {
+  width: 99px;
+  height: 32px;
+  padding: 5px 12px;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 22px;
+
+  i {
+    width: 14px;
+    height: 14px;
+    margin-right: 5px;
+    font-size: 14px;
+    line-height: 14px;
+  }
+}
+
+.project-cycle-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.project-cycle-row {
+  position: relative;
+  min-height: 100px;
+  padding: 16px;
+  background: #f5f6f9;
+  border: 1px dashed #e6e8ed;
+  border-radius: 4px;
+
+  :deep(.el-form-item) {
+    height: 68px;
+  }
+
+  :deep(.el-form-item__label) {
+    height: 32px;
+    margin-bottom: 4px;
+    padding: 5px 0;
+    color: #444a57;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 22px;
+  }
+
+  :deep(.el-form-item__content) {
+    height: 32px;
+    line-height: 32px;
+  }
+
+  :deep(.el-input),
+  :deep(.el-input-number),
+  :deep(.el-date-editor) {
+    height: 32px;
+  }
+
+  :deep(.el-input__wrapper),
+  :deep(.el-input-number .el-input__wrapper),
+  :deep(.el-date-editor .el-input__wrapper) {
+    height: 32px;
+    min-height: 32px;
+    padding: 5px 12px;
+    background: #fff;
+    border-radius: 4px;
+  }
+
+  :deep(.el-input__inner),
+  :deep(.el-input-number .el-input__inner) {
+    height: 22px;
+    color: #444a57;
+    font-size: 14px;
+    line-height: 22px;
+  }
+
+  :deep(.el-input__inner::placeholder) {
+    color: #858a99;
+  }
+
+  :deep(.el-input__prefix),
+  :deep(.el-input__suffix) {
+    color: #858a99;
+  }
+
+  &:hover,
+  &:focus-within {
+    .project-cycle-remove {
+      opacity: 1;
+      pointer-events: auto;
+    }
+  }
+}
+
+.project-cycle-fields {
+  display: grid;
+  height: 68px;
+  gap: 24px;
+  align-items: start;
+}
+
+.project-cycle-row--period .project-cycle-fields {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.project-cycle-row--payment .project-cycle-fields {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+.project-cycle-remove {
+  position: absolute;
+  top: 10px;
+  right: 16px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s ease;
 }
 
 .project-form-grid {
@@ -1279,12 +1495,25 @@ onMounted(async () => {
 }
 
 @media only screen and (max-width: 991px) {
-  .project-form-grid {
+  .project-form-grid,
+  .project-cycle-row--period .project-cycle-fields,
+  .project-cycle-row--payment .project-cycle-fields {
     grid-template-columns: 1fr;
   }
 
   .is-span-2 {
     grid-column: auto;
+  }
+
+  .project-cycle-remove {
+    position: static;
+    margin-top: 10px;
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .project-cycle-row {
+    padding: 16px;
   }
 
   .project-document-toolbar,

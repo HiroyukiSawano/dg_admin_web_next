@@ -5,7 +5,7 @@
     :description="t('ec.hardware.page.detailDescription')"
     back-path="/hardware/hardwareAssets"
     :breadcrumbs="[
-      '硬件资源',
+      '硬件资产',
       '基本详情',
     ]"
   >

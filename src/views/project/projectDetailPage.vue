@@ -6,7 +6,7 @@
     :description="t('ec.project.page.detailDescription')"
     back-path="/project/projects"
     :breadcrumbs="[
-      '项目资源',
+      '项目资产',
       '基本详情',
     ]"
   >
@@ -58,62 +58,49 @@
 
         <section class="organization-detail-section">
           <div class="organization-section-title">{{ t('ec.project.section.period') }}</div>
-          <div class="organization-detail-grid">
-            <div class="organization-detail-item">
-              <span>{{ t('ec.project.common.approvalDate') }}</span>
-              <strong>{{ formatProjectDate(detailRecord.project?.approvalDate) }}</strong>
-            </div>
-            <div class="organization-detail-item">
-              <span>{{ t('ec.project.common.startDate') }}</span>
-              <strong>{{ formatProjectDate(detailRecord.project?.startDate) }}</strong>
-            </div>
-            <div class="organization-detail-item">
-              <span>{{ t('ec.project.common.initialDeliveryDate') }}</span>
-              <strong>{{ formatProjectDate(detailRecord.project?.initialDeliveryDate) }}</strong>
-            </div>
-            <div class="organization-detail-item">
-              <span>{{ t('ec.project.common.endDate') }}</span>
-              <strong>{{ formatProjectDate(detailRecord.project?.endDate) }}</strong>
-            </div>
-            <div class="organization-detail-item">
-              <span>{{ t('ec.project.common.warrantyEndDate') }}</span>
-              <strong>{{ formatProjectDate(detailRecord.project?.warrantyEndDate) }}</strong>
-            </div>
-            <div class="organization-detail-item">
-              <span>{{ t('ec.project.common.stage') }}</span>
-              <strong>{{ detailRecord.project?.stage || '-' }}</strong>
+          <div v-if="projectPeriods.length > 0" class="project-timeline">
+            <div v-for="item in projectPeriods" :key="item.key" class="project-timeline-item">
+              <div class="project-timeline-item__dot"></div>
+              <div class="project-timeline-item__content">
+                <div class="project-timeline-item__title">{{ item.stageName || '-' }}</div>
+                <div class="project-timeline-item__meta">
+                  <span>{{ t('ec.project.timeline.plannedTime') }}：<strong>{{ formatTimelineDate(item.plannedDate) }}</strong></span>
+                  <span>{{ t('ec.project.timeline.actualTime') }}：<strong>{{ formatTimelineDate(item.actualDate) }}</strong></span>
+                </div>
+              </div>
             </div>
           </div>
+          <div v-else class="organization-resource-empty">{{ t('ec.project.common.noData') }}</div>
         </section>
 
         <section class="organization-detail-section">
           <div class="organization-section-title">{{ detailText.paymentSection }}</div>
-          <div class="organization-detail-grid">
-            <div class="organization-detail-item">
-              <span>{{ detailText.paymentCycleName }}</span>
-              <strong>{{ detailRecord.project?.paymentCycleName || '-' }}</strong>
-            </div>
-            <div class="organization-detail-item">
-              <span>{{ detailText.paymentRatio }}</span>
-              <strong>{{ detailRecord.project?.paymentRatio == null ? '-' : `${detailRecord.project.paymentRatio}%` }}</strong>
-            </div>
-            <div class="organization-detail-item">
-              <span>{{ detailText.paymentAmount }}</span>
-              <strong>{{ formatDetailAmount(detailRecord.project?.paymentAmount) }}</strong>
-            </div>
-            <div class="organization-detail-item">
-              <span>{{ t('ec.project.common.plannedPaymentDate') }}</span>
-              <strong>{{ formatProjectDate(detailRecord.project?.plannedPaymentDate) }}</strong>
-            </div>
-            <div class="organization-detail-item">
-              <span>{{ t('ec.project.common.actualPaymentDate') }}</span>
-              <strong>{{ formatProjectDate(detailRecord.project?.actualPaymentDate) }}</strong>
-            </div>
-            <div class="organization-detail-item">
-              <span>{{ detailText.paymentStatus }}</span>
-              <strong>{{ getStatusLabel(detailRecord.project?.paymentStatus, paymentStatusMap) }}</strong>
+          <div v-if="paymentCycles.length > 0" class="project-timeline project-timeline--payment">
+            <div
+              v-for="item in paymentCycles"
+              :key="item.key"
+              class="project-timeline-item"
+              :class="{ 'is-future': !item.actualPaymentDate }"
+            >
+              <div class="project-timeline-item__dot"></div>
+              <div class="project-timeline-item__content">
+                <div class="project-payment-title">
+                  <span class="project-payment-status" :class="{ 'is-future': !item.actualPaymentDate }">
+                    {{ getPaymentCycleStatusLabel(item) }}
+                  </span>
+                  <span class="project-timeline-item__title">{{ item.stageName || '-' }}</span>
+                </div>
+                <div class="project-payment-meta">
+                  <span>{{ t('ec.project.form.stageNameLabel') }}：<strong>{{ item.stageName || '-' }}</strong></span>
+                  <span>{{ detailText.paymentRatio }}：<strong>{{ formatPaymentRatio(item.paymentRatio) }}</strong></span>
+                  <span>{{ detailText.paymentAmount }}：<strong>{{ formatPaymentAmount(item.paymentAmount) }}</strong></span>
+                  <span>{{ t('ec.project.common.plannedPaymentDate') }}：<strong>{{ formatTimelineDate(item.plannedPaymentDate) }}</strong></span>
+                  <span>{{ t('ec.project.common.actualPaymentDate') }}：<strong>{{ formatTimelineDate(item.actualPaymentDate) }}</strong></span>
+                </div>
+              </div>
             </div>
           </div>
+          <div v-else class="organization-resource-empty">{{ t('ec.project.common.noData') }}</div>
         </section>
 
         <section class="organization-detail-section">
@@ -223,11 +210,8 @@ import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute } from 'vue-router'
 import { ElMessage } from 'element-plus'
-import dayjs from 'dayjs'
-import { getStatusDictionaries } from '@/services/modules/dictionaryService'
-import { buildStatusOptionMap } from '@/utils/statusDictionary'
 import { getProjectDetail } from '@/services/modules/projectService'
-import { formatDate, getStatusLabel } from './helpers'
+import { formatDate } from './helpers'
 import FigmaResourcePage from '@/views/organization/components/FigmaResourcePage.vue'
 import ServiceProviderRelationCard from '@/views/organization/components/ServiceProviderRelationCard.vue'
 import ServiceProviderVendorCard from '@/views/organization/components/ServiceProviderVendorCard.vue'
@@ -248,9 +232,10 @@ defineOptions({ name: 'ProjectDetailPage' })
 const { t, locale } = useI18n()
 const route = useRoute()
 const pageLoading = ref(false)
-const statusDictionaries = ref({})
 const detailRecord = ref({
   project: null,
+  projectPeriods: [],
+  paymentCycles: [],
   documents: [],
   persons: [],
   informationSystems: [],
@@ -308,8 +293,6 @@ const providerCardLabels = computed(() => {
     phone: 'Phone',
   }
 })
-
-const paymentStatusMap = computed(() => buildStatusOptionMap(statusDictionaries.value.paymentStatus, locale.value))
 
 const getProjectTypeLabel = (value) => projectTypeMap.value[value] || value || '-'
 const getSystemTypeLabel = (value) => systemTypeMap.value[value] || value || '-'
@@ -382,9 +365,38 @@ const formatDetailAmount = (value) => {
   return isZhLocale.value ? `${formatted}万元` : formatted
 }
 
-const formatProjectDate = (value) => {
-  if (!value) return '-'
-  return isZhLocale.value ? dayjs(value).format('YYYYMMDD') : formatDate(value)
+const formatTimelineDate = (value) => {
+  return value ? formatDate(value) : '-'
+}
+
+const formatPaymentRatio = (value) => {
+  return value == null || value === '' ? '-' : `${value}%`
+}
+
+const formatPaymentAmount = (value) => {
+  return value == null || value === '' ? '-' : String(value)
+}
+
+const projectPeriods = computed(() => {
+  const periods = Array.isArray(detailRecord.value.projectPeriods) ? detailRecord.value.projectPeriods : []
+  return periods.map((item, index) => ({
+    ...item,
+    key: item.id || `period-${index}`,
+  }))
+})
+
+const paymentCycles = computed(() => {
+  const cycles = Array.isArray(detailRecord.value.paymentCycles) ? detailRecord.value.paymentCycles : []
+  return cycles.map((item, index) => ({
+    ...item,
+    key: item.id || `payment-${index}`,
+  }))
+})
+
+const getPaymentCycleStatusLabel = (item) => {
+  return item?.actualPaymentDate
+    ? t('ec.project.timeline.completed')
+    : t('ec.project.timeline.inProgress')
 }
 
 const formatProjectFileSize = (value) => {
@@ -477,11 +489,7 @@ const serviceProviderCards = computed(() => {
 const loadDetail = async () => {
   pageLoading.value = true
   try {
-    const [statusOptions, detail] = await Promise.all([
-      getStatusDictionaries(),
-      getProjectDetail(route.params.id),
-    ])
-    statusDictionaries.value = statusOptions
+    const detail = await getProjectDetail(route.params.id)
     detailRecord.value = detail
   } catch (error) {
     ElMessage.error(error.message || t('ec.project.message.detailFailed'))
@@ -539,6 +547,104 @@ onMounted(loadDetail)
     min-width: 0;
     font-weight: 400;
     word-break: break-all;
+  }
+}
+
+.project-timeline {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  margin-top: 8px;
+  padding-left: 4px;
+}
+
+.project-timeline-item {
+  position: relative;
+  min-height: 24px;
+  padding-left: 34px;
+
+  &::before {
+    position: absolute;
+    top: 10px;
+    bottom: -34px;
+    left: 8px;
+    width: 2px;
+    background: #f3f4f6;
+    border-radius: 999px;
+    content: '';
+  }
+
+  &:last-child::before {
+    display: none;
+  }
+
+  &.is-future {
+    .project-timeline-item__dot {
+      background: #c4c6cc;
+    }
+  }
+}
+
+.project-timeline-item__dot {
+  position: absolute;
+  top: 6px;
+  left: 4px;
+  width: 10px;
+  height: 10px;
+  background: #2e5ef0;
+  border-radius: 999px;
+}
+
+.project-timeline-item__content {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.project-timeline-item__title {
+  color: #151b26;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 22px;
+}
+
+.project-timeline-item__meta,
+.project-payment-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 24px;
+  color: #858a99;
+  font-size: 14px;
+  line-height: 22px;
+
+  strong {
+    color: #444a57;
+    font-weight: 400;
+  }
+}
+
+.project-payment-title {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.project-payment-status {
+  display: inline-flex;
+  align-items: center;
+  height: 20px;
+  padding: 0 6px;
+  color: #155dfc;
+  font-size: 12px;
+  line-height: 20px;
+  background: #eff6ff;
+  border-radius: 4px;
+
+  &.is-future {
+    color: #858a99;
+    background: #edeef3;
   }
 }
 

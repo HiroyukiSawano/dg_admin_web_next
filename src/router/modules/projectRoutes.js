@@ -2,7 +2,7 @@ const projectRoutes = {
   path: '/project',
   name: 'project',
   meta: {
-    title: '项目资源',
+    title: '项目资产',
     locale: 'ec.menu.name.project',
     icon: 'ri-briefcase-4-line',
     type: 'directory',

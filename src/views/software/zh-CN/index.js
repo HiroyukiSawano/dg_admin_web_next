@@ -1,5 +1,5 @@
 export default {
-  'ec.menu.name.software': '软件资源',
+  'ec.menu.name.software': '软件资产',
   'ec.menu.name.softwareAssets': '软件台账',
 
   'ec.software.common.code': '软件编码',

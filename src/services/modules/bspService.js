@@ -20,8 +20,8 @@ const LOCAL_LOGIN_USERS = {
     token: 'local-asset-figma-demo-token',
     user: {
       id: 'local-asset-figma-demo-user',
-      name: '资产资源新版演示账号',
-      organName: '资产资源新版正式入口',
+      name: '资产新版演示账号',
+      organName: '资产新版正式入口',
       username: 'eam_figma_demo',
       avatar: '',
       role: 'ROLE_EAM_FIGMA',
@@ -626,7 +626,7 @@ export const apiUserMenus = () => {
           children: null,
           icon: null,
           menuId: 'e0150e69-adc2-8c3f-124f-68fbd5c99614',
-          title: '资源管理器',
+          title: '资产管理器',
           type: '2',
         },
         {

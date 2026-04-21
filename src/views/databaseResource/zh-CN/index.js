@@ -1,5 +1,5 @@
 export default {
-  'ec.menu.name.database': '数据库资源',
+  'ec.menu.name.database': '数据库资产',
   'ec.menu.name.databaseResources': '数据库台账',
 
   'ec.database.common.code': '数据库编码',
@@ -24,7 +24,7 @@ export default {
   'ec.database.page.createTitle': '新增数据库',
   'ec.database.page.editTitle': '编辑数据库',
   'ec.database.page.detailTitle': '数据库详情',
-  'ec.database.page.description': '维护软件资源可依赖的数据库基础台账。',
+  'ec.database.page.description': '维护软件资产可依赖的数据库基础台账。',
   'ec.database.section.basic': '基础信息',
 
   'ec.database.form.codePlaceholder': '请输入数据库编码',

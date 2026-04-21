@@ -1,6 +1,6 @@
 export default {
-  'ec.menu.name.hardware': '硬件资源',
-  'ec.menu.name.hardwareAssets': '硬件资源',
+  'ec.menu.name.hardware': '硬件资产',
+  'ec.menu.name.hardwareAssets': '硬件资产',
 
   'ec.hardware.common.code': '资产编码',
   'ec.hardware.common.name': '资产名称',

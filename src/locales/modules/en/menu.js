@@ -118,7 +118,7 @@ export default {
   'ec.menu.name.bizSmsManage': 'SMS Manage',
   'ec.menu.name.bizTreeExtend': 'Tree Extend',
   'ec.menu.name.bizPdf': 'PDF Edit',
-  'ec.menu.name.bizResource': 'Resource manager',
+  'ec.menu.name.bizResource': 'Asset manager',
   'ec.menu.name.bizWorkflow': 'Workflow',
   'ec.menu.name.bizFormDesign': 'Form Design',
   'ec.menu.name.bizWujie': 'Wujie',

@@ -120,7 +120,7 @@ export default {
   'ec.menu.name.bizSmsManage': '短信模版管理',
   'ec.menu.name.bizTreeExtend': '树形扩展',
   'ec.menu.name.bizPdf': 'Pdf编辑器',
-  'ec.menu.name.bizResource': '资源管理器',
+  'ec.menu.name.bizResource': '资产管理器',
   'ec.menu.name.bizWorkflow': '工作流',
   'ec.menu.name.bizFormDesign': '表单设计器',
   'ec.menu.name.bizWujie': '无界微前端',

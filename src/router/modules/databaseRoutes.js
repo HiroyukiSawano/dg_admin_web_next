@@ -2,7 +2,7 @@ const databaseRoutes = {
   path: '/database',
   name: 'database',
   meta: {
-    title: '数据库资源',
+    title: '数据库资产',
     locale: 'ec.menu.name.database',
     icon: 'ri-database-2-line',
     type: 'directory',

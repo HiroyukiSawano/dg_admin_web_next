@@ -2,7 +2,7 @@ const hardwareRoutes = {
   path: '/hardware',
   name: 'hardware',
   meta: {
-    title: '硬件资源',
+    title: '硬件资产',
     locale: 'ec.menu.name.hardware',
     icon: 'ri-database-2-line',
     type: 'directory',

@@ -2,7 +2,7 @@ const middlewareRoutes = {
   path: '/middleware',
   name: 'middleware',
   meta: {
-    title: '中间件资源',
+    title: '中间件资产',
     locale: 'ec.menu.name.middleware',
     icon: 'ri-node-tree',
     type: 'directory',

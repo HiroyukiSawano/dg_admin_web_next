@@ -2,7 +2,7 @@ const softwareRoutes = {
   path: '/software',
   name: 'software',
   meta: {
-    title: '软件资源',
+    title: '软件资产',
     locale: 'ec.menu.name.software',
     icon: 'ri-apps-2-line',
     type: 'directory',

@@ -1,6 +1,6 @@
 export default {
-  'ec.menu.name.project': '项目资源',
-  'ec.menu.name.projectAssets': '项目资源',
+  'ec.menu.name.project': '项目资产',
+  'ec.menu.name.projectAssets': '项目资产',
 
   'ec.project.common.code': '项目编码',
   'ec.project.common.name': '项目名称',
@@ -42,13 +42,13 @@ export default {
   'ec.project.common.deleteConfirm': '确定删除“{name}”吗？',
 
   'ec.project.page.createTitle': '新增项目',
-  'ec.project.page.createDescription': '项目资源 / 新增项目',
+  'ec.project.page.createDescription': '项目资产 / 新增项目',
   'ec.project.page.editTitle': '编辑项目',
-  'ec.project.page.editDescription': '项目资源 / 编辑项目',
+  'ec.project.page.editDescription': '项目资产 / 编辑项目',
   'ec.project.page.detailTitle': '项目详情',
-  'ec.project.page.detailDescription': '项目资源 / 项目详情',
+  'ec.project.page.detailDescription': '项目资产 / 项目详情',
   'ec.project.page.relationsTitle': '项目关联维护',
-  'ec.project.page.relationsDescription': '项目资源 / 项目关联维护',
+  'ec.project.page.relationsDescription': '项目资产 / 项目关联维护',
 
   'ec.project.section.basic': '基本信息',
   'ec.project.section.owner': '项目负责人',
@@ -90,6 +90,10 @@ export default {
   'ec.project.form.contractAmountLabel': '项目合同金额',
   'ec.project.form.ownerNameLabel': '姓名',
   'ec.project.form.ownerPhoneLabel': '联系电话',
+  'ec.project.form.addCycle': '添加周期',
+  'ec.project.form.stageNameLabel': '阶段名称',
+  'ec.project.form.plannedTimeLabel': '计划时间',
+  'ec.project.form.actualTimeLabel': '实际时间',
   'ec.project.form.paymentCycleNameLabel': '周期名称',
   'ec.project.form.paymentRatioLabel': '付款比例',
   'ec.project.form.paymentAmountLabel': '付款金额',
@@ -115,6 +119,14 @@ export default {
   'ec.project.validation.plannedPaymentDateRequired': '请选择计划付款时间',
   'ec.project.validation.actualPaymentDateRequired': '请选择实际付款时间',
   'ec.project.validation.paymentStatusRequired': '请选择付款状态',
+  'ec.project.validation.dynamicRequired': '请填写{label}',
+  'ec.project.validation.projectPeriodRequired': '请至少添加一条项目周期',
+  'ec.project.validation.paymentCycleRequired': '请至少添加一条资金支付周期',
+
+  'ec.project.timeline.plannedTime': '计划时间',
+  'ec.project.timeline.actualTime': '实际时间',
+  'ec.project.timeline.completed': '已完成',
+  'ec.project.timeline.inProgress': '进行中',
 
   'ec.project.detail.persons': '关联人员',
   'ec.project.detail.informationSystems': '关联软件',

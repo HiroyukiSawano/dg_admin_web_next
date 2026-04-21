@@ -5,7 +5,7 @@
     :description="t('ec.software.page.detailDescription')"
     back-path="/software/informationSystems"
     :breadcrumbs="[
-      '软件资源',
+      '软件资产',
       '基本详情',
     ]"
   >

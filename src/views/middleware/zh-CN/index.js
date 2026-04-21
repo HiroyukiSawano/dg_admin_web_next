@@ -1,5 +1,5 @@
 export default {
-  'ec.menu.name.middleware': '中间件资源',
+  'ec.menu.name.middleware': '中间件资产',
   'ec.menu.name.middlewareResources': '中间件台账',
 
   'ec.middleware.common.code': '中间件编码',
@@ -26,7 +26,7 @@ export default {
   'ec.middleware.page.createTitle': '新增中间件',
   'ec.middleware.page.editTitle': '编辑中间件',
   'ec.middleware.page.detailTitle': '中间件详情',
-  'ec.middleware.page.description': '维护软件资源可依赖的中间件基础台账。',
+  'ec.middleware.page.description': '维护软件资产可依赖的中间件基础台账。',
   'ec.middleware.section.basic': '基础信息',
 
   'ec.middleware.form.codePlaceholder': '请输入中间件编码',

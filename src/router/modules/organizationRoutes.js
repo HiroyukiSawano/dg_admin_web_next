@@ -2,7 +2,7 @@ const organizationRoutes = {
   path: '/organization',
   name: 'organization',
   meta: {
-    title: '组织资源',
+    title: '组织资产',
     locale: 'ec.menu.name.organization',
     icon: 'ri-team-line',
     type: 'directory',

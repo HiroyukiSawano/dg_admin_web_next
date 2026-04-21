@@ -23,6 +23,8 @@ const normalizePageResponse = (payload) => {
 const normalizeProjectDetail = (payload) => {
   return {
     project: payload?.project || null,
+    projectPeriods: Array.isArray(payload?.projectPeriods) ? payload.projectPeriods : [],
+    paymentCycles: Array.isArray(payload?.paymentCycles) ? payload.paymentCycles : [],
     documents: Array.isArray(payload?.documents) ? payload.documents : [],
     informationSystemIds: Array.isArray(payload?.informationSystemIds) ? payload.informationSystemIds : [],
     serviceProviderIds: Array.isArray(payload?.serviceProviderIds) ? payload.serviceProviderIds : [],
